@@ -11,6 +11,12 @@ class BrushMenu extends StatelessWidget {
           height: 50,
           width: 50,
           color: context.watch<DrawingContext>().color,
+          child: switch (context.read<DrawingContext>().mode) {
+            Mode.drawing => Icon(Icons.draw_rounded),
+            Mode.line => Icon(Icons.line_style),
+            Mode.fill => Icon(Icons.circle_sharp),
+            _ => null,
+          },
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -20,16 +26,8 @@ class BrushMenu extends StatelessWidget {
             _colorButton(Colors.blue, context),
             _colorButton(Colors.yellow, context),
             LineToolButton(),
-            SizedBox(
-                height: 30,
-                width: 30,
-                child: Center(
-                    child: Text(
-                  context.watch<DrawingContext>().buffer.length.toString(),
-                  style: TextStyle(
-                    fontSize: 10,
-                  ),
-                )))
+            FillToolButton(),
+            DrawToolButton(),
           ],
         )
       ],
@@ -40,14 +38,13 @@ class BrushMenu extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         ctx.read<DrawingContext>().changeColor(color);
-        ctx.read<DrawingContext>().changeMode(Mode.drawing);
       },
       child: Container(
           margin: EdgeInsets.all(8.0),
           height: 30,
           width: 30,
           color: color,
-          child: Icon(Icons.draw_rounded)),
+          child: null),
     );
   }
 }
@@ -65,6 +62,42 @@ class LineToolButton extends StatelessWidget {
         width: 30,
         color: Colors.white,
         child: Icon(Icons.line_style),
+      ),
+    );
+  }
+}
+
+class FillToolButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.read<DrawingContext>().changeMode(Mode.fill);
+      },
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        height: 30,
+        width: 30,
+        color: Colors.white,
+        child: Icon(Icons.circle_sharp),
+      ),
+    );
+  }
+}
+
+class DrawToolButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.read<DrawingContext>().changeMode(Mode.drawing);
+      },
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        height: 30,
+        width: 30,
+        color: Colors.white,
+        child: Icon(Icons.draw_outlined),
       ),
     );
   }

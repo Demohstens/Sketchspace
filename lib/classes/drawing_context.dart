@@ -14,12 +14,11 @@ class DrawingContext with ChangeNotifier {
   double _width = 10.0;
 
   Color get color => _color;
-  Mode get state => _mode;
+  Mode get mode => _mode;
   List<Stroke> get buffer => _buffer;
   Offset get currentPoint => _currentPoint;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
-
   void setCurrentPoint(Offset point) {
     _points.add(point);
     _currentPoint = point;
