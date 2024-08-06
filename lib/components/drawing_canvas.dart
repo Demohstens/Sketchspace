@@ -47,10 +47,8 @@ class DrawingCanvas extends StatelessWidget {
                     child: CustomPaint(
                       isComplex: true,
                       size: Size.infinite,
-                      painter: CurrentPathPen(
-                        drawingContext.points,
-                        drawingContext.getPaint(),
-                      ),
+                      painter: CurrentPathPen(drawingContext.points,
+                          drawingContext.getPaint(), drawingContext.mode),
                     ),
                   ),
                 ),

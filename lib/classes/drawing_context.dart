@@ -51,21 +51,28 @@ class DrawingContext with ChangeNotifier {
 
   /// Creates a new Stroke object depending ont he mode
   void createStroke(List<Offset>? points) {
+    Stroke stroke;
     if (points != null) {
       _points = points;
       switch (_mode) {
         case Mode.drawing:
-          _buffer.add(Stroke(points: points, paint: getPaint()));
+          stroke = Stroke(points: points, paint: getPaint());
+          // stroke.optimize();
+          _buffer.add(stroke);
         case Mode.erasing:
           break;
         case Mode.line:
-          _buffer.add(
-              Stroke(points: [points.first, points.last], paint: getPaint()));
+          stroke =
+              (Stroke(points: [points.first, points.last], paint: getPaint()));
+          _buffer.add(stroke);
         case Mode.fill:
-          _buffer.add(Stroke(points: points, paint: getPaint()));
+          stroke = (Stroke(points: points, paint: getPaint()));
+          // stroke.optimize();
+          _buffer.add(stroke);
         case Mode.lifted:
           break;
       }
+
       _points = [];
       notifyListeners();
       repaintListener.notifyListeners();

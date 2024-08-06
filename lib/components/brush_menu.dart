@@ -24,7 +24,6 @@ class BrushMenu extends StatelessWidget {
             _colorButton(Colors.red, context),
             _colorButton(Colors.green, context),
             _colorButton(Colors.blue, context),
-            _colorButton(Colors.yellow, context),
             LineToolButton(),
             FillToolButton(),
             DrawToolButton(),

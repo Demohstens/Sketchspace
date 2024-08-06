@@ -1,15 +1,5 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-
-double perpendicularDistance(Offset a, Offset b, Offset p) {
-  double d = (b.dx - a.dx) * (a.dy - p.dy) -
-      (a.dx - p.dx) *
-          (b.dy - a.dy).abs() /
-          sqrt(pow(b.dx - a.dx, 2) + pow(b.dy - a.dy, 2));
-
-  return d;
-}
 
 class Stroke {
   late Paint _paint;
@@ -40,12 +30,31 @@ class Stroke {
   void optimize() {
     List<Offset> optimizedPoints = optimizeRDP(
       [startPoint, ...middlePoints, endPoint],
-      5,
+      0.05,
     );
     _startPoint = optimizedPoints.first;
     _middlePoints = optimizedPoints.sublist(1, optimizedPoints.length - 1);
     _endPoint = optimizedPoints.last;
   }
+}
+
+double perpendicularDistance(Offset point, Offset lineStart, Offset lineEnd) {
+  double dx = lineEnd.dx - lineStart.dx;
+  double dy = lineEnd.dy - lineStart.dy;
+
+  double mag = sqrt(dx * dx + dy * dy);
+  if (mag == 0.0) return 0.0;
+
+  double u = ((point.dx - lineStart.dx) * dx + (point.dy - lineStart.dy) * dy) /
+      (mag * mag);
+
+  double x = lineStart.dx + u * dx;
+  double y = lineStart.dy + u * dy;
+
+  dx = x - point.dx;
+  dy = y - point.dy;
+
+  return sqrt(dx * dx + dy * dy);
 }
 
 List<Offset> optimizeRDP(List<Offset> points, double epsilon) {
@@ -56,8 +65,8 @@ List<Offset> optimizeRDP(List<Offset> points, double epsilon) {
   double dmax = 0;
   int index = 0;
   int end = points.length;
-  for (int i = 2; i < end - 1; i++) {
-    double d = perpendicularDistance(points[i], points[0], points[end]);
+  for (int i = 1; i < end - 1; i++) {
+    double d = perpendicularDistance(points[i], points[0], points[end - 1]);
     if (d > dmax) {
       index = i;
       dmax = d;
@@ -74,5 +83,6 @@ List<Offset> optimizeRDP(List<Offset> points, double epsilon) {
   } else {
     result = [points.first, points.last];
   }
+
   return result;
 }
