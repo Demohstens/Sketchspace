@@ -19,6 +19,7 @@ class BrushMenu extends StatelessWidget {
             _colorButton(Colors.green, context),
             _colorButton(Colors.blue, context),
             _colorButton(Colors.yellow, context),
+            LineToolButton(),
             SizedBox(
                 height: 30,
                 width: 30,
@@ -39,6 +40,7 @@ class BrushMenu extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         ctx.read<DrawingContext>().changeColor(color);
+        ctx.read<DrawingContext>().changeMode(Mode.drawing);
       },
       child: Container(
           margin: EdgeInsets.all(8.0),
@@ -46,6 +48,24 @@ class BrushMenu extends StatelessWidget {
           width: 30,
           color: color,
           child: Icon(Icons.draw_rounded)),
+    );
+  }
+}
+
+class LineToolButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.read<DrawingContext>().changeMode(Mode.line);
+      },
+      child: Container(
+        margin: EdgeInsets.all(8.0),
+        height: 30,
+        width: 30,
+        color: Colors.white,
+        child: Icon(Icons.line_style),
+      ),
     );
   }
 }

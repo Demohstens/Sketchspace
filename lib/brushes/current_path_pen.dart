@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 
 class CurrentPathPen extends CustomPainter {
   List<Offset> currentPath;
-  Color currentColor;
-  CurrentPathPen(this.currentPath, this.currentColor);
+  Paint strokePaint;
+  CurrentPathPen(this.currentPath, this.strokePaint);
 
   @override
   void paint(Canvas canvas, Size size) {
     if (currentPath.isNotEmpty) {
-      Paint paint = Paint()
-        ..color = currentColor
-        ..strokeWidth = 5.0
-        ..style = PaintingStyle.stroke;
+      Paint paint = strokePaint;
       Path currentPathToDraw = Path();
       currentPathToDraw.moveTo(currentPath.first.dx, currentPath.first.dy);
       for (int i = 1; i < currentPath.length; i++) {

@@ -3,7 +3,6 @@ import 'package:flutter_application/brushes/current_path_pen.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
 import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/brushes/lazy_painter.dart';
-import 'package:flutter_application/classes/stroke.dart';
 import 'package:provider/provider.dart';
 
 class DrawingCanvas extends StatelessWidget {
@@ -42,10 +41,7 @@ class DrawingCanvas extends StatelessWidget {
                     }
                   },
                   onPanEnd: (details) {
-                    drawingContext.addStroke(Stroke(
-                        color: drawingContext.color,
-                        points: drawingContext.points,
-                        width: 10.0));
+                    drawingContext.createStroke(drawingContext.points);
                   },
                   child: RepaintBoundary(
                     child: CustomPaint(
@@ -53,7 +49,7 @@ class DrawingCanvas extends StatelessWidget {
                       size: Size.infinite,
                       painter: CurrentPathPen(
                         drawingContext.points,
-                        drawingContext.color,
+                        drawingContext.getPaint(),
                       ),
                     ),
                   ),
