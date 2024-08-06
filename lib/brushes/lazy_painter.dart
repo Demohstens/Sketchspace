@@ -13,20 +13,16 @@ class LazyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
     for (Stroke stroke in strokes) {
-      Paint paint = Paint()
-        ..color = stroke.color
-        ..strokeWidth = 5.0
-        // ..blendMode = BlendMode.src
-        // ..strokeCap = StrokeCap.round
-        // ..strokeJoin = StrokeJoin.round
-        ..style = PaintingStyle.stroke;
+      Paint paint = stroke.paint;
 
       Path pathToDraw = Path();
-      for (int i = 0; i < stroke.points.length; i++) {
+      for (int i = 0; i < stroke.middlePoints.length; i++) {
         if (i == 0) {
-          pathToDraw.moveTo(stroke.points[i].dx, stroke.points[i].dy);
+          pathToDraw.moveTo(
+              stroke.middlePoints[i].dx, stroke.middlePoints[i].dy);
         } else if (i > 0) {
-          pathToDraw.lineTo(stroke.points[i].dx, stroke.points[i].dy);
+          pathToDraw.lineTo(
+              stroke.middlePoints[i].dx, stroke.middlePoints[i].dy);
         }
       }
       canvas.drawPath(pathToDraw, paint);

@@ -3,7 +3,6 @@ import 'package:flutter_application/brushes/current_path_pen.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
 import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/brushes/lazy_painter.dart';
-import 'package:flutter_application/classes/stroke.dart';
 import 'package:provider/provider.dart';
 
 class DrawingCanvas extends StatelessWidget {
@@ -22,7 +21,6 @@ class DrawingCanvas extends StatelessWidget {
                   child: Container(
                     // Hacky way to force an update.
                     key: Key(context.watch<DrawingContext>().buffer.toString()),
-                    color: Colors.white,
                     child: CustomPaint(
                       willChange: false,
                       isComplex: true,
@@ -36,25 +34,21 @@ class DrawingCanvas extends StatelessWidget {
                 /// Current Path Custom Paint - CurrentLinePainter
                 GestureDetector(
                   onPanUpdate: (details) {
-                    print(
-                        "Debu"); // Checks if the current point is the same as the last point
+                    // Checks if the current point is the same as the last point
                     // to avoid adding the same point multiple times
                     if (details.localPosition != drawingContext.currentPoint) {
                       drawingContext.setCurrentPoint(details.localPosition);
                     }
                   },
                   onPanEnd: (details) {
-                    drawingContext.addStroke(
-                        Stroke(drawingContext.color, drawingContext.points));
+                    drawingContext.createStroke(drawingContext.points);
                   },
                   child: RepaintBoundary(
                     child: CustomPaint(
                       isComplex: true,
                       size: Size.infinite,
-                      painter: CurrentPathPen(
-                        drawingContext.points,
-                        drawingContext.color,
-                      ),
+                      painter: CurrentPathPen(drawingContext.points,
+                          drawingContext.getPaint(), drawingContext.mode),
                     ),
                   ),
                 ),
