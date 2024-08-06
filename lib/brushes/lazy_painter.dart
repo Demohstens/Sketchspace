@@ -15,7 +15,7 @@ class LazyPainter extends CustomPainter {
     for (Stroke stroke in strokes) {
       Paint paint = Paint()
         ..color = stroke.color
-        ..strokeWidth = 5.0
+        ..strokeWidth = stroke.width
         // ..blendMode = BlendMode.src
         // ..strokeCap = StrokeCap.round
         // ..strokeJoin = StrokeJoin.round

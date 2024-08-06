@@ -25,4 +25,8 @@ class CurrentPathPen extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
+
+  void drawLine() {
+    print('drawLine');
+  }
 }

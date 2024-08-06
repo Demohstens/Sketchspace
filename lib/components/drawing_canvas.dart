@@ -35,16 +35,17 @@ class DrawingCanvas extends StatelessWidget {
                 /// Current Path Custom Paint - CurrentLinePainter
                 GestureDetector(
                   onPanUpdate: (details) {
-                    print(
-                        "Debu"); // Checks if the current point is the same as the last point
+                    // Checks if the current point is the same as the last point
                     // to avoid adding the same point multiple times
                     if (details.localPosition != drawingContext.currentPoint) {
                       drawingContext.setCurrentPoint(details.localPosition);
                     }
                   },
                   onPanEnd: (details) {
-                    drawingContext.addStroke(
-                        Stroke(drawingContext.color, drawingContext.points));
+                    drawingContext.addStroke(Stroke(
+                        color: drawingContext.color,
+                        points: drawingContext.points,
+                        width: 10.0));
                   },
                   child: RepaintBoundary(
                     child: CustomPaint(

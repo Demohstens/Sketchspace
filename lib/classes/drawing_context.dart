@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/brushes/utils/repaint_listener.dart';
 import 'package:flutter_application/classes/stroke.dart';
+import 'package:flutter_application/classes/tool.dart';
 
 enum State { drawing, lifted }
 
@@ -11,6 +12,7 @@ class DrawingContext with ChangeNotifier {
   Offset _currentPoint = Offset(0, 0);
   List<Offset> _points = [];
   RepaintListener repaintListener = RepaintListener();
+  CustomPainter? tool;
 
   Color get color => _color;
   State get state => _state;
@@ -30,7 +32,7 @@ class DrawingContext with ChangeNotifier {
       _buffer.add(stroke);
       notifyListeners();
     } else {
-      _buffer.add(Stroke(_color, _points));
+      _buffer.add(Stroke(color: _color, points: _points, width: 10.0));
       _points = [];
       notifyListeners();
     }
@@ -40,8 +42,12 @@ class DrawingContext with ChangeNotifier {
   void changeState(State state) {
     _state = state;
     notifyListeners();
-
     repaintListener.notifyListeners();
+  }
+
+  void changeTool(CustomPainter tool) {
+    this.tool = tool;
+    notifyListeners();
   }
 
   void changeColor(Color color) {
