@@ -22,7 +22,6 @@ class DrawingCanvas extends StatelessWidget {
                   child: Container(
                     // Hacky way to force an update.
                     key: Key(context.watch<DrawingContext>().buffer.toString()),
-                    color: Colors.white,
                     child: CustomPaint(
                       willChange: false,
                       isComplex: true,
