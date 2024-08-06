@@ -17,9 +17,7 @@ class Pen extends CustomPainter {
         ..style = PaintingStyle.stroke;
 
       for (int i = 0; i < stroke.points.length - 1; i++) {
-        if (stroke.points[i] != null && stroke.points[i + 1] != null) {
-          canvas.drawLine(stroke.points[i], stroke.points[i + 1], paint);
-        }
+        canvas.drawLine(stroke.points[i], stroke.points[i + 1], paint);
       }
     }
     if (points.length > 1) {
@@ -29,9 +27,7 @@ class Pen extends CustomPainter {
         ..style = PaintingStyle.stroke;
 
       for (int i = 0; i < points.length - 1; i++) {
-        if (points[i] != null && points[i + 1] != null) {
-          canvas.drawLine(points[i], points[i + 1], paint);
-        }
+        canvas.drawLine(points[i], points[i + 1], paint);
       }
     }
   }
@@ -41,5 +37,3 @@ class Pen extends CustomPainter {
     return true;
   }
 }
-
-///#TODO Implement the Pen class. ccan't access DrawingContext from within?
