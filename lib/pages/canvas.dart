@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/DrawingContext.dart';
 import 'package:flutter_application/classes/Settings.dart';
+import 'package:flutter_application/classes/stroke.dart';
 import 'package:flutter_application/utils/pen.dart';
 import 'package:provider/provider.dart';
 
@@ -53,10 +54,16 @@ class DrawingCanvas extends StatelessWidget {
         return Container(
             color: context.watch<Settings>().background,
             child: GestureDetector(
-                child: CustomPaint(
-              painter: Pen(
-                  drawingContext.color), // Pass any necessary parameters to Pen
-            )));
+              onPanUpdate: (details) {
+                drawingContext.setCurrentPoint(details.localPosition);
+              },
+              onPanEnd: (details) {
+                drawingContext.addStroke(null);
+              },
+              child: CustomPaint(
+                  painter: Pen(drawingContext.buffer, drawingContext.points,
+                      drawingContext.color)),
+            ));
       },
     );
   }
