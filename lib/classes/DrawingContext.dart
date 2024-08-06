@@ -3,7 +3,7 @@ import 'package:flutter_application/classes/stroke.dart';
 
 enum State { drawing, lifted }
 
-class Drawingcontext with ChangeNotifier {
+class DrawingContext with ChangeNotifier {
   Color _color = Colors.red;
   State _state = State.lifted;
   List<Stroke> _buffer = [];

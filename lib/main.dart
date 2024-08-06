@@ -10,7 +10,7 @@ void main() {
     /// can use [MyApp] while mocking the providers
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => Drawingcontext()),
+        ChangeNotifierProvider(create: (_) => DrawingContext()),
         ChangeNotifierProvider(create: (_) => Settings()),
       ],
       child: MyApp(),
