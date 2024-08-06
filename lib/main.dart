@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application/classes/DrawingContext.dart';
-import 'package:flutter_application/classes/Settings.dart';
+import 'package:flutter_application/classes/demo_debug.dart';
+import 'package:flutter_application/classes/drawing_context.dart';
+import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/pages/homepage.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => DrawingContext()),
         ChangeNotifierProvider(create: (_) => Settings()),
+        ChangeNotifierProvider(create: (_) => DemoDebug()),
       ],
       child: MyApp(),
     ),

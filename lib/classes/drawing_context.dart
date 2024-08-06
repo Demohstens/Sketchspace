@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/brushes/utils/repaint_listener.dart';
 import 'package:flutter_application/classes/stroke.dart';
 
 enum State { drawing, lifted }
@@ -9,6 +10,7 @@ class DrawingContext with ChangeNotifier {
   List<Stroke> _buffer = [];
   Offset _currentPoint = Offset(0, 0);
   List<Offset> _points = [];
+  RepaintListener repaintListener = RepaintListener();
 
   Color get color => _color;
   State get state => _state;
@@ -24,6 +26,7 @@ class DrawingContext with ChangeNotifier {
 
   void addStroke(Stroke? stroke) {
     if (stroke != null) {
+      _points = [];
       _buffer.add(stroke);
       notifyListeners();
     } else {
@@ -31,15 +34,25 @@ class DrawingContext with ChangeNotifier {
       _points = [];
       notifyListeners();
     }
+    repaintListener.notifyListeners();
   }
 
   void changeState(State state) {
     _state = state;
     notifyListeners();
+
+    repaintListener.notifyListeners();
   }
 
   void changeColor(Color color) {
     _color = color;
+    notifyListeners();
+  }
+
+  void reset() {
+    _buffer = [];
+    _points = [];
+    repaintListener.notifyListeners();
     notifyListeners();
   }
 }

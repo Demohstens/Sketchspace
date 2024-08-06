@@ -1,0 +1,27 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+/// Listener to trigger a repaint of all paths
+///
+/// Author: Philip Lalonde
+class RepaintListener implements Listenable {
+  final StreamController<void> _controller = StreamController<void>.broadcast();
+
+  @override
+  void addListener(VoidCallback listener) {
+    _controller.stream.listen((_) => listener());
+  }
+
+  @override
+  void removeListener(VoidCallback listener) {}
+
+  void notifyListeners() {
+    _controller.add(null);
+    print("Triggered repaint");
+  }
+
+  void dispose() {
+    _controller.close();
+  }
+}
