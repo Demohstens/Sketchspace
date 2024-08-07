@@ -1,40 +1,27 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Stroke {
-  late Paint _paint;
-  late Offset _startPoint;
-  late List<Offset> _middlePoints;
-  late Offset _endPoint;
+  final Paint _paint;
+  final List<Offset> _points;
 
-  Stroke({
-    required Paint paint,
-    required List<Offset> points,
-    Offset? startPoint,
-    Offset? endPoint,
-  }) {
-    _paint = paint;
-    _startPoint = points.first;
-    _middlePoints = points;
-    _endPoint = points.last;
-  }
-
+  Stroke(this._paint, this._points);
   Paint get paint => _paint;
   double get width => _paint.strokeWidth;
   Color get color => _paint.color;
-  Offset get startPoint => _startPoint;
-  List<Offset> get middlePoints => _middlePoints;
-  Offset get endPoint => _endPoint;
+  List<Offset> get points => _points;
 
-  /// Ramer-Douglas-Peucker Algorithm
-  void optimize() {
+  /// Ramer-Douglas-Peucker Algorithm. Returns an optimized Stroke
+  Stroke optimize() {
+    if (_points.length < 3) {
+      return this;
+    }
     List<Offset> optimizedPoints = optimizeRDP(
-      [startPoint, ...middlePoints, endPoint],
+      _points,
       0.05,
     );
-    _startPoint = optimizedPoints.first;
-    _middlePoints = optimizedPoints.sublist(1, optimizedPoints.length - 1);
-    _endPoint = optimizedPoints.last;
+    return Stroke(_paint, optimizedPoints);
   }
 }
 

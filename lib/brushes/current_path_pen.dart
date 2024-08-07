@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
 
@@ -15,6 +17,10 @@ class CurrentPathPen extends CustomPainter {
 
     void drawPath() {
       if (currentPath.isNotEmpty) {
+        if (currentPath.length == 1) {
+          canvas.drawPoints(PointMode.points, currentPath, strokePaint);
+          return;
+        }
         Paint paint = strokePaint;
         Path currentPathToDraw = Path();
         currentPathToDraw.moveTo(currentPath.first.dx, currentPath.first.dy);

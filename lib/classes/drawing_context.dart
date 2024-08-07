@@ -56,17 +56,19 @@ class DrawingContext with ChangeNotifier {
       _points = points;
       switch (_mode) {
         case Mode.drawing:
-          stroke = Stroke(points: points, paint: getPaint());
+          stroke = Stroke(getPaint(), points);
           // stroke.optimize();
           _buffer.add(stroke);
         case Mode.erasing:
           break;
         case Mode.line:
-          stroke =
-              (Stroke(points: [points.first, points.last], paint: getPaint()));
+          if (points.length < 2) {
+            _buffer.add(Stroke(getPaint(), points));
+          }
+          stroke = (Stroke(getPaint(), [points.first, points.last]));
           _buffer.add(stroke);
         case Mode.fill:
-          stroke = (Stroke(points: points, paint: getPaint()));
+          stroke = (Stroke(getPaint(), points));
           // stroke.optimize();
           _buffer.add(stroke);
         case Mode.lifted:
@@ -80,11 +82,14 @@ class DrawingContext with ChangeNotifier {
   }
 
   void changeMode(Mode mode) {
+    print("Changing mode: $mode");
     _mode = mode;
     notifyListeners();
   }
 
   void changeColor(Color color) {
+    print("Changing color: $color");
+
     _color = color;
     notifyListeners();
   }
