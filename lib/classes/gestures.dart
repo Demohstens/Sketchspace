@@ -18,20 +18,14 @@ class Gestures extends ChangeNotifier {
   }
 
   bool startGesture(Offset start, StartedFrom from) {
-    if (_potentialGestureStart != null) {
-      return false;
-    }
     _potentialGestureStart = start;
     _startedFrom = from;
     return true;
   }
 
   void endGesture(Offset end) {
-    if (_potentialGestureStart == null) {
-      return;
-    }
     _potentialGestureEnd = end;
-    _path = [_potentialGestureStart!, _potentialGestureEnd!];
+    _path = [_potentialGestureStart, _potentialGestureEnd];
     notifyListeners();
   }
 

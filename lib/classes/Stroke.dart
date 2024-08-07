@@ -23,6 +23,18 @@ class Stroke {
     );
     return Stroke(_paint, optimizedPoints);
   }
+
+  /// Returns A string for json serialization
+  /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}
+  Map<String, dynamic> toJson() {
+    return {
+      'paint': {
+        'color': _paint.color.value,
+        'strokeWidth': _paint.strokeWidth,
+      },
+      'points': _points.map((e) => (e.dx, e.dy)).toList(),
+    };
+  }
 }
 
 double perpendicularDistance(Offset point, Offset lineStart, Offset lineEnd) {
