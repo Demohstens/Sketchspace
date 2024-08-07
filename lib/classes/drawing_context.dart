@@ -25,6 +25,11 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeWidth(double width) {
+    _width = width;
+    notifyListeners();
+  }
+
   Paint getPaint() {
     Paint pt = Paint()
       ..color = _color

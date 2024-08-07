@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application/brushes/current_path_pen.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
+import 'package:flutter_application/classes/gestures.dart';
 import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/brushes/lazy_painter.dart';
 import 'package:provider/provider.dart';
