@@ -12,6 +12,7 @@ class CurrentPathPen extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     void drawLine() {
+      if (currentPath.length < 2) return;
       canvas.drawLine(currentPath.first, currentPath.last, strokePaint);
     }
 
@@ -34,16 +35,12 @@ class CurrentPathPen extends CustomPainter {
     switch (mode) {
       case Mode.drawing:
         drawPath();
-        break;
       case Mode.erasing:
         drawPath();
-        break;
       case Mode.line:
         drawLine();
-        break;
       case Mode.fill:
         drawPath();
-        break;
       case Mode.lifted:
         break;
     }
