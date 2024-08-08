@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_application/classes/stroke.dart';
@@ -62,10 +63,35 @@ Future<List<File>> getFiles() async {
 
 /// Saves a list of strokes to a file
 void saveFile(String name, List<Stroke> strokes) async {
+  String jsonString = "";
+  if (strokes.isEmpty) {
+    return;
+  }
+  if (name.isEmpty) {
+    name = "Untitled";
+  }
   final String content =
-      [for (var stroke in strokes) stroke.toJson()].toString();
+      [for (var stroke in strokes) stroke.toJsonString() + ","].toString();
+  for (var stroke in strokes) {
+    jsonString += stroke.toJsonString() + ",";
+  }
+  if (content.trim().endsWith(",]")) {
+    print("Ends with ,]");
+    jsonString = content.substring(0, content.length - 3) + "]";
+  }
   final Directory appDir = await appDirectory();
   final File file = File('${appDir.path}/$name.json');
-  file.writeAsString(content);
+  jsonString = "{\"Strokes\": $jsonString}";
+  file.writeAsString(jsonString);
   print('Saved file to ${file.path}');
+}
+
+/// Loads a file and returns a list of strokes
+List<Stroke> loadFile(File file) {
+  final String content = file.readAsStringSync();
+  final List<dynamic> json = jsonDecode(content);
+  if (json.isNotEmpty) {
+    return [for (var stroke in json) Stroke.fromJson(stroke)];
+  }
+  return [];
 }

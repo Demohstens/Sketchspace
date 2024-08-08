@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application/classes/draw_file.dart';
 import 'package:flutter_application/pages/canvas.dart';
 
 // Menu for selecting pages (Canvas, etc.)
@@ -29,5 +32,12 @@ class Windows extends StatelessWidget {
           },
           child: Text('Canvas')),
     ]);
+  }
+}
+
+void main() async {
+  List<File> fs = await getFiles();
+  for (File f in fs) {
+    print(loadFile(f));
   }
 }

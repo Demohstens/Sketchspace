@@ -24,17 +24,44 @@ class Stroke {
     return Stroke(_paint, optimizedPoints);
   }
 
+  /// Returns a Stroke object from a json object
+  factory Stroke.fromJson(Map<String, dynamic> json) {
+    return Stroke(
+      Paint()
+        ..color = Color(json['paint']['color'])
+        ..strokeWidth = json['paint']['strokeWidth'],
+      (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
+    );
+  }
+
   /// Returns A string for json serialization
   /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}
-  Map<String, dynamic> toJson() {
-    return {
-      'paint': {
-        'color': _paint.color.value,
-        'strokeWidth': _paint.strokeWidth,
-      },
-      'points': _points.map((e) => (e.dx, e.dy)).toList(),
-    };
+  String toJsonString() {
+    return """
+{
+  "paint": {
+    "color": ${_paint.color.value},
+    "strokeWidth": ${_paint.strokeWidth}
+  },
+  "points": ${_points.map((e) => "[${e.dx}, ${e.dy}]").toList()}
+}
+  """;
   }
+
+//   {
+//   "Strokes": [
+//     {
+//       "paint": {
+//         "color": 4278190080,
+//         "strokeWidth": 0.0
+//       },
+//       "points": [
+//         [0.0, 0.0],
+//         [1.0, 1.0]
+//       ]
+//     }
+//   ]
+// }
 }
 
 double perpendicularDistance(Offset point, Offset lineStart, Offset lineEnd) {
