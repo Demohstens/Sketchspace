@@ -25,6 +25,11 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void loadFileToBuffer(List<Stroke> strokes) {
+    _buffer = strokes;
+    notifyListeners();
+  }
+
   void changeWidth(double width) {
     _width = width;
     notifyListeners();

@@ -15,7 +15,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => DrawingContext()),
         ChangeNotifierProvider(create: (_) => Settings()),
         ChangeNotifierProvider(create: (_) => DemoDebug()),
-        ChangeNotifierProvider(create: (_) => Gestures()),
+        ChangeNotifierProvider(create: (_) => DrawFileProvider()),
       ],
       child: MyApp(),
     ),
