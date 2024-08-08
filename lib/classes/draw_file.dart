@@ -89,9 +89,11 @@ void saveFile(String name, List<Stroke> strokes) async {
 /// Loads a file and returns a list of strokes
 List<Stroke> loadFile(File file) {
   final String content = file.readAsStringSync();
-  final List<dynamic> json = jsonDecode(content);
-  if (json.isNotEmpty) {
-    return [for (var stroke in json) Stroke.fromJson(stroke)];
+  final Map<String, dynamic> json = jsonDecode(content);
+  if (json["Strokes"].isNotEmpty) {
+    print("Loaded file: ${file.path}");
+    return [for (var stroke in json["Strokes"]) Stroke.fromJson(stroke)];
   }
+  print('File is empty');
   return [];
 }
