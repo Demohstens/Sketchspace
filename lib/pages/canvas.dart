@@ -1,11 +1,12 @@
-import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
-import 'package:flutter_application/classes/draw_file.dart';
 import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/components/brush_menu.dart';
 import 'package:flutter_application/components/drawing_canvas.dart';
+import 'package:flutter_application/components/save_file_reminder.dart';
+import 'package:flutter_application/pages/homepage.dart';
 import 'package:provider/provider.dart';
 
 class CanvasPage extends StatelessWidget {
@@ -20,24 +21,28 @@ class CanvasPage extends StatelessWidget {
           height: MediaQuery.of(context).size.height,
           child: DrawingCanvas(),
         ),
+        // Button to return Home and save if needed / allowed
         Positioned(
           right: 0,
           bottom: 0,
           child: FloatingActionButton(
               heroTag: "home",
               onPressed: () {
-                if (context.read<Settings>().autoSaveExistingFiles) {
-                  String name = context
-                          .read<DrawingContext>()
-                          .workingFile
-                          ?.path
-                          .split("/")
-                          .last ??
-                      "_temp";
-                  saveToFile(name, context.read<DrawingContext>().buffer);
+                if (context.read<Settings>().autoSaveExistingFiles &&
+                    context.read<DrawingContext>().buffer != []) {
+                  context
+                      .read<DrawingContext>()
+                      .saveFile(context)
+                      .then((saveSuccess) {
+                    Navigator.pop(context);
+                    context.read<DrawingContext>().reset();
+                  });
+                } else {
+                  context.read<DrawingContext>().reset();
+                  Navigator.pop(context);
                 }
-                Navigator.pop(context);
-                context.read<DrawingContext>().reset();
+
+                context.read<DrawFileProvider>().updateFileList();
               },
               child: Icon(Icons.home)),
         ),
@@ -68,8 +73,7 @@ class CanvasPage extends StatelessWidget {
             child: FloatingActionButton(
               heroTag: "save",
               onPressed: () {
-                String name = "_temp";
-                saveToFile(name, context.read<DrawingContext>().buffer);
+                context.read<DrawingContext>().saveFile(context);
               },
             ))
       ],

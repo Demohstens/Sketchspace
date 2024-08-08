@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/draw_file.dart';
+import 'package:flutter_application/components/save_file_reminder.dart';
+import 'package:flutter_application/components/toasts.dart';
 import 'package:flutter_application/utils/repaint_listener.dart';
 import 'package:flutter_application/classes/stroke.dart';
+import 'package:path/path.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
 
@@ -15,7 +19,7 @@ class DrawingContext with ChangeNotifier {
   RepaintListener repaintListener = RepaintListener();
   Mode _mode = Mode.drawing;
   double _width = 10.0;
-  File? _workingFile;
+  DrawFile _workingFile = DrawFile.empty("Untitled");
 
   // GETTERS
   Color get color => _color;
@@ -24,7 +28,53 @@ class DrawingContext with ChangeNotifier {
   Offset get currentPoint => _currentPoint;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
-  File? get workingFile => _workingFile;
+  DrawFile? get workingFile => _workingFile;
+
+  Future<bool> saveFile(BuildContext context, {String? name}) async {
+    // return await _workingFile.save(context);
+    String _name;
+    if (name != null) {
+      _name = name;
+    } else if (_workingFile.name != null) {
+      _name = _workingFile.name!;
+    } else {
+      _name = "Untitled";
+    }
+    bool success = false;
+    if (_buffer.isEmpty) {
+      print("No content to save.");
+      return success;
+    }
+    if (_name == "") {
+      await showFileNameDialog(context).then((value) {
+        if (value != null && value != "") {
+          _name = value;
+          success = true;
+        } else {
+          _name = "Untitled";
+        }
+      });
+    }
+    // Convert strokes to JSON list
+    final List<String> jsonStrokes = [
+      for (var stroke in _buffer) stroke.toJson()
+    ];
+    final String jsonString = jsonEncode({"Strokes": jsonStrokes});
+
+    final Directory appDir = await appDirectory();
+    String filePath;
+    if (_name.endsWith(".json")) {
+      filePath = '${appDir.path}/$_name';
+    } else {
+      filePath = '${appDir.path}/$_name.json';
+    }
+    File file = File(filePath);
+
+    // Write the JSON string to the file
+    await file.writeAsString(jsonString);
+    print('Saved file to ${file.path}');
+    return success;
+  }
 
   void setCurrentPoint(Offset point) {
     _points.add(point);
@@ -33,9 +83,16 @@ class DrawingContext with ChangeNotifier {
   }
 
   void loadFileContext(File file) {
-    List<Stroke> strokes = loadFile(file);
-    _buffer = strokes;
-    notifyListeners();
+    _workingFile = loadFile(file) ?? DrawFile.empty("Untitled");
+    _buffer = _workingFile.getStrokes();
+
+    if (_workingFile.content == null) {
+      print("Error loading file: ${file.path}. Invalid file.");
+    } else {
+      print("Loaded file: ${file.path}");
+      notifyListeners();
+      repaintListener.notifyListeners();
+    }
   }
 
   void changeWidth(double width) {
@@ -67,7 +124,7 @@ class DrawingContext with ChangeNotifier {
     }
   }
 
-  /// Creates a new Stroke object depending ont he mode
+  /// Creates a new Stroke object depending on the mode
   void createStroke(List<Offset>? points) {
     Stroke stroke;
     if (points != null) {
@@ -92,6 +149,9 @@ class DrawingContext with ChangeNotifier {
         case Mode.lifted:
           break;
       }
+      if (_workingFile != null) {
+        _workingFile!.content = _buffer;
+      }
 
       _points = [];
       notifyListeners();
@@ -113,6 +173,10 @@ class DrawingContext with ChangeNotifier {
   }
 
   void reset() {
+    if (_workingFile != null) {
+      _workingFile!.content = null;
+    }
+    _workingFile = DrawFile.empty("");
     _buffer = [];
     _points = [];
     repaintListener.notifyListeners();
