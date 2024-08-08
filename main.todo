@@ -1,5 +1,5 @@
-- Loadfiles
-- MainMenu
+[/] Loadfiles 
+[-] MainMenu
 - Interface
 
 ---
@@ -7,3 +7,12 @@
 - Moveable, modular Interface
 - Tablet mode
 - hotkeys
+
+# Selection logic:
+1. detect a tap & hold gesture on the GestureDetecter 
+2. Pass that coordinate to the DrawingContext's selectStroke method
+3.1. Check each strokes boundary box for a match and return a list of possible matches
+3.2. narrow down the matches by checking each individual point (Possibly stop once one is "close enough")
+4. Create a temporary layer for the stroke that is drawn above the canvas allowing for free movement
+5. Once let go, readd the stroke to the list of strokes in the buffer and transform it's coordinates
+6. (Maybe also show highlight points to transform? Such as ends of a line. Also allow for scaling?)

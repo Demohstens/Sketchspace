@@ -52,9 +52,22 @@ class DrawFileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ElevatedButton(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: TextButton(
         onPressed: () {
-          context.read<DrawingContext>().loadFileToBuffer(loadFile(file));
+          context.read<DrawingContext>().loadFileContext(file);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => CanvasPage()),

@@ -26,7 +26,18 @@ class CanvasPage extends StatelessWidget {
           child: FloatingActionButton(
               heroTag: "home",
               onPressed: () {
+                if (context.read<Settings>().autoSaveExistingFiles) {
+                  String name = context
+                          .read<DrawingContext>()
+                          .workingFile
+                          ?.path
+                          .split("/")
+                          .last ??
+                      "_temp";
+                  saveToFile(name, context.read<DrawingContext>().buffer);
+                }
                 Navigator.pop(context);
+                context.read<DrawingContext>().reset();
               },
               child: Icon(Icons.home)),
         ),
@@ -58,7 +69,7 @@ class CanvasPage extends StatelessWidget {
               heroTag: "save",
               onPressed: () {
                 String name = "_temp";
-                saveFile(name, context.read<DrawingContext>().buffer);
+                saveToFile(name, context.read<DrawingContext>().buffer);
               },
             ))
       ],

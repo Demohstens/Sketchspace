@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application/classes/draw_file.dart';
 import 'package:flutter_application/utils/repaint_listener.dart';
 import 'package:flutter_application/classes/stroke.dart';
 
@@ -12,20 +15,25 @@ class DrawingContext with ChangeNotifier {
   RepaintListener repaintListener = RepaintListener();
   Mode _mode = Mode.drawing;
   double _width = 10.0;
+  File? _workingFile;
 
+  // GETTERS
   Color get color => _color;
   Mode get mode => _mode;
   List<Stroke> get buffer => _buffer;
   Offset get currentPoint => _currentPoint;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
+  File? get workingFile => _workingFile;
+
   void setCurrentPoint(Offset point) {
     _points.add(point);
     _currentPoint = point;
     notifyListeners();
   }
 
-  void loadFileToBuffer(List<Stroke> strokes) {
+  void loadFileContext(File file) {
+    List<Stroke> strokes = loadFile(file);
     _buffer = strokes;
     notifyListeners();
   }
@@ -66,19 +74,19 @@ class DrawingContext with ChangeNotifier {
       _points = points;
       switch (_mode) {
         case Mode.drawing:
-          stroke = Stroke(getPaint(), points);
+          stroke = Stroke(getPaint(), points, _mode);
           // stroke.optimize();
           _buffer.add(stroke);
         case Mode.erasing:
           break;
         case Mode.line:
           if (points.length < 2) {
-            _buffer.add(Stroke(getPaint(), points));
+            _buffer.add(Stroke(getPaint(), points, _mode));
           }
-          stroke = (Stroke(getPaint(), [points.first, points.last]));
+          stroke = (Stroke(getPaint(), [points.first, points.last], _mode));
           _buffer.add(stroke);
         case Mode.fill:
-          stroke = (Stroke(getPaint(), points));
+          stroke = (Stroke(getPaint(), points, _mode));
           // stroke.optimize();
           _buffer.add(stroke);
         case Mode.lifted:

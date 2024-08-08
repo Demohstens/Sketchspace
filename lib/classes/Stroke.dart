@@ -1,16 +1,20 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application/classes/drawing_context.dart';
 
 class Stroke {
   final Paint _paint;
   final List<Offset> _points;
+  final Mode _mode;
 
-  Stroke(this._paint, this._points);
+  Stroke(this._paint, this._points, this._mode);
   Paint get paint => _paint;
   double get width => _paint.strokeWidth;
   Color get color => _paint.color;
   List<Offset> get points => _points;
+  Mode get mode => _mode;
 
   /// Ramer-Douglas-Peucker Algorithm. Returns an optimized Stroke
   Stroke optimize() {
@@ -21,7 +25,7 @@ class Stroke {
       _points,
       0.05,
     );
-    return Stroke(_paint, optimizedPoints);
+    return Stroke(_paint, optimizedPoints, _mode);
   }
 
   /// Returns a Stroke object from a json object
@@ -29,39 +33,25 @@ class Stroke {
     return Stroke(
       Paint()
         ..color = Color(json['paint']['color'])
-        ..strokeWidth = json['paint']['strokeWidth'],
+        ..strokeWidth = json['paint']['strokeWidth']
+        ..style = modeToPaintingStyle(stringToMode(json['mode'])),
       (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
+      stringToMode(json['mode']),
     );
   }
 
   /// Returns A string for json serialization
   /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}
-  String toJsonString() {
-    return """
-{
-  "paint": {
-    "color": ${_paint.color.value},
-    "strokeWidth": ${_paint.strokeWidth}
-  },
-  "points": ${_points.map((e) => "[${e.dx}, ${e.dy}]").toList()}
-}
-  """;
+  String toJson() {
+    return jsonEncode({
+      "mode": _mode.toString().split('.').last,
+      "paint": {
+        "color": _paint.color.value,
+        "strokeWidth": _paint.strokeWidth,
+      },
+      "points": _points.map((e) => [e.dx, e.dy]).toList(),
+    });
   }
-
-//   {
-//   "Strokes": [
-//     {
-//       "paint": {
-//         "color": 4278190080,
-//         "strokeWidth": 0.0
-//       },
-//       "points": [
-//         [0.0, 0.0],
-//         [1.0, 1.0]
-//       ]
-//     }
-//   ]
-// }
 }
 
 double perpendicularDistance(Offset point, Offset lineStart, Offset lineEnd) {
@@ -111,4 +101,36 @@ List<Offset> optimizeRDP(List<Offset> points, double epsilon) {
   }
 
   return result;
+}
+
+PaintingStyle modeToPaintingStyle(Mode mode) {
+  switch (mode) {
+    case Mode.drawing:
+      return PaintingStyle.stroke;
+    case Mode.erasing:
+      return PaintingStyle.stroke;
+    case Mode.line:
+      return PaintingStyle.stroke;
+    case Mode.fill:
+      return PaintingStyle.fill;
+    case Mode.lifted:
+      return PaintingStyle.stroke;
+  }
+}
+
+Mode stringToMode(String str) {
+  switch (str) {
+    case 'drawing':
+      return Mode.drawing;
+    case 'erasing':
+      return Mode.erasing;
+    case 'line':
+      return Mode.line;
+    case 'fill':
+      return Mode.fill;
+    case 'lifted':
+      return Mode.lifted;
+    case _:
+      return Mode.lifted;
+  }
 }

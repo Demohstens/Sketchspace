@@ -62,38 +62,49 @@ Future<List<File>> getFiles() async {
 }
 
 /// Saves a list of strokes to a file
-void saveFile(String name, List<Stroke> strokes) async {
-  String jsonString = "";
+void saveToFile(String name, List<Stroke> strokes) async {
   if (strokes.isEmpty) {
     return;
   }
   if (name.isEmpty) {
     name = "Untitled";
   }
-  final String content =
-      [for (var stroke in strokes) stroke.toJsonString() + ","].toString();
-  for (var stroke in strokes) {
-    jsonString += stroke.toJsonString() + ",";
-  }
-  if (content.trim().endsWith(",]")) {
-    print("Ends with ,]");
-    jsonString = content.substring(0, content.length - 3) + "]";
-  }
+
+  // Convert strokes to JSON list
+  final List<String> jsonStrokes = [
+    for (var stroke in strokes) stroke.toJson()
+  ];
+  final String jsonString = jsonEncode({"Strokes": jsonStrokes});
+
   final Directory appDir = await appDirectory();
   final File file = File('${appDir.path}/$name.json');
-  jsonString = "{\"Strokes\": $jsonString}";
-  file.writeAsString(jsonString);
+
+  // Write the JSON string to the file
+  await file.writeAsString(jsonString);
   print('Saved file to ${file.path}');
 }
 
 /// Loads a file and returns a list of strokes
 List<Stroke> loadFile(File file) {
-  final String content = file.readAsStringSync();
-  final Map<String, dynamic> json = jsonDecode(content);
-  if (json["Strokes"].isNotEmpty) {
-    print("Loaded file: ${file.path}");
-    return [for (var stroke in json["Strokes"]) Stroke.fromJson(stroke)];
+  try {
+    final String content = file.readAsStringSync();
+    final Map<String, dynamic> json = jsonDecode(content);
+
+    if (json.containsKey("Strokes") && json["Strokes"] is List) {
+      final strokes = json["Strokes"];
+      if (strokes.isNotEmpty) {
+        print("Loaded file: ${file.path}");
+        return [
+          for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
+        ];
+      } else {
+        print('File contains no strokes: ${file.path}');
+      }
+    } else {
+      print('Invalid JSON structure in file: ${file.path}');
+    }
+  } catch (e) {
+    print('Error loading file: ${file.path}, Error: $e');
   }
-  print('File is empty');
   return [];
 }

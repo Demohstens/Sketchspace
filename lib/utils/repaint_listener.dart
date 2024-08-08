@@ -18,7 +18,6 @@ class RepaintListener implements Listenable {
 
   void notifyListeners() {
     _controller.add(null);
-    print("Triggered repaint");
   }
 
   void dispose() {
