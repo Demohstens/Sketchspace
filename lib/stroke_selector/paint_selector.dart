@@ -36,7 +36,8 @@ class _Painter extends CustomPainter {
     }
     Paint shadowPaint = Paint()
       ..color = Colors.black.withOpacity(0.5)
-      ..strokeWidth = paint.strokeWidth + 5;
+      ..strokeWidth = paint.strokeWidth + 5
+      ..style = PaintingStyle.stroke;
     Path shadowPath = Path()..moveTo(points.first.dx, points.first.dy);
     for (int i = 1; i < points.length; i++) {
       shadowPath.lineTo(points[i].dx, points[i].dy);
