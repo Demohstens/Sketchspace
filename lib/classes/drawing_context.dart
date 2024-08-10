@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/draw_file.dart';
 import 'package:flutter_application/components/save_file_reminder.dart';
 import 'package:flutter_application/stroke_selector/paint_selector.dart';
-import 'package:flutter_application/stroke_selector/src/classes/stroke.dart';
+import 'package:flutter_application/stroke_selector/src/stroke.dart';
 import 'package:flutter_application/utils/repaint_listener.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
@@ -33,6 +33,17 @@ class DrawingContext with ChangeNotifier {
   void selectStroke(Offset point) {
     selectedPaint = paintSelector(_buffer, point);
     notifyListeners();
+  }
+
+  void removeStroke(int index) {
+    if (index < 0 || index >= _buffer.length) {
+      return;
+    }
+    _buffer.removeAt(index);
+    _workingFile.content = _buffer;
+    selectedPaint = null;
+    notifyListeners();
+    repaintListener.notifyListeners();
   }
 
   void unselectStroke() {

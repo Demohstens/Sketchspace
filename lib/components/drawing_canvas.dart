@@ -40,10 +40,13 @@ class DrawingCanvas extends StatelessWidget {
                           .read<DrawingContext>()
                           .selectStroke(details.globalPosition);
                     },
-                    onLongPressEnd: (details) {
+                    onLongPressEnd: (details) {},
+                    onTap: () {
                       context.read<DrawingContext>().unselectStroke();
                     },
                     onPanUpdate: (details) {
+                      context.read<DrawingContext>().unselectStroke();
+
                       // Checks if the current point is the same as the last point
                       // to avoid adding the same point multiple times
                       if (details.localPosition !=

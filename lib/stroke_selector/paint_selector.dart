@@ -1,10 +1,12 @@
 library paint_selector;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application/stroke_selector/src/classes/stroke.dart';
+import 'package:flutter_application/classes/drawing_context.dart';
+import 'package:flutter_application/stroke_selector/src/stroke.dart';
 import 'package:flutter_application/stroke_selector/src/find_closest_stroke.dart';
+import 'package:provider/provider.dart';
 
-Container? paintSelector(List<Stroke> strokes, Offset touchPoint) {
+Widget? paintSelector(List<Stroke> strokes, Offset touchPoint) {
   int? indexOfClosestStroke = findClosestStrokeIndex(strokes, touchPoint);
   // If there is no stroke, which is close enough to fit the pramaters, return null
   if (indexOfClosestStroke == null) {
@@ -12,14 +14,21 @@ Container? paintSelector(List<Stroke> strokes, Offset touchPoint) {
   }
 
   Stroke closestStroke = strokes[indexOfClosestStroke];
-  return Container(
-    color: Colors.transparent,
-    width: closestStroke.boundary().width,
-    height: closestStroke.boundary().height,
-    child: CustomPaint(
-      painter: _Painter(closestStroke),
-    ),
-  );
+  return Stack(children: [
+    Positioned(
+        left: 0,
+        top: 0,
+        child:
+    Container(
+      color: Colors.transparent,
+      width: closestStroke.boundary().width,
+      height: closestStroke.boundary().height,
+      child: CustomPaint(
+        painter: _Painter(closestStroke),
+      ),
+    )),
+    StrokeManipulationMenu(indexOfClosestStroke, touchPoint)
+  ]);
 }
 
 class _Painter extends CustomPainter {
@@ -54,4 +63,20 @@ class _Painter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
   }
+}
+
+class StrokeManipulationMenu extends StatelessWidget {
+  final int index;
+  final Offset touchPoint;
+  StrokeManipulationMenu(this.index, this.touchPoint);
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: touchPoint.dy - 100,
+        left: touchPoint.dx,
+        child: FloatingActionButton.small(
+        onPressed: () {
+          context.read<DrawingContext>().removeStroke(index);
+        },
+        child: Icon(Icons.delete)));}
 }
