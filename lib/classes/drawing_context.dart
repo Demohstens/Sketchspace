@@ -67,14 +67,12 @@ class DrawingContext with ChangeNotifier {
       return success;
     }
     if (_name == "") {
-      await showFileNameDialog(context).then((value) {
-        if (value != null && value != "") {
-          _name = value;
-          success = true;
-        } else {
-          _name = "Untitled";
-        }
-      });
+      String? fileName = await showFileNameDialog(context);
+      if (fileName != null) {
+        _name = fileName;
+      } else {
+        return success;
+      }
     }
     // Convert strokes to JSON list
     final List<String> jsonStrokes = [

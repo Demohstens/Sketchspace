@@ -61,14 +61,10 @@ class DrawFile {
       return success;
     }
     if (_name == null) {
-      await showFileNameDialog(context).then((value) {
-        if (value != null && value != "") {
-          _name = value;
-          success = true;
-        } else {
-          _name = "Untitled";
-        }
-      });
+      _name = await showFileNameDialog(context);
+      if (_name == null) {
+        return success;
+      }
     }
     // Convert strokes to JSON list
     final List<String> jsonStrokes = [
