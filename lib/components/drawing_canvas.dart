@@ -35,18 +35,13 @@ class DrawingCanvas extends StatelessWidget {
 
                 /// Current Path Custom Paint - CurrentLinePainter
                 GestureDetector(
-                    onLongPressDown: (details) {
-                      var c = paintSelector(
-                          drawingContext.buffer, details.localPosition);
-                      if (c != null) {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: c,
-                              );
-                            });
-                      }
+                    onLongPressStart: (details) {
+                      context
+                          .read<DrawingContext>()
+                          .selectStroke(details.globalPosition);
+                    },
+                    onLongPressEnd: (details) {
+                      context.read<DrawingContext>().unselectStroke();
                     },
                     onPanUpdate: (details) {
                       // Checks if the current point is the same as the last point
@@ -68,6 +63,8 @@ class DrawingCanvas extends StatelessWidget {
                               drawingContext.getPaint(), drawingContext.mode),
                         ),
                       ),
+                      context.watch<DrawingContext>().selectedPaint ??
+                          Container(),
                     ])),
               ],
             ));

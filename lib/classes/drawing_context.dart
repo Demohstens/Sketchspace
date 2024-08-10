@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/draw_file.dart';
 import 'package:flutter_application/components/save_file_reminder.dart';
+import 'package:flutter_application/stroke_selector/paint_selector.dart';
 import 'package:flutter_application/stroke_selector/src/classes/stroke.dart';
 import 'package:flutter_application/utils/repaint_listener.dart';
 
@@ -18,6 +19,7 @@ class DrawingContext with ChangeNotifier {
   Mode _mode = Mode.drawing;
   double _width = 10.0;
   DrawFile _workingFile = DrawFile.empty("Untitled");
+  Widget? selectedPaint;
 
   // GETTERS
   Color get color => _color;
@@ -27,6 +29,16 @@ class DrawingContext with ChangeNotifier {
   List<Offset> get points => _points;
   double get strokeWidth => _width;
   DrawFile? get workingFile => _workingFile;
+
+  void selectStroke(Offset point) {
+    selectedPaint = paintSelector(_buffer, point);
+    notifyListeners();
+  }
+
+  void unselectStroke() {
+    selectedPaint = null;
+    notifyListeners();
+  }
 
   Future<bool> saveFile(BuildContext context, {String? name}) async {
     // return await _workingFile.save(context);
