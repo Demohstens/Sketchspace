@@ -1,17 +1,17 @@
-[/] Loadfiles 
-[-] MainMenu
-- Interface
-[ ] toasts 
+✔ Loadfiles @done(24-08-10 00:48)
+☐ MainMenu
+☐ Interface
+☐ toasts 
 
 ----
 # Bugs 
-- Loading files broke again - FIXED
-- saving files might be broken? see above. - FIXED
-- able to save empty file names - FIXED but introduced:
+✔ Loading files broke again - FIXED @done(24-08-10 00:48)
+✔ saving files might be broken? see above. - FIXED @done(24-08-10 00:48)
+✔ able to save empty file names - FIXED but introduced: @done(24-08-10 00:48)
 - Cancelling saving will leave the filename empty instead -> Will name "unknown"
 - will exit canvas instead of cancelling saving 
 - Doesn't check for invalid file names properly :SOB: maybe use prebuilt solution
-
+- saving an untitled file will save it as "Untitled" 
 
 ---
 - Android / IOS ?

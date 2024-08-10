@@ -3,6 +3,8 @@ import 'package:flutter_application/brushes/current_path_pen.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
 import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/brushes/lazy_painter.dart';
+import 'package:flutter_application/stroke_selector/paint_selector.dart';
+import 'package:flutter_application/stroke_selector/src/find_closest_stroke.dart';
 import 'package:provider/provider.dart';
 
 class DrawingCanvas extends StatelessWidget {
@@ -33,25 +35,40 @@ class DrawingCanvas extends StatelessWidget {
 
                 /// Current Path Custom Paint - CurrentLinePainter
                 GestureDetector(
-                  onPanUpdate: (details) {
-                    // Checks if the current point is the same as the last point
-                    // to avoid adding the same point multiple times
-                    if (details.localPosition != drawingContext.currentPoint) {
-                      drawingContext.setCurrentPoint(details.localPosition);
-                    }
-                  },
-                  onPanEnd: (details) {
-                    drawingContext.createStroke(drawingContext.points);
-                  },
-                  child: RepaintBoundary(
-                    child: CustomPaint(
-                      isComplex: true,
-                      size: Size.infinite,
-                      painter: CurrentPathPen(drawingContext.points,
-                          drawingContext.getPaint(), drawingContext.mode),
-                    ),
-                  ),
-                ),
+                    onLongPressDown: (details) {
+                      var c = paintSelector(
+                          drawingContext.buffer, details.localPosition);
+                      if (c != null) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: c,
+                              );
+                            });
+                      }
+                    },
+                    onPanUpdate: (details) {
+                      // Checks if the current point is the same as the last point
+                      // to avoid adding the same point multiple times
+                      if (details.localPosition !=
+                          drawingContext.currentPoint) {
+                        drawingContext.setCurrentPoint(details.localPosition);
+                      }
+                    },
+                    onPanEnd: (details) {
+                      drawingContext.createStroke(drawingContext.points);
+                    },
+                    child: Stack(children: [
+                      RepaintBoundary(
+                        child: CustomPaint(
+                          isComplex: true,
+                          size: Size.infinite,
+                          painter: CurrentPathPen(drawingContext.points,
+                              drawingContext.getPaint(), drawingContext.mode),
+                        ),
+                      ),
+                    ])),
               ],
             ));
       },

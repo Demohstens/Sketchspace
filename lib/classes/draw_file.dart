@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/components/save_file_reminder.dart';
+import 'package:flutter_application/stroke_selector/src/classes/stroke.dart';
 import 'package:path/path.dart';
-
-import 'package:flutter_application/classes/stroke.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DrawFile {

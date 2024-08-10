@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/draw_file.dart';
 import 'package:flutter_application/components/save_file_reminder.dart';
-import 'package:flutter_application/components/toasts.dart';
+import 'package:flutter_application/stroke_selector/src/classes/stroke.dart';
 import 'package:flutter_application/utils/repaint_listener.dart';
-import 'package:flutter_application/classes/stroke.dart';
-import 'package:path/path.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
 
@@ -104,8 +102,7 @@ class DrawingContext with ChangeNotifier {
     Paint pt = Paint()
       ..color = _color
       ..strokeWidth = _width
-      ..style = _getStyle()
-      ..strokeCap = StrokeCap.round;
+      ..style = _getStyle();
     return pt;
   }
 
@@ -131,27 +128,25 @@ class DrawingContext with ChangeNotifier {
       _points = points;
       switch (_mode) {
         case Mode.drawing:
-          stroke = Stroke(getPaint(), points, _mode);
+          stroke = Stroke(getPaint(), points);
           // stroke.optimize();
           _buffer.add(stroke);
         case Mode.erasing:
           break;
         case Mode.line:
           if (points.length < 2) {
-            _buffer.add(Stroke(getPaint(), points, _mode));
+            _buffer.add(Stroke(getPaint(), points));
           }
-          stroke = (Stroke(getPaint(), [points.first, points.last], _mode));
+          stroke = (Stroke(getPaint(), [points.first, points.last]));
           _buffer.add(stroke);
         case Mode.fill:
-          stroke = (Stroke(getPaint(), points, _mode));
+          stroke = (Stroke(getPaint(), points));
           // stroke.optimize();
           _buffer.add(stroke);
         case Mode.lifted:
           break;
       }
-      if (_workingFile != null) {
-        _workingFile!.content = _buffer;
-      }
+      _workingFile.content = _buffer;
 
       _points = [];
       notifyListeners();
@@ -173,9 +168,6 @@ class DrawingContext with ChangeNotifier {
   }
 
   void reset() {
-    if (_workingFile != null) {
-      _workingFile!.content = null;
-    }
     _workingFile = DrawFile.empty("");
     _buffer = [];
     _points = [];

@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application/classes/drawing_context.dart';
 import 'package:flutter_application/classes/settings.dart';
 import 'package:flutter_application/components/brush_menu.dart';
 import 'package:flutter_application/components/drawing_canvas.dart';
-import 'package:flutter_application/components/save_file_reminder.dart';
 import 'package:flutter_application/pages/homepage.dart';
 import 'package:provider/provider.dart';
 
