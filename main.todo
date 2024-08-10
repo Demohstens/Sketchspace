@@ -8,12 +8,13 @@
 ✔ Loading files broke again - FIXED @done(24-08-10 00:48)
 ✔ saving files might be broken? see above. - FIXED @done(24-08-10 00:48)
 ✔ able to save empty file names - FIXED but introduced: @done(24-08-10 00:48)
-- Cancelling saving will leave the filename empty instead -> Will name "unknown"
-- will exit canvas instead of cancelling saving 
-- Doesn't check for invalid file names properly :SOB: maybe use prebuilt solution
-- saving an untitled file will save it as "Untitled" 
+✔ Cancelling saving will leave the filename empty instead -> Will name "unknown" @done(24-08-10 19:34)
+✔ will exit canvas instead of cancelling saving @done(24-08-10 19:34)
+✔ Doesn't check for invalid file names properly :SOB: maybe use prebuilt solution @done(24-08-10 19:34)
+✔ saving an untitled file will save it as "Untitled" @done(24-08-10 19:34)
 - Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. 
     - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
+- cannot exit without saving
 
 ---
 - Android / IOS ?

@@ -59,6 +59,7 @@ class CanvasPage extends StatelessWidget {
           bottom: 0,
           left: 0,
           child: FloatingActionButton(
+            heroTag: "reset",
             onPressed: () {
               context.read<DrawingContext>().reset();
             },

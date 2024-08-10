@@ -189,6 +189,7 @@ class DrawingContext with ChangeNotifier {
   }
 
   void reset() {
+    selectedPaint = null;
     _workingFile = DrawFile.empty("");
     _buffer = [];
     _points = [];

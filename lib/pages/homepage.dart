@@ -120,16 +120,28 @@ class DrawFileButton extends StatelessWidget {
           ),
         ],
       ),
-      child: TextButton(
-        onPressed: () {
-          context.read<DrawingContext>().loadFileContext(file);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CanvasPage()),
-          );
-        },
-        child: Text(file.uri.toString()),
-      ),
+      child: Stack(children: [
+        TextButton(
+          onPressed: () {
+            context.read<DrawingContext>().loadFileContext(file);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => CanvasPage()),
+            );
+          },
+          child: Text(file.uri.toString()),
+        ),
+        Positioned(
+            right: 0,
+            bottom: 0,
+            child: IconButton(
+              onPressed: () {
+                file.delete();
+                context.read<DrawFileProvider>().updateFileList();
+              },
+              icon: Icon(Icons.delete),
+            )),
+      ]),
     );
   }
 }

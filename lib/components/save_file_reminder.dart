@@ -63,6 +63,10 @@ class _FileSaveDialogState extends State<FileSaveDialog> {
     Navigator.pop(context);
   }
 
+  void exitWithoutSaving() {
+    Navigator.pop(context, null);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -84,9 +88,12 @@ class _FileSaveDialogState extends State<FileSaveDialog> {
           child: const Text('Save'),
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: cancel,
           child: const Text('Cancel'),
         ),
+        TextButton(
+            onPressed: exitWithoutSaving,
+            child: const Text('Exit without saving')),
       ],
     );
   }
