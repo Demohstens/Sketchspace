@@ -12,6 +12,8 @@
 - will exit canvas instead of cancelling saving 
 - Doesn't check for invalid file names properly :SOB: maybe use prebuilt solution
 - saving an untitled file will save it as "Untitled" 
+- Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. 
+    - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
 
 ---
 - Android / IOS ?
