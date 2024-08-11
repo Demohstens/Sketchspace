@@ -49,15 +49,13 @@ class DrawingContext with ChangeNotifier {
     undoBuffer.add(_buffer.removeAt(index));
     _workingFile.content = _buffer;
     selectedPaint = null;
-
+    HapticFeedback.lightImpact();
     notifyListeners();
     repaintListener.notifyListeners();
   }
 
   void unselectStroke() {
     selectedPaint = null;
-    HapticFeedback.selectionClick();
-
     notifyListeners();
   }
 

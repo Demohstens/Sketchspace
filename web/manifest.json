@@ -1,6 +1,6 @@
 {
-    "name": "flutter_application",
-    "short_name": "flutter_application",
+    "name": "sketchspace",
+    "short_name": "sketchspace",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

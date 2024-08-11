@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page - Sketchspace'),
+        title: const Text('Home Page - Sketchspace'),
       ),
       body: FileGrid(),
     );
@@ -42,7 +42,7 @@ class FileGrid extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => CanvasPage()),
                   );
                 },
-                child: Row(
+                child: const Row(
                   children: [
                     Text(
                       "+",
@@ -56,7 +56,7 @@ class FileGrid extends StatelessWidget {
                 )),
           ),
           SizedBox(
-            width: MediaQuery.of(context).size.width * 0.7,
+            width: MediaQuery.of(context).size.width * 0.5,
           ),
           IconButton(
               onPressed: () {
