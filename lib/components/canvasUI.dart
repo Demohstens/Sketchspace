@@ -4,6 +4,7 @@ import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
 import 'package:sketchspace/pages/homepage.dart';
+import 'package:sketchspace/pages/settings_page.dart';
 
 class CanvasUI extends StatefulWidget {
   @override
@@ -48,14 +49,15 @@ class _CanvasUIState extends State<CanvasUI> {
               },
               child: Icon(Icons.home)),
         ),
-        // Toggle Dark mode button
+        // Open Settings Page
         Positioned(
             top: screenHeight * 0.05,
             right: 0,
             child: FloatingActionButton(
-                heroTag: "darkmode",
-                child: Icon(Icons.color_lens),
-                onPressed: () => context.read<Settings>().toggleDarkMode())),
+                heroTag: "settingscanvas",
+                child: const Icon(Icons.settings),
+                onPressed: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsPage())))),
         // Brush Menu
         Positioned(
             bottom: screenHeight * 0.01,

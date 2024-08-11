@@ -10,6 +10,7 @@ import 'package:sketchspace/pages/canvas.dart';
 import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:sketchspace/pages/settings_page.dart';
 
 // Menu for selecting pages (Canvas, etc.)
 class HomePage extends StatelessWidget {
@@ -31,13 +32,30 @@ class HomePage extends StatelessWidget {
   }
 }
 
+class FileGrid extends StatefulWidget {
+  @override
+  _FileGridState createState() => _FileGridState();
+}
+
 // A display of all available Pages/windows. Hardcoded for now.
-class FileGrid extends StatelessWidget {
+class _FileGridState extends State<FileGrid> {
+  List<File> files = [];
+  @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   getFiles().then((value) {
+  //     setState(() {
+  //       files = value;
+  //     });
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
-    List<File> files = context.watch<DrawFileProvider>().files;
+    files = context.watch<DrawFileProvider>().files;
     if (files.isEmpty) {
-      return Center(child: NewFileButton(tag: "newfileGrid"));
+      return Expanded(child: Center(child: NewFileButton(tag: "newfileGrid")));
     } else {
       return Expanded(
           child: GridView(
@@ -67,16 +85,28 @@ class TopBar extends StatelessWidget {
           child: Container(
               margin: EdgeInsets.all(10),
               child: FloatingActionButton(
+                  heroTag: "refresh",
                   onPressed: () {
                     context.read<DrawFileProvider>().updateFileList();
                   },
-                  child: const Icon(Icons.refresh))))
+                  child: const Icon(Icons.refresh)))),
+      SizedBox(
+          child: Container(
+              margin: EdgeInsets.all(10),
+              child: FloatingActionButton(
+                  heroTag: "settingscanvas",
+                  child: const Icon(Icons.settings),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SettingsPage()))))),
     ]);
   }
 }
 
 class DrawFileProvider extends ChangeNotifier {
   List<File> files = [];
+
   DrawFileProvider() {
     getFiles().then((value) {
       files = value;

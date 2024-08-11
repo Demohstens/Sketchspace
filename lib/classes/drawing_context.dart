@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/components/save_file_reminder.dart';
-import 'package:sketchspace/pages/homepage.dart';
 import 'package:sketchspace/stroke_selector/paint_selector.dart';
 import 'package:sketchspace/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/utils/repaint_listener.dart';
@@ -22,6 +21,8 @@ class DrawingContext with ChangeNotifier {
   double _width = 10.0;
   DrawFile _workingFile = DrawFile.empty("Untitled");
   Widget? selectedPaint;
+
+  bool ui_enabled = true;
 
   List<Stroke> redoBuffer = [];
   List<Stroke> undoBuffer = [];
@@ -43,13 +44,19 @@ class DrawingContext with ChangeNotifier {
     }
   }
 
+  void toggleUI() {
+    ui_enabled = !ui_enabled;
+    notifyListeners();
+  }
+
   void removeStroke(int index) {
     if (index < 0 || index >= _buffer.length) {
       return;
     }
+    selectedPaint = null;
+
     undoBuffer.add(_buffer.removeAt(index));
     _workingFile.content = _buffer;
-    selectedPaint = null;
     HapticFeedback.lightImpact();
     notifyListeners();
     repaintListener.notifyListeners();
@@ -144,6 +151,7 @@ class DrawingContext with ChangeNotifier {
       print("Error loading file: ${file.path}. Invalid file.");
     } else {
       print("Loaded file: ${file.path}");
+      ui_enabled = true;
       notifyListeners();
       repaintListener.notifyListeners();
     }

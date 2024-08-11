@@ -33,6 +33,9 @@ class DrawingCanvas extends StatelessWidget {
 
                 /// Current Path Custom Paint - CurrentLinePainter
                 GestureDetector(
+                    onDoubleTap: () {
+                      context.read<DrawingContext>().toggleUI();
+                    },
                     onLongPressStart: (details) {
                       context
                           .read<DrawingContext>()

@@ -5,6 +5,7 @@
     ✔ Show delete button @done(24-08-11 15:09)
     ✔ Display grid dynamically @done(24-08-11 17:24)
 ☐ Thumbnails
+☐ settings menu
 ☐ Share 
 ☐ Interface
 ☐ toasts 
@@ -35,7 +36,7 @@
 - FileSaveDialog too... tall? Odd. 
 - Selection color hardcoded. Darkmode makes it invisible.
 - Android doesn't work: 
-    - Scaling is off
+    ✔ Scaling is off @done(24-08-11 17:53) ?? 
     - touch support is inconsistant
     ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
 
