@@ -102,7 +102,7 @@ class DrawingContext with ChangeNotifier {
   }
 
   void loadFileContext(File file) {
-    _workingFile = loadFile(file) ?? DrawFile.empty("Untitled");
+    _workingFile = loadFile(file);
     _buffer = _workingFile.getStrokes();
 
     if (_workingFile.content == null) {

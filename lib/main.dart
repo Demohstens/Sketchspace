@@ -17,17 +17,18 @@ void main() {
         ChangeNotifierProvider(create: (_) => DemoDebug()),
         ChangeNotifierProvider(create: (_) => DrawFileProvider()),
       ],
-      child: MyApp(),
+      child: Sketchspace(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class Sketchspace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Drawing App',
+      title: 'Sketchspace',
       theme: ThemeData(
+          useMaterial3: true,
           primarySwatch: Colors.blue,
           pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
