@@ -160,7 +160,7 @@ class _DrawFileButtonState extends State<DrawFileButton> {
         child: Stack(
           children: [
             if (thumbnail == null)
-              const Center(child: Positioned(top: 30, child: Icon(Icons.image)))
+              const Center(child: Icon(Icons.image))
             else
               Positioned.fill(
                 child: Icon(Icons.image),

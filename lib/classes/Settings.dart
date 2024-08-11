@@ -31,6 +31,10 @@ class Settings with ChangeNotifier {
   Color get primaryColor => _primaryColor;
   Color get secondaryColor => _secondaryColor;
   Color get tertiaryColor => _tertiaryColor;
+  void toggleAutoSaveOnExit() {
+    autoSaveExistingFiles = !autoSaveExistingFiles;
+    notifyListeners();
+  }
 
   void toggleDarkMode() {
     themeMode = themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;

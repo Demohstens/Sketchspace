@@ -27,7 +27,7 @@ Widget? paintSelector(List<Stroke> strokes, Offset touchPoint) {
             painter: _Painter(closestStroke),
           ),
         )),
-    CircularContextMenu(),
+    // CircularContextMenu(),
     StrokeManipulationMenu(indexOfClosestStroke, touchPoint)
   ]);
 }

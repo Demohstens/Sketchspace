@@ -80,22 +80,29 @@ class _FileSaveDialogState extends State<FileSaveDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Save File'),
-      content: Column(
-        children: [
-          TextField(
-            onChanged: (value) {
-              validateFileNameCallback(value);
-            },
-            decoration: const InputDecoration(hintText: 'Enter file name'),
-          ),
-          Text(invalidFileName ? fileSavingError : ''),
-        ],
+      content: Container(
+        constraints: const BoxConstraints(maxHeight: 100),
+        child: Column(
+          children: [
+            TextField(
+              canRequestFocus: true,
+              autofocus: true,
+              onSubmitted: (value) {
+                validateFileNameCallback(value);
+                if (!invalidFileName) {
+                  save();
+                }
+              },
+              onChanged: (value) {
+                validateFileNameCallback(value);
+              },
+              decoration: const InputDecoration(hintText: 'Enter file name'),
+            ),
+            Text(invalidFileName ? fileSavingError : ''),
+          ],
+        ),
       ),
       actions: <Widget>[
-        TextButton(
-          onPressed: save,
-          child: const Text('Save'),
-        ),
         TextButton(
           onPressed: cancel,
           child: const Text('Cancel'),
@@ -103,6 +110,10 @@ class _FileSaveDialogState extends State<FileSaveDialog> {
         TextButton(
             onPressed: exitWithoutSaving,
             child: const Text('Exit without saving')),
+        TextButton(
+          onPressed: save,
+          child: const Text('Save'),
+        ),
       ],
     );
   }

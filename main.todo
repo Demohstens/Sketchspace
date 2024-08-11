@@ -9,7 +9,7 @@
 ☐ Share 
 https://pub.dev/packages/share_pluss
 ☐ Interface
-    ☐ Custom Context Menu @started(24-08-11 18:46)
+    ☐ Custom Context Menu
 ☐ toasts 
 ☐ Android / IOS 
 ☐ Button to hot switch between the last two brushes
@@ -35,7 +35,7 @@ https://pub.dev/packages/share_pluss
 - Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. 
     - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
 ✔ cannot exit without saving, due to the way the file is saved. @done(24-08-11 15:08)
-- FileSaveDialog too... tall? Odd. 
+✔ FileSaveDialog too... tall? Odd. @done(24-08-11 20:20)
 - Selection color hardcoded. Darkmode makes it invisible.
 - Android doesn't work: 
     ✔ Scaling is off @done(24-08-11 17:53) ?? 
