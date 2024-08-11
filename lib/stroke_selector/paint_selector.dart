@@ -1,9 +1,9 @@
 library paint_selector;
 
+import 'package:demo_space/classes/drawing_context.dart';
+import 'package:demo_space/stroke_selector/src/find_closest_stroke.dart';
+import 'package:demo_space/stroke_selector/src/stroke.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/classes/drawing_context.dart';
-import 'package:flutter_application/stroke_selector/src/stroke.dart';
-import 'package:flutter_application/stroke_selector/src/find_closest_stroke.dart';
 import 'package:provider/provider.dart';
 
 Widget? paintSelector(List<Stroke> strokes, Offset touchPoint) {
@@ -18,15 +18,14 @@ Widget? paintSelector(List<Stroke> strokes, Offset touchPoint) {
     Positioned(
         left: 0,
         top: 0,
-        child:
-    Container(
-      color: Colors.transparent,
-      width: closestStroke.boundary().width,
-      height: closestStroke.boundary().height,
-      child: CustomPaint(
-        painter: _Painter(closestStroke),
-      ),
-    )),
+        child: Container(
+          color: Colors.transparent,
+          width: closestStroke.boundary().width,
+          height: closestStroke.boundary().height,
+          child: CustomPaint(
+            painter: _Painter(closestStroke),
+          ),
+        )),
     StrokeManipulationMenu(indexOfClosestStroke, touchPoint)
   ]);
 }
@@ -72,11 +71,12 @@ class StrokeManipulationMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: touchPoint.dy - 100,
+        top: touchPoint.dy - 100,
         left: touchPoint.dx,
         child: FloatingActionButton.small(
-        onPressed: () {
-          context.read<DrawingContext>().removeStroke(index);
-        },
-        child: Icon(Icons.delete)));}
+            onPressed: () {
+              context.read<DrawingContext>().removeStroke(index);
+            },
+            child: Icon(Icons.delete)));
+  }
 }

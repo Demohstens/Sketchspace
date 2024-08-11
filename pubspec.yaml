@@ -1,5 +1,5 @@
-name: flutter_application
-description: A new Flutter project.
+name: demo_space
+description: A space to draw and share your ideas.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 

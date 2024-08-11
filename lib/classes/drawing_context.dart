@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:demo_space/classes/draw_file.dart';
+import 'package:demo_space/components/save_file_reminder.dart';
+import 'package:demo_space/stroke_selector/paint_selector.dart';
+import 'package:demo_space/stroke_selector/src/stroke.dart';
+import 'package:demo_space/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/classes/draw_file.dart';
-import 'package:flutter_application/components/save_file_reminder.dart';
-import 'package:flutter_application/stroke_selector/paint_selector.dart';
-import 'package:flutter_application/stroke_selector/src/stroke.dart';
-import 'package:flutter_application/utils/repaint_listener.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
 

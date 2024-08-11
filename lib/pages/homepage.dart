@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:demo_space/classes/draw_file.dart';
+import 'package:demo_space/classes/drawing_context.dart';
+import 'package:demo_space/pages/canvas.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/classes/draw_file.dart';
-import 'package:flutter_application/classes/drawing_context.dart';
-import 'package:flutter_application/pages/canvas.dart';
 import 'package:provider/provider.dart';
 
 // Menu for selecting pages (Canvas, etc.)

@@ -1,5 +1,5 @@
+import 'package:demo_space/stroke_selector/src/stroke.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_application/stroke_selector/src/stroke.dart';
 
 int? findClosestStrokeIndex(List<Stroke> strokes, Offset touchPoint) {
   if (strokes.isEmpty) {

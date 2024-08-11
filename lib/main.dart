@@ -1,8 +1,9 @@
+import 'package:demo_space/classes/demo_debug.dart';
+import 'package:demo_space/classes/drawing_context.dart';
+import 'package:demo_space/classes/settings.dart';
+import 'package:demo_space/pages/homepage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/classes/demo_debug.dart';
-import 'package:flutter_application/classes/drawing_context.dart';
-import 'package:flutter_application/classes/settings.dart';
-import 'package:flutter_application/pages/homepage.dart';
+
 import 'package:provider/provider.dart';
 
 void main() {
@@ -27,8 +28,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Drawing App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+          primarySwatch: Colors.blue,
+          pageTransitionsTheme: const PageTransitionsTheme(
+              builders: <TargetPlatform, PageTransitionsBuilder>{
+                // Set the predictive back transitions for Android.
+                TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+              })),
       home: HomePage(),
     );
   }

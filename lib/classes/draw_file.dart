@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:demo_space/components/save_file_reminder.dart';
+import 'package:demo_space/stroke_selector/src/stroke.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/components/save_file_reminder.dart';
-import 'package:flutter_application/stroke_selector/src/stroke.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 

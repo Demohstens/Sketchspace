@@ -2,7 +2,15 @@
 ☐ MainMenu
 ☐ Interface
 ☐ toasts 
-
+☐ Android / IOS 
+☐ Button to hot switch between the last two brushes
+☐ Custom Color palette
+☐ Custom Brush settings
+☐ Layers (Moveable, hideable, etc) using caching
+☐ Images
+☐ Text
+☐ Shapes (Arcs, squares, circles, etc)
+☐ haptic feedback on android 
 ----
 # Bugs 
 ✔ Loading files broke again - FIXED @done(24-08-10 00:48)
@@ -14,10 +22,14 @@
 ✔ saving an untitled file will save it as "Untitled" @done(24-08-10 19:34)
 - Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. 
     - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
-- cannot exit without saving
+- cannot exit without saving, due to the way the file is saved. 
+- FileSaveDialog too... tall? Odd. 
+- Android doesn't work: 
+    - Scaling is off
+    - touch support is inconsistant
+    - can't access options (need to push them down by the nozle thingy)
 
 ---
-- Android / IOS ?
 - Moveable, modular Interface
 - Tablet mode
 - hotkeys

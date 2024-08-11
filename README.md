@@ -1,4 +1,4 @@
-# Demo Drawing App
+# Demo space - A drawing app
 
 A demonstrative drawing app built in flutter by me (Demo)
 

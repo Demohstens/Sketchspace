@@ -1,10 +1,8 @@
+import 'package:demo_space/brushes/current_path_pen.dart';
+import 'package:demo_space/brushes/lazy_painter.dart';
+import 'package:demo_space/classes/drawing_context.dart';
+import 'package:demo_space/classes/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/brushes/current_path_pen.dart';
-import 'package:flutter_application/classes/drawing_context.dart';
-import 'package:flutter_application/classes/settings.dart';
-import 'package:flutter_application/brushes/lazy_painter.dart';
-import 'package:flutter_application/stroke_selector/paint_selector.dart';
-import 'package:flutter_application/stroke_selector/src/find_closest_stroke.dart';
 import 'package:provider/provider.dart';
 
 class DrawingCanvas extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'dart:ui';
 
+import 'package:demo_space/stroke_selector/src/stroke.dart';
+import 'package:demo_space/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/stroke_selector/src/stroke.dart';
-import 'package:flutter_application/utils/repaint_listener.dart';
 
 class LazyPainter extends CustomPainter {
   final List<Stroke> strokes;

@@ -1,9 +1,9 @@
+import 'package:demo_space/classes/drawing_context.dart';
+import 'package:demo_space/classes/settings.dart';
+import 'package:demo_space/components/brush_menu.dart';
+import 'package:demo_space/components/drawing_canvas.dart';
+import 'package:demo_space/pages/homepage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application/classes/drawing_context.dart';
-import 'package:flutter_application/classes/settings.dart';
-import 'package:flutter_application/components/brush_menu.dart';
-import 'package:flutter_application/components/drawing_canvas.dart';
-import 'package:flutter_application/pages/homepage.dart';
 import 'package:provider/provider.dart';
 
 class CanvasPage extends StatelessWidget {
@@ -66,14 +66,6 @@ class CanvasPage extends StatelessWidget {
             child: Icon(Icons.lock_reset_sharp),
           ),
         ),
-        Positioned(
-            top: MediaQuery.of(context).size.height / 2,
-            child: FloatingActionButton(
-              heroTag: "save",
-              onPressed: () {
-                context.read<DrawingContext>().saveFile(context);
-              },
-            ))
       ],
     );
   }
