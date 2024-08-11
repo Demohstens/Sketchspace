@@ -1,16 +1,28 @@
 import 'package:demo_space/classes/drawing_context.dart';
+import 'package:demo_space/classes/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 // possible to use menu anchor instead?
 // https://api.flutter.dev/flutter/material/PopupMenuButton-class.html
 
+enum MenuEntry { width }
+
 class BrushMenu extends StatelessWidget {
+  final MenuController _menuController = MenuController();
   @override
   Widget build(BuildContext context) {
+    Color secondary = context.watch<Settings>().secondaryColor;
     return Material(
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       PopupMenuButton<ColorButton>(
+        constraints: BoxConstraints(maxWidth: 50),
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(),
+        ),
+        position: PopupMenuPosition.under,
         initialValue: ColorToColotButton(context.read<DrawingContext>().color),
         onSelected: (ColorButton result) {
           context
@@ -31,10 +43,16 @@ class BrushMenu extends StatelessWidget {
           width: 40,
           decoration: BoxDecoration(
               color: context.watch<DrawingContext>().color,
-              border: Border.all(width: 1, color: Colors.black)),
+              border: Border.all(width: 1, color: secondary)),
         ),
       ),
       PopupMenuButton<Mode>(
+        constraints: BoxConstraints(maxWidth: 50),
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(),
+        ),
+        position: PopupMenuPosition.under,
         onSelected: (Mode result) {
           context.read<DrawingContext>().changeMode(result);
         },
@@ -49,39 +67,33 @@ class BrushMenu extends StatelessWidget {
         child: Container(
             height: 40,
             width: 40,
-            decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black)),
+            decoration:
+                BoxDecoration(border: Border.all(width: 1, color: secondary)),
             child: switch (context.read<DrawingContext>().mode) {
-              Mode.drawing => Icon(Icons.draw_rounded),
-              Mode.line => Icon(Icons.line_style),
-              Mode.fill => Icon(Icons.crop_3_2_rounded),
+              Mode.drawing => Icon(Icons.draw_rounded, color: secondary),
+              Mode.line => Icon(
+                  Icons.line_style,
+                  color: secondary,
+                ),
+              Mode.fill => Icon(Icons.crop_3_2_rounded, color: secondary),
               _ => null,
             }),
       ),
-      PopupMenuButton<double>(
-        onSelected: (double result) {
-          context.read<DrawingContext>().changeWidth(result);
-        },
-        initialValue: context.read<DrawingContext>().strokeWidth,
-        tooltip: "Change stroke width",
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<double>>[
-          PopupMenuItem(value: 5.0, child: _widthButton(5.0)),
-          PopupMenuItem(value: 10.0, child: _widthButton(10.0)),
-          PopupMenuItem(value: 15, child: _widthButton(15.0)),
-          PopupMenuItem(value: 20, child: _widthButton(20.0)),
-        ],
-        child: Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black)),
-            child: switch (context.read<DrawingContext>().strokeWidth) {
-              (double a) => Icon(
-                  (Icons.circle),
-                  size: a,
-                ),
-            }),
-      )
+      MenuAnchor(
+          controller: _menuController,
+          menuChildren: <Widget>[_widthSlider(context)],
+          child: GestureDetector(
+              onTap: () {
+                _menuController.open();
+              },
+              child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: secondary)),
+                  child: Icon(Icons.circle,
+                      size: context.read<DrawingContext>().strokeWidth,
+                      color: secondary)))),
     ]));
   }
 
@@ -91,24 +103,29 @@ class BrushMenu extends StatelessWidget {
 
   Widget _toolButton(IconData icon) {
     return Container(
-      margin: EdgeInsets.all(8.0),
-      height: 30,
-      width: 30,
-      color: Colors.white,
       child: Icon(icon),
     );
   }
 
   Widget _widthButton(double width) {
     return Container(
-      margin: EdgeInsets.all(8.0),
-      height: 30,
-      width: 30,
-      color: Colors.white,
       child: Icon(
         Icons.circle_sharp,
         size: width,
       ),
+    );
+  }
+
+  Widget _widthSlider(BuildContext context) {
+    return Slider(
+      value: context.read<DrawingContext>().strokeWidth,
+      min: 1,
+      max: 20,
+      divisions: 19,
+      label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
+      onChanged: (double value) {
+        context.read<DrawingContext>().changeWidth(value);
+      },
     );
   }
 }

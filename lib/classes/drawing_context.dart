@@ -7,6 +7,7 @@ import 'package:demo_space/stroke_selector/paint_selector.dart';
 import 'package:demo_space/stroke_selector/src/stroke.dart';
 import 'package:demo_space/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
 
@@ -32,6 +33,7 @@ class DrawingContext with ChangeNotifier {
 
   void selectStroke(Offset point) {
     selectedPaint = paintSelector(_buffer, point);
+    HapticFeedback.selectionClick();
     notifyListeners();
   }
 

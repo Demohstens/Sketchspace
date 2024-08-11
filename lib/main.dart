@@ -28,13 +28,16 @@ class Sketchspace extends StatelessWidget {
     return MaterialApp(
       title: 'Sketchspace',
       theme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.blue,
+          brightness: Brightness.light,
           pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
                 // Set the predictive back transitions for Android.
                 TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
               })),
+      darkTheme: ThemeData.dark(),
+      themeMode: context.watch<Settings>().darkModeEnabled
+          ? ThemeMode.dark
+          : ThemeMode.light,
       home: HomePage(),
     );
   }

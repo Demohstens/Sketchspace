@@ -51,10 +51,12 @@ class CanvasPage extends StatelessWidget {
                 heroTag: "darkmode",
                 child: Icon(Icons.color_lens),
                 onPressed: () => context.read<Settings>().toggleDarkMode())),
+        // Brush Menu
         Positioned(
-            top: 0,
+            bottom: MediaQuery.of(context).size.height * 0.01,
             left: MediaQuery.of(context).size.width / 2 - 50,
             child: BrushMenu()),
+        // Reset Button
         Positioned(
           bottom: 0,
           left: 0,

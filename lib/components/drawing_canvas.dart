@@ -14,7 +14,6 @@ class DrawingCanvas extends StatelessWidget {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             color: context.watch<Settings>().background,
-            // color: Colors.transparent,
             child: Stack(
               children: [
                 /// Background Custom Paint - LazyPainter

@@ -4,7 +4,7 @@ import 'package:demo_space/classes/draw_file.dart';
 import 'package:demo_space/classes/drawing_context.dart';
 import 'package:demo_space/pages/canvas.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 // Menu for selecting pages (Canvas, etc.)
