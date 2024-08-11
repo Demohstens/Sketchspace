@@ -43,7 +43,7 @@ class _Painter extends CustomPainter {
       return;
     }
     Paint shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
+      ..color = Color.fromARGB(255, 0, 0, 0).withOpacity(0.5)
       ..strokeWidth = paint.strokeWidth + 5
       ..style = PaintingStyle.stroke;
     Path shadowPath = Path()..moveTo(points.first.dx, points.first.dy);

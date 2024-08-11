@@ -1,7 +1,6 @@
 import 'package:demo_space/classes/drawing_context.dart';
 import 'package:demo_space/classes/settings.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 // possible to use menu anchor instead?
@@ -22,7 +21,7 @@ class BrushMenu extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(),
         ),
-        position: PopupMenuPosition.under,
+        position: PopupMenuPosition.over,
         initialValue: ColorToColotButton(context.read<DrawingContext>().color),
         onSelected: (ColorButton result) {
           context
@@ -52,7 +51,7 @@ class BrushMenu extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(),
         ),
-        position: PopupMenuPosition.under,
+        position: PopupMenuPosition.over,
         onSelected: (Mode result) {
           context.read<DrawingContext>().changeMode(result);
         },

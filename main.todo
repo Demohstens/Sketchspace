@@ -5,12 +5,15 @@
 ☐ Android / IOS 
 ☐ Button to hot switch between the last two brushes
 ☐ Custom Color palette
-☐ Custom Brush settings
+☐ Custom Brush settings 
+    ✔ Adjustable size @done(24-08-11 01:15)
 ☐ Layers (Moveable, hideable, etc) using caching
 ☐ Images
 ☐ Text
 ☐ Shapes (Arcs, squares, circles, etc)
-☐ haptic feedback on android 
+☐ haptic feedback on android
+✔ undo/redo @done(24-08-11 01:50)
+
 ----
 # Bugs 
 ✔ Loading files broke again - FIXED @done(24-08-10 00:48)
@@ -24,10 +27,11 @@
     - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
 - cannot exit without saving, due to the way the file is saved. 
 - FileSaveDialog too... tall? Odd. 
+- Selection color hardcoded. Darkmode makes it invisible.
 - Android doesn't work: 
     - Scaling is off
     - touch support is inconsistant
-    - can't access options (need to push them down by the nozle thingy)
+    ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
 
 ---
 - Moveable, modular Interface

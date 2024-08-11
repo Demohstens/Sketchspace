@@ -45,7 +45,7 @@ class CanvasPage extends StatelessWidget {
         ),
         // Toggle Dark mode button
         Positioned(
-            top: 0,
+            top: MediaQuery.of(context).size.height * 0.05,
             right: 0,
             child: FloatingActionButton(
                 heroTag: "darkmode",
@@ -68,6 +68,33 @@ class CanvasPage extends StatelessWidget {
             child: Icon(Icons.lock_reset_sharp),
           ),
         ),
+        // Redo/undo
+        Positioned(
+            top: MediaQuery.of(context).size.height * 0.45,
+            child: Container(
+                decoration: BoxDecoration(
+                    color: context.read<Settings>().background,
+                    border: Border.all(
+                        width: 1,
+                        color: context.watch<Settings>().secondaryColor)),
+                child: Column(children: [
+                  // Redo Button
+                  IconButton(
+                      onPressed: () {
+                        context.read<DrawingContext>().redo();
+                      },
+                      icon: Icon(Icons.redo,
+                          color: context.read<Settings>().secondaryColor)),
+                  // Undo Button
+                  IconButton(
+                      onPressed: () {
+                        context.read<DrawingContext>().undo();
+                      },
+                      icon: Icon(
+                        Icons.undo,
+                        color: context.read<Settings>().secondaryColor,
+                      )),
+                ]))),
       ],
     );
   }

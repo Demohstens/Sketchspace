@@ -22,6 +22,9 @@ class DrawingContext with ChangeNotifier {
   DrawFile _workingFile = DrawFile.empty("Untitled");
   Widget? selectedPaint;
 
+  List<Stroke> redoBuffer = [];
+  List<Stroke> undoBuffer = [];
+
   // GETTERS
   Color get color => _color;
   Mode get mode => _mode;
@@ -33,24 +36,55 @@ class DrawingContext with ChangeNotifier {
 
   void selectStroke(Offset point) {
     selectedPaint = paintSelector(_buffer, point);
-    HapticFeedback.selectionClick();
-    notifyListeners();
+    if (selectedPaint != null) {
+      HapticFeedback.selectionClick();
+      notifyListeners();
+    }
   }
 
   void removeStroke(int index) {
     if (index < 0 || index >= _buffer.length) {
       return;
     }
-    _buffer.removeAt(index);
+    undoBuffer.add(_buffer.removeAt(index));
     _workingFile.content = _buffer;
     selectedPaint = null;
+    HapticFeedback.lightImpact();
+
     notifyListeners();
     repaintListener.notifyListeners();
   }
 
   void unselectStroke() {
     selectedPaint = null;
+    HapticFeedback.selectionClick();
+
     notifyListeners();
+  }
+
+  void undo() {
+    if (undoBuffer.isNotEmpty) {
+      print("Undoing stroke");
+      _buffer.add(undoBuffer.removeLast());
+      redoBuffer.add(_buffer.last);
+      _workingFile.content = _buffer;
+      notifyListeners();
+      repaintListener.notifyListeners();
+    } else if (_buffer.isNotEmpty) {
+      redoBuffer.add(_buffer.removeLast());
+      _workingFile.content = _buffer;
+      notifyListeners();
+      repaintListener.notifyListeners();
+    }
+  }
+
+  void redo() {
+    if (redoBuffer.isNotEmpty) {
+      _buffer.add(redoBuffer.removeLast());
+      _workingFile.content = _buffer;
+      notifyListeners();
+      repaintListener.notifyListeners();
+    }
   }
 
   Future<bool> saveFile(BuildContext context, {String? name}) async {
@@ -104,6 +138,7 @@ class DrawingContext with ChangeNotifier {
   }
 
   void loadFileContext(File file) {
+    reset(); // TODO check if this is necessary
     _workingFile = loadFile(file);
     _buffer = _workingFile.getStrokes();
 
@@ -170,7 +205,8 @@ class DrawingContext with ChangeNotifier {
           break;
       }
       _workingFile.content = _buffer;
-
+      redoBuffer = [];
+      undoBuffer = [];
       _points = [];
       notifyListeners();
       repaintListener.notifyListeners();
@@ -191,6 +227,8 @@ class DrawingContext with ChangeNotifier {
   }
 
   void reset() {
+    undoBuffer = [];
+    redoBuffer = [];
     selectedPaint = null;
     _workingFile = DrawFile.empty("");
     _buffer = [];
