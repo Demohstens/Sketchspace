@@ -1,8 +1,8 @@
-import 'package:demo_space/classes/drawing_context.dart';
-import 'package:demo_space/classes/settings.dart';
-import 'package:demo_space/components/brush_menu.dart';
-import 'package:demo_space/components/drawing_canvas.dart';
-import 'package:demo_space/pages/homepage.dart';
+import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/components/brush_menu.dart';
+import 'package:sketchspace/components/drawing_canvas.dart';
+import 'package:sketchspace/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

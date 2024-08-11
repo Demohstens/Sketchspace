@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:demo_space/classes/draw_file.dart';
-import 'package:demo_space/components/save_file_reminder.dart';
-import 'package:demo_space/stroke_selector/paint_selector.dart';
-import 'package:demo_space/stroke_selector/src/stroke.dart';
-import 'package:demo_space/utils/repaint_listener.dart';
+import 'package:sketchspace/classes/draw_file.dart';
+import 'package:sketchspace/components/save_file_reminder.dart';
+import 'package:sketchspace/stroke_selector/paint_selector.dart';
+import 'package:sketchspace/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

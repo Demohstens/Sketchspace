@@ -1,5 +1,5 @@
-import 'package:demo_space/classes/drawing_context.dart';
-import 'package:demo_space/classes/settings.dart';
+import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/classes/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

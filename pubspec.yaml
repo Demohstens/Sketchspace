@@ -1,4 +1,4 @@
-name: demo_space
+name: sketchspace
 description: A space to draw and share your ideas.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

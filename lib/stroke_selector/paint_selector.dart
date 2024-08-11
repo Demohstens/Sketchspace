@@ -1,8 +1,8 @@
 library paint_selector;
 
-import 'package:demo_space/classes/drawing_context.dart';
-import 'package:demo_space/stroke_selector/src/find_closest_stroke.dart';
-import 'package:demo_space/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/stroke_selector/src/find_closest_stroke.dart';
+import 'package:sketchspace/stroke_selector/src/stroke.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

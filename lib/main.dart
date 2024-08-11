@@ -1,7 +1,7 @@
-import 'package:demo_space/classes/demo_debug.dart';
-import 'package:demo_space/classes/drawing_context.dart';
-import 'package:demo_space/classes/settings.dart';
-import 'package:demo_space/pages/homepage.dart';
+import 'package:sketchspace/classes/demo_debug.dart';
+import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/pages/homepage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';

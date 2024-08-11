@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:demo_space/classes/drawing_context.dart';
+import 'package:sketchspace/classes/drawing_context.dart';
 import 'package:flutter/material.dart';
 
 class CurrentPathPen extends CustomPainter {
