@@ -40,6 +40,9 @@ class DrawFile {
   DrawFile.fromFile(File file) {
     loadFile(file);
   }
+  Image? getThumbnail() {
+    // return Image.asset('assets/images/thumbnail.png');
+  }
 
   // Map<String, dynamic> toJson() {
   //   return {

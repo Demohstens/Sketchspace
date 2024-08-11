@@ -1,17 +1,23 @@
 ✔ Loadfiles @done(24-08-10 00:48)
-☐ MainMenu
+✔ MainMenu @done(24-08-11 14:48)
+    ✔ Show new button sintead of loading screen @started(24-08-11 15:09) @done(24-08-11 17:43) @lasted(2h34m49s)
+    ✔ Show share button @done(24-08-11 17:43)
+    ✔ Show delete button @done(24-08-11 15:09)
+    ✔ Display grid dynamically @done(24-08-11 17:24)
+☐ Thumbnails
+☐ Share 
 ☐ Interface
 ☐ toasts 
 ☐ Android / IOS 
 ☐ Button to hot switch between the last two brushes
 ☐ Custom Color palette
 ☐ Custom Brush settings 
-    ✔ Adjustable size @done(24-08-11 01:15)
+    ✔ Adjustable size @done(24-08-11 01:15) alpha v.0.0.2
 ☐ Layers (Moveable, hideable, etc) using caching
 ☐ Images
 ☐ Text
 ☐ Shapes (Arcs, squares, circles, etc)
-☐ haptic feedback on android
+✔ haptic feedback on android @done(24-08-11 14:48) alpha v.0.0.2
 ✔ undo/redo @done(24-08-11 01:50)
 
 ----
@@ -25,7 +31,7 @@
 ✔ saving an untitled file will save it as "Untitled" @done(24-08-10 19:34)
 - Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. 
     - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
-- cannot exit without saving, due to the way the file is saved. 
+✔ cannot exit without saving, due to the way the file is saved. @done(24-08-11 15:08)
 - FileSaveDialog too... tall? Odd. 
 - Selection color hardcoded. Darkmode makes it invisible.
 - Android doesn't work: 

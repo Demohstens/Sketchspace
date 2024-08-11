@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/components/save_file_reminder.dart';
+import 'package:sketchspace/pages/homepage.dart';
 import 'package:sketchspace/stroke_selector/paint_selector.dart';
 import 'package:sketchspace/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/utils/repaint_listener.dart';
@@ -221,6 +222,10 @@ class DrawingContext with ChangeNotifier {
 
     _color = color;
     notifyListeners();
+  }
+
+  void exit() {
+    return;
   }
 
   void reset() {

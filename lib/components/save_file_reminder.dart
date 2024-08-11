@@ -1,15 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:provider/provider.dart';
+import 'package:sketchspace/pages/homepage.dart';
 
 Future<String?> showFileNameDialog(BuildContext context) async {
   final Completer<String?> completer = Completer<String?>();
   showDialog(
       context: context,
       builder: (BuildContext context) {
-        return FileSaveDialog(saveCallback: (textInput) {
-          completer.complete(textInput);
-        });
+        return FileSaveDialog(
+            saveCallback: (textInput) {
+              completer.complete(textInput);
+            },
+            exitCallback: context.read<DrawingContext>().exit);
       });
   return await completer.future;
 }
@@ -23,7 +29,8 @@ bool validateFileName(String input) {
 class FileSaveDialog extends StatefulWidget {
   /// Function to be called when the user saves a file with valid name.
   final Function saveCallback; // saveCallback(String fileName) {};
-  FileSaveDialog({required this.saveCallback});
+  final Function exitCallback;
+  FileSaveDialog({required this.saveCallback, required this.exitCallback});
   @override
   _FileSaveDialogState createState() => _FileSaveDialogState();
 }
@@ -63,7 +70,11 @@ class _FileSaveDialogState extends State<FileSaveDialog> {
   }
 
   void exitWithoutSaving() {
-    Navigator.pop(context, null);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => HomePage()),
+    );
+    widget.exitCallback();
   }
 
   @override
