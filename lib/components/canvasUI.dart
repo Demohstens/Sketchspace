@@ -37,11 +37,16 @@ class _CanvasUIState extends State<CanvasUI> {
                       .read<DrawingContext>()
                       .saveFile(context)
                       .then((saveSuccess) {
-                    Navigator.pop(context);
-                    context.read<DrawingContext>().reset();
+                    if (mounted) {
+                      Navigator.pop(context);
+                      context.read<DrawFileProvider>().updateFileList();
+
+                      context.read<DrawingContext>().reset();
+                    }
                   });
                 } else {
                   context.read<DrawingContext>().reset();
+                  context.read<DrawFileProvider>().updateFileList();
                   Navigator.pop(context);
                 }
 

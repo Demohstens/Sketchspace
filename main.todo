@@ -5,9 +5,11 @@
     ✔ Show delete button @done(24-08-11 15:09)
     ✔ Display grid dynamically @done(24-08-11 17:24)
 ☐ Thumbnails
-☐ settings menu
+✔ settings menu @done(24-08-11 18:45)
 ☐ Share 
+https://pub.dev/packages/share_pluss
 ☐ Interface
+    ☐ Custom Context Menu @started(24-08-11 18:46)
 ☐ toasts 
 ☐ Android / IOS 
 ☐ Button to hot switch between the last two brushes

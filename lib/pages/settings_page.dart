@@ -7,26 +7,21 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(builder: (context, Settings settings, child) {
       return Scaffold(
-          appBar: AppBar(
-            title: const Text('Settings - Sketchspace'),
-          ),
-          body: Container(
-            child: Center(
-              child: Column(
-                children: [
-                  // Toggle Dark Mode
-                  Row(children: [
-                    const Text('Dark Mode'),
-                    Switch(
-                        value: context.watch<Settings>().darkModeEnabled,
-                        onChanged: (bool newValue) {
-                          context.read<Settings>().toggleDarkMode();
-                        })
-                  ])
-                ],
-              ),
-            ),
-          ));
+        appBar: AppBar(
+          title: const Text('Settings - Sketchspace'),
+        ),
+        body: Container(
+            child: Column(children: [
+          // Toggle Dark Mode
+          Center(
+              child: SwitchListTile(
+                  title: const Text("Dark Mode"),
+                  value: context.watch<Settings>().darkModeEnabled,
+                  onChanged: (bool newValue) {
+                    context.read<Settings>().toggleDarkMode();
+                  })),
+        ])),
+      );
     });
   }
 }
