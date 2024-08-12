@@ -24,14 +24,14 @@ class CanvasViewport extends StatelessWidget {
                   },
                   onScaleStart: (details) {
                     if (details.pointerCount > 1) {
-                      drawingContext.startScaling();
+                      drawingContext.startScaling(details);
                     } else {
                       drawingContext.endScaling();
                     }
                   },
                   onScaleUpdate: (details) {
                     drawingContext.scaling
-                        ? drawingContext.updateScale(details.scale)
+                        ? drawingContext.updateScale(details)
                         : drawingContext
                             .setCurrentPoint(details.localFocalPoint);
                   },
@@ -50,8 +50,11 @@ class CanvasViewport extends StatelessWidget {
                         CustomPaint(
                           isComplex: true,
                           size: Size.infinite,
-                          painter: CurrentPathPen(drawingContext.points,
-                              drawingContext.getPaint(), drawingContext.mode),
+                          painter: CurrentPathPen(
+                              context.watch<DrawingContext>().points,
+                              drawingContext.getPaint(),
+                              drawingContext.mode,
+                              drawingContext.transformMatrix),
                         ),
                         drawingContext.selectedPaint ?? Container(),
                       ]),

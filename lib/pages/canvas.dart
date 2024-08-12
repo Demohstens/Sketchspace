@@ -11,20 +11,19 @@ class CanvasPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        AnimatedScale(
-            scale: context.watch<DrawingContext>().scale,
-            duration: Duration(milliseconds: 0),
-            child: RepaintBoundary(
-                child: Container(
-              color: context.watch<Settings>().background,
-              child: CustomPaint(
-                willChange: false,
-                isComplex: true,
-                size: Size.infinite,
-                painter: LazyPainter(context.watch<DrawingContext>().buffer,
-                    context.read<DrawingContext>().repaintListener),
-              ),
-            ))),
+        RepaintBoundary(
+            child: Container(
+          color: context.watch<Settings>().background,
+          child: CustomPaint(
+            willChange: false,
+            isComplex: true,
+            size: Size.infinite,
+            painter: LazyPainter(
+                context.watch<DrawingContext>().buffer,
+                context.read<DrawingContext>().repaintListener,
+                context.watch<DrawingContext>().transformMatrix),
+          ),
+        )),
         Positioned.fill(
           child: CanvasViewport(),
         ),

@@ -27,29 +27,48 @@ class DrawingContext with ChangeNotifier {
   // Zoom logic
   bool _scaling = false;
   double _scale = 1.0;
+  Matrix4 transformMatrix = Matrix4.identity();
   double _initialScale = 1.0;
-  double scaleSensitivity = 0.1;
+  Offset _initialFocalPoint = Offset.zero;
+  Offset _panOffset = Offset.zero;
+  Offset _initialPanOffset = Offset.zero;
+  double scaleSensitivity = 2;
   double minScale = 1;
-  double maxScale = 5;
-  double get scale => _scale;
+  double maxScale = 3;
+  double get scale => transformMatrix.getMaxScaleOnAxis();
   bool get scaling => _scaling;
-  void startScaling() {
+  Offset get pan => _panOffset;
+
+  void startScaling(ScaleStartDetails details) {
     _scaling = true;
     _initialScale = _scale;
+    _initialFocalPoint = details.focalPoint;
+    _initialPanOffset = _panOffset;
     notifyListeners();
   }
 
   void endScaling() {
     _scaling = false;
+    _initialPanOffset = _panOffset;
+    _initialScale = _scale;
     notifyListeners();
     repaintListener.notifyListeners();
   }
 
-  void updateScale(deltaScale) {
-    _scale = (_initialScale * deltaScale).clamp(minScale, maxScale);
+  void updateScale(ScaleUpdateDetails details) {
+    // Calculate the scale
+    _scale = (_initialScale * details.scale).clamp(minScale, maxScale);
+
+    // Calculate the new pan offset relative to the initial pan offset
+    Offset deltaPan = details.focalPoint - _initialFocalPoint;
+    _panOffset = _initialPanOffset + deltaPan;
+
+    // Update the transformation matrix
+    transformMatrix = Matrix4.identity()
+      ..scale(_scale)
+      ..translate(_panOffset.dx, _panOffset.dy);
 
     notifyListeners();
-    repaintListener.notifyListeners();
   }
 
   bool ui_enabled = true;
@@ -283,6 +302,7 @@ class DrawingContext with ChangeNotifier {
   }
 
   void reset() {
+    transformMatrix = Matrix4.identity();
     _scale = 1.0;
     undoBuffer = [];
     redoBuffer = [];

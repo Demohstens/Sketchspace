@@ -24,6 +24,11 @@ class _CanvasUIState extends State<CanvasUI> {
     return Visibility(
         child: Stack(
       children: [
+        Positioned(
+            top: 0,
+            left: 0,
+            child: Text(
+                "${context.read<DrawingContext>().scale.toString()}, panx: ${context.read<DrawingContext>().transformMatrix.getTranslation().x}, pany: ${context.read<DrawingContext>().transformMatrix.getTranslation().y}")),
         // Button to return Home and save if needed / allowed
         Positioned(
           right: 0,
