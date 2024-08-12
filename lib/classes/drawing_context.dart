@@ -15,7 +15,7 @@ enum Mode { drawing, lifted, erasing, line, fill }
 class DrawingContext with ChangeNotifier {
   Color _color = Colors.red;
   List<Stroke> _buffer = [];
-  Offset _currentPoint = Offset(0, 0);
+  Offset _currentPoint = Offset.zero;
   List<Offset> _points = [];
   RepaintListener repaintListener = RepaintListener();
   Mode _mode = Mode.drawing;
@@ -29,8 +29,8 @@ class DrawingContext with ChangeNotifier {
   double _scale = 1.0;
   double _initialScale = 1.0;
   double scaleSensitivity = 0.1;
-  double minScale = 0.1;
-  double maxScale = 3;
+  double minScale = 1;
+  double maxScale = 5;
   double get scale => _scale;
   bool get scaling => _scaling;
   void startScaling() {
@@ -74,10 +74,14 @@ class DrawingContext with ChangeNotifier {
   }
 
   /// Creates a new Stroke object depending on the mode
-  void createStroke(List<Offset>? points) {
+  void createStroke({List<Offset>? points}) {
     Stroke stroke;
     if (points != null) {
-      _points = points;
+      _points = localToGlobal(points);
+    } else {
+      points = localToGlobal(_points);
+    }
+    if (points.isNotEmpty) {
       switch (_mode) {
         case Mode.drawing:
           stroke = Stroke(getPaint(), points);
@@ -98,14 +102,21 @@ class DrawingContext with ChangeNotifier {
         case Mode.lifted:
           break;
       }
-      // backgroundImage = getLazyLayer(_buffer, 1920, 1080);
-      _workingFile.content = _buffer;
-      redoBuffer = [];
-      undoBuffer = [];
-      _points = [];
-      notifyListeners();
-      repaintListener.notifyListeners();
     }
+    // backgroundImage = getLazyLayer(_buffer, 1920, 1080);
+    _workingFile.content = _buffer;
+    redoBuffer = [];
+    undoBuffer = [];
+    _points = [];
+    notifyListeners();
+    repaintListener.notifyListeners();
+  }
+
+  // Convert localpoints to equivalent global points
+  List<Offset> localToGlobal(List<Offset> points) {
+    return points.map((point) {
+      return Offset(point.dx * _scale, point.dy * _scale);
+    }).toList();
   }
 
   // seleection logic

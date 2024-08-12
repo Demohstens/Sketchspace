@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:path/path.dart';
+
 import 'package:sketchspace/brushes/current_path_pen.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/classes/drawing_context.dart';
-import 'package:sketchspace/classes/settings.dart';
-import 'package:sketchspace/stroke_selector/src/stroke.dart';
-import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:provider/provider.dart';
 
 class CanvasViewport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    print("Building Canvas");
     return Stack(
       children: [
         Consumer<DrawingContext>(builder: (context, drawingContext, _) {
@@ -20,7 +15,6 @@ class CanvasViewport extends StatelessWidget {
               // Gesture handling for the Canvas
               child: GestureDetector(
                   onDoubleTap: () {
-                    print("Double Tap");
                     context.read<DrawingContext>().toggleUI();
                   },
                   onLongPressStart: (details) {
@@ -38,11 +32,12 @@ class CanvasViewport extends StatelessWidget {
                   onScaleUpdate: (details) {
                     drawingContext.scaling
                         ? drawingContext.updateScale(details.scale)
-                        : drawingContext.setCurrentPoint(details.focalPoint);
+                        : drawingContext
+                            .setCurrentPoint(details.localFocalPoint);
                   },
                   onScaleEnd: (details) {
                     drawingContext.endScaling();
-                    drawingContext.createStroke(drawingContext.points);
+                    drawingContext.createStroke();
                   },
 
                   // The Visual Representation of the Canvas

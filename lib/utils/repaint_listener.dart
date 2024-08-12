@@ -7,10 +7,14 @@ import 'package:flutter/material.dart';
 /// Author: Philip Lalonde
 class RepaintListener implements Listenable {
   final StreamController<void> _controller = StreamController<void>.broadcast();
-
+  bool _isDisposed = false;
   @override
   void addListener(VoidCallback listener) {
-    _controller.stream.listen((_) => listener());
+    if (!_isDisposed) {
+      _controller.stream.listen((_) => listener());
+    } else {
+      throw Exception('Cannot add listener after disposal');
+    }
   }
 
   @override
@@ -21,6 +25,7 @@ class RepaintListener implements Listenable {
   }
 
   void dispose() {
+    _isDisposed = true;
     _controller.close();
   }
 }
