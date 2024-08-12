@@ -1,5 +1,4 @@
 import 'package:sketchspace/brushes/current_path_pen.dart';
-import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/classes/drawing_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,7 @@ class DrawingCanvas extends StatelessWidget {
             color: context.watch<Settings>().background,
             child: Stack(
               children: [
-                /// Background Custom Paint - LazyPainter
+                // Background Custom Paint - LazyPainter
                 // RepaintBoundary(
                 //   child: Container(
                 //       // Hacky way to force an update.
@@ -25,15 +24,13 @@ class DrawingCanvas extends StatelessWidget {
                 //         scale: context.watch<DrawingContext>().scale,
                 //         duration: Duration(milliseconds: 0),
                 //         child: CustomPaint(
-                //           willChange: false,
-                //           isComplex: true,
-                //           size: Size.infinite,
-                //           painter: LazyPainter(drawingContext.buffer,
-                //               drawingContext.repaintListener),
-                //         ),
+                //             willChange: false,
+                //             isComplex: true,
+                //             size: Size.infinite,
+                //             painter: DrawImage(drawingContext.backgroundImage,
+                //                 drawingContext.repaintListener)),
                 //       )),
                 // ),
-                context.watch<DrawingContext>().getLazyPaint(),
 
                 /// Current Path Custom Paint - CurrentLinePainter
                 GestureDetector(

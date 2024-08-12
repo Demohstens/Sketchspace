@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 
-import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/components/save_file_reminder.dart';
 import 'package:sketchspace/stroke_selector/paint_selector.dart';
@@ -22,26 +22,7 @@ class DrawingContext with ChangeNotifier {
   double _width = 10.0;
   DrawFile _workingFile = DrawFile.empty("Untitled");
   Widget? selectedPaint;
-
-  Widget getLazyPaint() {
-    return RepaintBoundary(
-      child: Container(
-          // Hacky way to force an update.
-          key: Key("Canvas"),
-          child: AnimatedScale(
-            scale: scale,
-            duration: Duration(milliseconds: 0),
-            child: CustomPaint(
-              willChange: false,
-              isComplex: true,
-              size: Size.infinite,
-              painter: LazyPainter(buffer, repaintListener),
-            ),
-          )),
-    );
-  }
-
-  late Widget lazyCanvas = getLazyPaint();
+  ui.Image? backgroundImage;
 
   // Zoom logic
   bool _scaling = false;
@@ -117,6 +98,7 @@ class DrawingContext with ChangeNotifier {
         case Mode.lifted:
           break;
       }
+      // backgroundImage = getLazyLayer(_buffer, 1920, 1080);
       _workingFile.content = _buffer;
       redoBuffer = [];
       undoBuffer = [];

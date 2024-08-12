@@ -8,8 +8,8 @@ class LazyPainter extends CustomPainter {
   final List<Stroke> strokes;
 
   final RepaintListener repaintListener;
-  LazyPainter(
-      this.strokes, this.repaintListener); // : super(repaint: repaintListener);
+  LazyPainter(this.strokes, this.repaintListener)
+      : super(repaint: repaintListener); // : super(repaint: repaintListener);
 
   @override
   void paint(Canvas canvas, Size size) {
