@@ -35,6 +35,7 @@ class DrawingContext with ChangeNotifier {
   double scaleSensitivity = 2;
   double minScale = 1;
   double maxScale = 3;
+  double maxPan = 100;
   double get scale => transformMatrix.getMaxScaleOnAxis();
   bool get scaling => _scaling;
   Offset get pan => _panOffset;
@@ -61,13 +62,17 @@ class DrawingContext with ChangeNotifier {
 
     // Calculate the new pan offset relative to the initial pan offset
     Offset deltaPan = details.focalPoint - _initialFocalPoint;
-    _panOffset = _initialPanOffset + deltaPan;
+    double _panOffsetX =
+        (_initialPanOffset.dx + deltaPan.dx).clamp(-maxPan, maxPan);
+    double _panOffsetY =
+        (_initialPanOffset.dy + deltaPan.dy).clamp(-maxPan, maxPan);
+    _panOffset = Offset(_panOffsetX, _panOffsetY);
 
     // Update the transformation matrix
     transformMatrix = Matrix4.identity()
       ..scale(_scale)
       ..translate(_panOffset.dx, _panOffset.dy);
-
+    repaintListener.notifyListeners();
     notifyListeners();
   }
 
@@ -310,7 +315,9 @@ class DrawingContext with ChangeNotifier {
     _workingFile = DrawFile.empty("");
     _buffer = [];
     _points = [];
-    repaintListener.notifyListeners();
+    if (!repaintListener.isDisposed) {
+      repaintListener.notifyListeners();
+    }
     notifyListeners();
   }
 }

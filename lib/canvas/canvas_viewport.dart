@@ -12,6 +12,7 @@ class CanvasViewport extends StatelessWidget {
       children: [
         Consumer<DrawingContext>(builder: (context, drawingContext, _) {
           return Container(
+
               // Gesture handling for the Canvas
               child: GestureDetector(
                   onDoubleTap: () {
@@ -43,7 +44,7 @@ class CanvasViewport extends StatelessWidget {
                   // The Visual Representation of the Canvas
                   child: Stack(children: [
                     // LazyCanvas - cached Background
-
+                    // Moved to canvas.dart
                     // Current Path - CurrentLinePainter
                     RepaintBoundary(
                       child: Stack(children: [
