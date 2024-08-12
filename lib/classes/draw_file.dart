@@ -32,7 +32,7 @@ class DrawFile {
   DrawFile.empty(name, {path}) {
     _name = name;
     if (path == null) {
-      _path = '${appDirectory()}/$name.json';
+      _path = '${getAppDirectory()}/$name.json';
     } else {
       _path = path;
     }
@@ -75,7 +75,7 @@ class DrawFile {
     ];
     final String jsonString = jsonEncode({"Strokes": jsonStrokes});
 
-    final Directory appDir = await appDirectory();
+    final Directory appDir = await getAppDirectory();
     final File file = File('${appDir.path}/$_name');
 
     // Write the JSON string to the file
@@ -95,7 +95,7 @@ class DrawFile {
   }
 }
 
-Future<Directory> appDirectory() async {
+Future<Directory> getAppDirectory() async {
   final Directory directory = await getApplicationDocumentsDirectory();
   final appDirectory = Directory('${directory.path}/DemoDraw');
   if (!await appDirectory.exists()) {
@@ -107,7 +107,7 @@ Future<Directory> appDirectory() async {
 // Returns a list of files in the app directory.
 Future<List<File>> getFiles() async {
   List<File> files = [];
-  final Directory appDir = await appDirectory();
+  final Directory appDir = await getAppDirectory();
 
   appDir.listSync().forEach((element) {
     if (element is File && element.path.endsWith('.json')) {

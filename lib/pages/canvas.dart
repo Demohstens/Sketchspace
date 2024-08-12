@@ -1,3 +1,4 @@
+import 'package:sketchspace/canvas/canvas_viewport.dart';
 import 'package:sketchspace/classes/drawing_context.dart';
 import 'package:sketchspace/components/canvasUI.dart';
 import 'package:sketchspace/components/drawing_canvas.dart';
@@ -9,11 +10,7 @@ class CanvasPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Positioned(
-          left: 0,
-          top: 0,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
+        Positioned.fill(
           child: DrawingCanvas(),
         ),
         Visibility(

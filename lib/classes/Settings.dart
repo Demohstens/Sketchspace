@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sketchspace/classes/draw_file.dart';
 
 class Settings with ChangeNotifier {
   static const Color mainColor = Color(0xffbb86fc);
@@ -17,12 +21,23 @@ class Settings with ChangeNotifier {
   late Color _secondaryColor;
   late Color _tertiaryColor;
 
+  // Application Settings
+  late Directory saveDirectory;
+
+  // Default Settings
   Settings() {
+    _populate();
     themeMode = ThemeMode.system;
     _background = colorScheme.surface;
     _primaryColor = colorScheme.primary;
     _secondaryColor = colorScheme.secondary;
     _tertiaryColor = colorScheme.tertiary;
+  }
+
+  /// Populate the settings with async data
+  void _populate() async {
+    saveDirectory = await getApplicationDocumentsDirectory();
+    notifyListeners();
   }
 
   bool get darkModeEnabled => themeMode == ThemeMode.dark;

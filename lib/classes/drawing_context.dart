@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/components/save_file_reminder.dart';
 import 'package:sketchspace/stroke_selector/paint_selector.dart';
@@ -22,6 +23,54 @@ class DrawingContext with ChangeNotifier {
   DrawFile _workingFile = DrawFile.empty("Untitled");
   Widget? selectedPaint;
 
+  Widget getLazyPaint() {
+    return RepaintBoundary(
+      child: Container(
+          // Hacky way to force an update.
+          key: Key("Canvas"),
+          child: AnimatedScale(
+            scale: scale,
+            duration: Duration(milliseconds: 0),
+            child: CustomPaint(
+              willChange: false,
+              isComplex: true,
+              size: Size.infinite,
+              painter: LazyPainter(buffer, repaintListener),
+            ),
+          )),
+    );
+  }
+
+  late Widget lazyCanvas = getLazyPaint();
+
+  // Zoom logic
+  bool _scaling = false;
+  double _scale = 1.0;
+  double _initialScale = 1.0;
+  double scaleSensitivity = 0.1;
+  double minScale = 0.1;
+  double maxScale = 3;
+  double get scale => _scale;
+  bool get scaling => _scaling;
+  void startScaling() {
+    _scaling = true;
+    _initialScale = _scale;
+    notifyListeners();
+  }
+
+  void endScaling() {
+    _scaling = false;
+    notifyListeners();
+    repaintListener.notifyListeners();
+  }
+
+  void updateScale(deltaScale) {
+    _scale = (_initialScale * deltaScale).clamp(minScale, maxScale);
+
+    notifyListeners();
+    repaintListener.notifyListeners();
+  }
+
   bool ui_enabled = true;
 
   List<Stroke> redoBuffer = [];
@@ -36,6 +85,48 @@ class DrawingContext with ChangeNotifier {
   double get strokeWidth => _width;
   DrawFile? get workingFile => _workingFile;
 
+  // Drawing logic
+  void setCurrentPoint(Offset point) {
+    _points.add(point);
+    _currentPoint = point;
+    notifyListeners();
+  }
+
+  /// Creates a new Stroke object depending on the mode
+  void createStroke(List<Offset>? points) {
+    Stroke stroke;
+    if (points != null) {
+      _points = points;
+      switch (_mode) {
+        case Mode.drawing:
+          stroke = Stroke(getPaint(), points);
+          // stroke.optimize();
+          _buffer.add(stroke);
+        case Mode.erasing:
+          break;
+        case Mode.line:
+          if (points.length < 2) {
+            _buffer.add(Stroke(getPaint(), points));
+          }
+          stroke = (Stroke(getPaint(), [points.first, points.last]));
+          _buffer.add(stroke);
+        case Mode.fill:
+          stroke = (Stroke(getPaint(), points));
+          // stroke.optimize();
+          _buffer.add(stroke);
+        case Mode.lifted:
+          break;
+      }
+      _workingFile.content = _buffer;
+      redoBuffer = [];
+      undoBuffer = [];
+      _points = [];
+      notifyListeners();
+      repaintListener.notifyListeners();
+    }
+  }
+
+  // seleection logic
   void selectStroke(Offset point) {
     selectedPaint = paintSelector(_buffer, point);
     if (selectedPaint != null) {
@@ -44,8 +135,8 @@ class DrawingContext with ChangeNotifier {
     }
   }
 
-  void toggleUI() {
-    ui_enabled = !ui_enabled;
+  void unselectStroke() {
+    selectedPaint = null;
     notifyListeners();
   }
 
@@ -62,11 +153,12 @@ class DrawingContext with ChangeNotifier {
     repaintListener.notifyListeners();
   }
 
-  void unselectStroke() {
-    selectedPaint = null;
+  void toggleUI() {
+    ui_enabled = !ui_enabled;
     notifyListeners();
   }
 
+  // Undo / redo logic
   void undo() {
     if (undoBuffer.isNotEmpty) {
       print("Undoing stroke");
@@ -92,6 +184,7 @@ class DrawingContext with ChangeNotifier {
     }
   }
 
+  // File logic
   Future<bool> saveFile(BuildContext context, {String? name}) async {
     // return await _workingFile.save(context);
     String _name;
@@ -121,7 +214,7 @@ class DrawingContext with ChangeNotifier {
     ];
     final String jsonString = jsonEncode({"Strokes": jsonStrokes});
 
-    final Directory appDir = await appDirectory();
+    final Directory appDir = await getAppDirectory();
     String filePath;
     if (_name.endsWith(".json")) {
       filePath = '${appDir.path}/$_name';
@@ -134,12 +227,6 @@ class DrawingContext with ChangeNotifier {
     await file.writeAsString(jsonString);
     print('Saved file to ${file.path}');
     return success;
-  }
-
-  void setCurrentPoint(Offset point) {
-    _points.add(point);
-    _currentPoint = point;
-    notifyListeners();
   }
 
   void loadFileContext(File file) {
@@ -185,40 +272,6 @@ class DrawingContext with ChangeNotifier {
     }
   }
 
-  /// Creates a new Stroke object depending on the mode
-  void createStroke(List<Offset>? points) {
-    Stroke stroke;
-    if (points != null) {
-      _points = points;
-      switch (_mode) {
-        case Mode.drawing:
-          stroke = Stroke(getPaint(), points);
-          // stroke.optimize();
-          _buffer.add(stroke);
-        case Mode.erasing:
-          break;
-        case Mode.line:
-          if (points.length < 2) {
-            _buffer.add(Stroke(getPaint(), points));
-          }
-          stroke = (Stroke(getPaint(), [points.first, points.last]));
-          _buffer.add(stroke);
-        case Mode.fill:
-          stroke = (Stroke(getPaint(), points));
-          // stroke.optimize();
-          _buffer.add(stroke);
-        case Mode.lifted:
-          break;
-      }
-      _workingFile.content = _buffer;
-      redoBuffer = [];
-      undoBuffer = [];
-      _points = [];
-      notifyListeners();
-      repaintListener.notifyListeners();
-    }
-  }
-
   void changeMode(Mode mode) {
     print("Changing mode: $mode");
     _mode = mode;
@@ -237,6 +290,7 @@ class DrawingContext with ChangeNotifier {
   }
 
   void reset() {
+    _scale = 1.0;
     undoBuffer = [];
     redoBuffer = [];
     selectedPaint = null;
