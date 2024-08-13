@@ -30,30 +30,35 @@ class Stroke {
   }
 
   /// Returns a Stroke object from a json object
-  // factory Stroke.fromJson(Map<String, dynamic> json) {
-  //   return Stroke(
-  //     Paint()
-  //       ..color = Color(json['paint']['color'])
-  //       ..strokeWidth = json['paint']['strokeWidth']
-  //       ..style = json['paint']['style'] == 'fill'
-  //           ? PaintingStyle.fill
-  //           : PaintingStyle.stroke,
-  //     (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
-  //   );
-  // }
+  factory Stroke.fromJson(Map<String, dynamic> json) {
+    print("Stroke.fromJson: $json");
+    return Stroke(
+      Paint()
+        ..color = Color(json['paint']['color'])
+        ..strokeWidth = json['paint']['strokeWidth']
+        ..style = json['paint']['style'] == 'fill'
+            ? PaintingStyle.fill
+            : PaintingStyle.stroke,
+      (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
+      Mode.values.firstWhere(
+          (element) => element.toString().split('.').last == json['mode']),
+    );
+  }
 
   /// Returns A string for json serialization
-  /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}
+  /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...], "Mode": }
   String toJson() {
-    return jsonEncode({
+    var ret = jsonEncode({
       "paint": {
         "color": _paint.color.value,
         "strokeWidth": _paint.strokeWidth,
         "style": _paint.style.toString().split('.').last,
       },
       "points": _points.map((e) => [e.dx, e.dy]).toList(),
-      "Mode": _mode.toString().split('.').last,
+      "mode": _mode.toString().split('.').last,
     });
+    print("Stroke.toJson: $ret");
+    return ret;
   }
 
   Rect boundary() {

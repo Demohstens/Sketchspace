@@ -224,7 +224,7 @@ class NewFileButton extends StatelessWidget {
           heroTag: tag,
           tooltip: "Create a new file",
           onPressed: () {
-            context.read<Worldspace>().clear();
+            context.read<DrawingContext>().newFile();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CanvasPage()),

@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 
 class ErrorPainter extends CustomPainter {
   final String error;

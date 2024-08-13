@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
-import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
 
 class LazyPainter extends CustomPainter {

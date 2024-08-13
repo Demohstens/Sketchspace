@@ -5,9 +5,7 @@ import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/components/save_file_reminder.dart';
-import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
 
@@ -71,7 +69,6 @@ class DrawingContext with ChangeNotifier {
   // Undo / redo logic
   void undo() {
     if (undoBuffer.isNotEmpty) {
-      print("Undoing stroke");
       Stroke undoneStroke = undoBuffer.removeLast();
       worldspace.addStroke(undoneStroke);
       redoBuffer.add(undoneStroke);
@@ -94,6 +91,10 @@ class DrawingContext with ChangeNotifier {
   }
 
   // File logic
+  void newFile() {
+    resetAll();
+  }
+
   Future<bool> saveFile(BuildContext context, {String? name}) async {
     // return await _workingFile.save(context);
     String _name;
@@ -104,7 +105,7 @@ class DrawingContext with ChangeNotifier {
       print("No content to save.");
       return saveSuccess;
     }
-    if (_name == "") {
+    if (_name == "" || _name == null || _name == "Untitled") {
       String? fileName = await showFileNameDialog(context);
       if (fileName != null) {
         _name = fileName;
@@ -135,7 +136,7 @@ class DrawingContext with ChangeNotifier {
 
   void loadFileContext(File file) {
     resetAll(); // TODO check if this is necessary
-    _workingFile = loadFile(file);
+    _workingFile = loadFile(file) ?? DrawFile.empty("Untitled");
     worldspace.loadStrokes(_workingFile.getStrokes());
 
     if (_workingFile.content == null) {

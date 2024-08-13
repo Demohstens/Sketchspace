@@ -41,7 +41,7 @@ https://pub.dev/packages/share_pluss
     ✔ Scaling is off @done(24-08-11 17:53) ?? 
     - touch support is inconsistant
     ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
-- Rewrite RepaintListener to allow for unloading of Listeners.
+✔ Rewrite RepaintListener to allow for unloading of Listeners. @done(24-08-13 14:21) replaced with ValueNotifier
 
 # For alpha 1:
 ✔ fix undo/redo @done(24-08-13 10:28)

@@ -118,7 +118,7 @@ Future<List<File>> getFiles() async {
 }
 
 /// Loads a file and returns a list of strokes
-DrawFile loadFile(File file) {
+DrawFile? loadFile(File file) {
   try {
     final String content = file.readAsStringSync();
     final Map<String, dynamic> json = jsonDecode(content);
@@ -127,20 +127,16 @@ DrawFile loadFile(File file) {
     if (json.containsKey("Strokes") && json["Strokes"] is List) {
       final strokes = json["Strokes"];
       if (strokes.isNotEmpty) {
-        print("Loaded file: ${file.path}");
         strokesList = [
-          // for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
+          for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
         ];
         return DrawFile(basename(file.path), file.path, strokesList);
       } else {
         print('File contains no strokes: ${file.path}');
         return DrawFile(basename(file.path), file.path, null);
       }
-    } else {
-      print('Invalid JSON structure in file: ${file.path}');
-    }
+    } else {}
   } catch (e) {
     print('Error loading file: ${file.path}, Error: $e');
   }
-  return DrawFile.empty(basename(file.path));
 }

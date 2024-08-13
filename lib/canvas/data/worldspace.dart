@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
-import 'package:sketchspace/canvas/stroke_selector/src/find_closest_stroke.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
-import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 /// The "World" in which all Strokes are stored in relation to the 0,0 coordinates.
