@@ -1,11 +1,8 @@
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:sketchspace/pages/canvas.dart';
 import 'package:flutter/material.dart';
