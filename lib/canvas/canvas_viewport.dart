@@ -28,12 +28,8 @@ class CanvasViewport extends StatelessWidget {
                 maxScale: 3,
                 maxZoomWidth: 2000,
                 maxZoomHeight: 2000,
-                onScaleUpdateDetails: (details) {
-                  if (details.pointerCount == 1) {
-                    context
-                        .read<DrawingContext>()
-                        .updateDrawing((details.localFocalPoint));
-                  }
+                onDrawUpdate: (point) {
+                  context.read<DrawingContext>().updateDrawing(point);
                 },
                 child:
                     //  GestureDetector(
