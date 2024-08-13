@@ -25,11 +25,6 @@ class _CanvasUIState extends State<CanvasUI> {
     return Visibility(
         child: Stack(
       children: [
-        Positioned(
-            top: 0,
-            left: 0,
-            child: Text(
-                "${context.read<ScaleProvier>().scale.roundToDouble().toString()}, panx: ${context.read<ScaleProvier>().transformMatrix.getTranslation().x.floor()}, pany: ${context.read<ScaleProvier>().transformMatrix.getTranslation().y.floor()}")),
         // Button to return Home and save if needed / allowed
         Positioned(
           right: 0,

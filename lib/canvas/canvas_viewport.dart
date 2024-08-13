@@ -31,36 +31,10 @@ class CanvasViewport extends StatelessWidget {
                 onDrawUpdate: (point) {
                   context.read<DrawingContext>().updateDrawing(point);
                 },
-                child:
-                    //  GestureDetector(
-                    //   onDoubleTap: () {
-                    //     context.read<DrawingContext>().toggleUI();
-                    //   },
-                    //   // onLongPressStart: (details) {
-                    //   //   context
-                    //   //       .read<DrawingContext>()
-                    //   //       .selectStroke(details.globalPosition);
-                    //   // },
-                    //   // onScaleStart: (details) {
-                    //   //   if (details.pointerCount > 1) {
-                    //   //     scaleContext.startScaling(details);
-                    //   //   } else {
-                    //   //     scaleContext.endScaling();
-                    //   //   }
-                    //   // },
-                    //   onPanUpdate: (details) {
-                    //     context
-                    //         .read<DrawingContext>()
-                    //         .updateDrawing((details.localPosition));
-                    //   },
-                    //   // onScaleEnd: (details) {
-                    //   //   scaleContext.endScaling();
-                    //   //   context.read<DrawingContext>().endDrawing();
-                    //   // },
-
-                    //   // The Visual Representation of the Canvas
-                    //   child:
-                    Stack(children: [
+                onDrawEnd: () {
+                  context.read<DrawingContext>().endDrawing();
+                },
+                child: Stack(children: [
                   Positioned.fill(
                       child: RepaintBoundary(
                     child: CustomPaint(
