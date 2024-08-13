@@ -197,8 +197,9 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                       onPressed: () {
                         // Share(file);
                         Share.share(
-                            "...But in the meantime check out this project's reposity for updates! https://github.com/Demohstens/Sketchspace",
-                            subject: "This feature is not yet Implemented");
+                            "...But in the meantime check out this project's reposity for updates! ",
+                            subject:
+                                "This feature is not yet Implemented: https://github.com/Demohstens/Sketchspace");
                         context.read<DrawFileProvider>().updateFileList();
                       },
                       icon: const Icon(Icons.share),
@@ -212,7 +213,7 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                       onPressed: () {
                         // Rename file
                         showFileRenameDialog(context, file).then((value) {
-                          if (value != null) {
+                          if (mounted) {
                             context.read<DrawFileProvider>().addFile(value);
                           }
                         });
