@@ -1,10 +1,5 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:ui' as ui;
-
+import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
-import 'package:sketchspace/components/save_file_reminder.dart';
-import 'package:sketchspace/canvas/data/stroke_selector/paint_selector.dart';
 import 'package:sketchspace/canvas/data/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
@@ -15,8 +10,9 @@ enum Mode { drawing, lifted, erasing, line, fill }
 /// Everything the active painter needs to draw on the canvas
 /// Also includes everything the
 class DrawingContext with ChangeNotifier {
+  DrawingContext(this.worldspace);
   // * ATTRIBUTES * //
-  Offset _currentPoint = Offset.zero;
+  Worldspace worldspace;
   List<Offset> _points = [];
   RepaintListener repaintListener = RepaintListener();
   Mode _mode = Mode.drawing;
@@ -39,19 +35,27 @@ class DrawingContext with ChangeNotifier {
   List<Offset> get points => _points;
   double get strokeWidth => _width;
   DrawFile? get workingFile => _workingFile;
-  Matrix4 get inverseTransformMatrix => _inverseMatrix;
 
-  Matrix4 _inverseMatrix = Matrix4.identity();
   // Drawing logic
-  void setCurrentPoint(Offset point) {
-    _points.add(point);
-    _currentPoint = point;
-    notifyListeners();
-  }
-
   void toggleUI() {
     ui_enabled = !ui_enabled;
     notifyListeners();
+  }
+
+  void updateDrawing(Offset p) {
+    _points.add(p);
+    notifyListeners();
+  }
+
+  void endDrawing() {
+    if (_points.isNotEmpty) {
+      worldspace.addStrokeFromPoints(_points, getPaint());
+      _points.clear();
+      notifyListeners();
+    }
+    if (!repaintListener.isDisposed) {
+      repaintListener.notifyListeners();
+    }
   }
 
   // Undo / redo logic

@@ -13,7 +13,6 @@ class LazyPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    print("Painting lazy painter");
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
 
     for (Stroke stroke in strokes) {

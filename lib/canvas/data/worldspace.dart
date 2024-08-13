@@ -30,19 +30,23 @@ class Worldspace extends ChangeNotifier {
 
   void addStroke(Stroke stroke) {
     _strokes.add(stroke);
+    notifyListeners();
   }
 
   void addStrokeFromPoints(List<Offset> points, Paint paint) {
     List<Offset> worldSpacePoints = canvasSpace.convertPoints(points);
-    _strokes.add(Stroke(paint, worldSpacePoints));
+    addStroke(Stroke(paint, worldSpacePoints));
+    notifyListeners();
   }
 
   void removeStrokeAt(int index) {
     _strokes.removeAt(index);
+    notifyListeners();
   }
 
   void clear() {
     _strokes.clear();
+    notifyListeners();
   }
 
   /// Provides the closest stroke to the touchpoint within 25p.

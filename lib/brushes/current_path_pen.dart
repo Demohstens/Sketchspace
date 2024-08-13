@@ -7,9 +7,7 @@ class CurrentPathPen extends CustomPainter {
   List<Offset> currentPath;
   Paint strokePaint;
   Mode mode;
-  Matrix4 transformMatrix;
-  CurrentPathPen(
-      this.currentPath, this.strokePaint, this.mode, this.transformMatrix);
+  CurrentPathPen(this.currentPath, this.strokePaint, this.mode);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -29,19 +27,19 @@ class CurrentPathPen extends CustomPainter {
         }
         canvas.drawPath(currentPathToDraw, paint);
       }
+    }
 
-      switch (mode) {
-        case Mode.drawing:
-          drawPath();
-        case Mode.erasing:
-          drawPath();
-        case Mode.line:
-          drawLine();
-        case Mode.fill:
-          drawPath();
-        case Mode.lifted:
-          break;
-      }
+    switch (mode) {
+      case Mode.drawing:
+        drawPath();
+      case Mode.erasing:
+        drawPath();
+      case Mode.line:
+        drawLine();
+      case Mode.fill:
+        drawPath();
+      case Mode.lifted:
+        break;
     }
   }
 

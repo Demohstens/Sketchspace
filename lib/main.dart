@@ -22,7 +22,10 @@ void main() {
             update: (context, canvasSpace, worldSpace) =>
                 worldSpace ?? Worldspace(canvasSpace)),
         ChangeNotifierProvider(create: (_) => DrawFileProvider()),
-        ChangeNotifierProvider(create: (_) => DrawingContext()),
+        ChangeNotifierProxyProvider<Worldspace, DrawingContext>(
+            create: (context) => DrawingContext(context.read<Worldspace>()),
+            update: (context, canvasSpace, worldSpace) =>
+                worldSpace ?? DrawingContext(canvasSpace)),
       ],
       child: Sketchspace(),
     ),

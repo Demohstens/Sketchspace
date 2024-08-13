@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
@@ -85,6 +84,7 @@ class _CanvasUIState extends State<CanvasUI> {
             heroTag: "reset",
             onPressed: () {
               context.read<Worldspace>().clear();
+              context.read<ScaleProvier>().reset();
             },
             child: Icon(Icons.lock_reset_sharp),
           ),
