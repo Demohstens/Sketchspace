@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/classes/settings.dart';
@@ -195,6 +196,9 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                     child: IconButton(
                       onPressed: () {
                         // Share(file);
+                        Share.share(
+                            "...But in the meantime check out this project's reposity for updates! https://github.com/Demohstens/Sketchspace",
+                            subject: "This feature is not yet Implemented");
                         context.read<DrawFileProvider>().updateFileList();
                       },
                       icon: const Icon(Icons.share),
