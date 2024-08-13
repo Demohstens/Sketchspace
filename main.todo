@@ -55,3 +55,19 @@ https://pub.dev/packages/share_pluss
 4. Create a temporary layer for the stroke that is drawn above the canvas allowing for free movement
 5. Once let go, readd the stroke to the list of strokes in the buffer and transform it's coordinates
 6. (Maybe also show highlight points to transform? Such as ends of a line. Also allow for scaling?)
+
+# Pan and Zoom
+Option 1:
+    Use a common CustomPaint object and paint a static lazy image of the canvas on it. 
+    Then use a Transform widget to move and scale the canvas then restore and draw the current 
+    strokes on top of it before merging it with the static image.
+Option 2:
+    Use a CustomPaint object for the canvas and a separate CustomPaint object for the strokes. 
+    Then use a Transform widget to move and scale the canvas and strokes separately. 
+    This would require a lot of extra logic to keep the strokes in sync with the canvas.
+Option 3: 
+    Use a main global canvsa to lazypaint on, then use a Transform widget to move and scale the canvas. 
+    Then use a Active Painter to draw acoording to the TransFormationController.
+
+Option 4: 
+    Subtract the size difference of the two canvases, 

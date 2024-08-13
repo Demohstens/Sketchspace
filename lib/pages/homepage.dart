@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
+import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
-import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:sketchspace/pages/canvas.dart';
 import 'package:flutter/material.dart';
@@ -147,7 +148,7 @@ class _DrawFileButtonState extends State<DrawFileButton> {
       surfaceTintColor: context.read<Settings>().secondaryColor,
       child: InkWell(
         onTap: () {
-          context.read<DrawingContext>().loadFileContext(widget.file);
+          // context.read<DrawingContext>().loadFileContext(widget.file);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => CanvasPage()),
@@ -234,7 +235,7 @@ class NewFileButton extends StatelessWidget {
           heroTag: tag,
           tooltip: "Create a new file",
           onPressed: () {
-            context.read<DrawingContext>().reset();
+            context.read<Worldspace>().clear();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CanvasPage()),

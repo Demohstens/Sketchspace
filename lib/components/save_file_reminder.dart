@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/pages/homepage.dart';
 

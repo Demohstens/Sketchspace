@@ -1,26 +1,21 @@
 import 'dart:ui';
 
-import 'package:sketchspace/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/canvas/data/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/utils/repaint_listener.dart';
 import 'package:flutter/material.dart';
 
 class LazyPainter extends CustomPainter {
   final List<Stroke> strokes;
-  final Matrix4 translationMatrix;
 
   final RepaintListener repaintListener;
-  LazyPainter(this.strokes, this.repaintListener, this.translationMatrix)
+  LazyPainter(this.strokes, this.repaintListener)
       : super(repaint: repaintListener); // : super(repaint: repaintListener);
 
   @override
   void paint(Canvas canvas, Size size) {
     print("Painting lazy painter");
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
-    double scale = translationMatrix.getMaxScaleOnAxis();
-    Offset pan = Offset(translationMatrix.getTranslation().xy.x,
-        translationMatrix.getTranslation().xy.y);
-    canvas.translate(pan.dx, pan.dy);
-    canvas.transform(translationMatrix.storage);
+
     for (Stroke stroke in strokes) {
       if (stroke.points.length == 1) {
         canvas.drawPoints(PointMode.points, stroke.points, stroke.paint);

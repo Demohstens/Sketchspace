@@ -1,8 +1,9 @@
 library paint_selector;
 
-import 'package:sketchspace/classes/drawing_context.dart';
-import 'package:sketchspace/stroke_selector/src/find_closest_stroke.dart';
-import 'package:sketchspace/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/canvas/data/worldspace.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/data/stroke_selector/src/find_closest_stroke.dart';
+import 'package:sketchspace/canvas/data/stroke_selector/src/stroke.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -76,7 +77,7 @@ class StrokeManipulationMenu extends StatelessWidget {
         left: touchPoint.dx,
         child: FloatingActionButton.small(
             onPressed: () {
-              context.read<DrawingContext>().removeStroke(index);
+              context.read<Worldspace>().removeStrokeAt(index);
             },
             child: Icon(Icons.delete)));
   }

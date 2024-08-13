@@ -1,5 +1,7 @@
+import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/demo_debug.dart';
-import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:sketchspace/pages/homepage.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +14,15 @@ void main() {
     /// can use [MyApp] while mocking the providers
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => DrawingContext()),
+        ChangeNotifierProvider(create: (_) => ScaleProvier()),
         ChangeNotifierProvider(create: (_) => Settings()),
-        ChangeNotifierProvider(create: (_) => DemoDebug()),
+        ChangeNotifierProvider(create: (_) => CanvasSpace(Matrix4.identity())),
+        ChangeNotifierProxyProvider<CanvasSpace, Worldspace>(
+            create: (context) => Worldspace(context.read<CanvasSpace>()),
+            update: (context, canvasSpace, worldSpace) =>
+                worldSpace ?? Worldspace(canvasSpace)),
         ChangeNotifierProvider(create: (_) => DrawFileProvider()),
+        ChangeNotifierProvider(create: (_) => DrawingContext()),
       ],
       child: Sketchspace(),
     ),

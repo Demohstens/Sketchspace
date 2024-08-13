@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/canvas/data/worldspace.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
@@ -28,7 +30,7 @@ class _CanvasUIState extends State<CanvasUI> {
             top: 0,
             left: 0,
             child: Text(
-                "${context.read<DrawingContext>().scale.toString()}, panx: ${context.read<DrawingContext>().transformMatrix.getTranslation().x}, pany: ${context.read<DrawingContext>().transformMatrix.getTranslation().y}")),
+                "${context.read<ScaleProvier>().scale.roundToDouble().toString()}, panx: ${context.read<ScaleProvier>().transformMatrix.getTranslation().x.floor()}, pany: ${context.read<ScaleProvier>().transformMatrix.getTranslation().y.floor()}")),
         // Button to return Home and save if needed / allowed
         Positioned(
           right: 0,
@@ -36,21 +38,23 @@ class _CanvasUIState extends State<CanvasUI> {
           child: FloatingActionButton(
               heroTag: "home",
               onPressed: () {
-                if (context.read<Settings>().autoSaveExistingFiles &&
-                    context.read<DrawingContext>().buffer != []) {
-                  context
-                      .read<DrawingContext>()
-                      .saveFile(context)
-                      .then((saveSuccess) {
-                    if (mounted) {
-                      Navigator.pop(context);
-                      context.read<DrawFileProvider>().updateFileList();
+                // TODO: Add auto save on exit
+                // if (context.read<Settings>().autoSaveExistingFiles &&
+                //     context.read<Worldspace>().strokes != []) {
+                //   context
+                //       .read<DrawingContext>()
+                //       .saveFile(context)
+                //       .then((saveSuccess) {
+                //     if (mounted) {
+                //       Navigator.pop(context);
+                //       context.read<DrawFileProvider>().updateFileList();
 
-                      context.read<DrawingContext>().reset();
-                    }
-                  });
-                } else {
-                  context.read<DrawingContext>().reset();
+                //       context.read<Worldspace>().clear();
+                //     }
+                //   });
+                // } else
+                {
+                  context.read<Worldspace>().clear();
                   context.read<DrawFileProvider>().updateFileList();
                   Navigator.pop(context);
                 }
@@ -80,7 +84,7 @@ class _CanvasUIState extends State<CanvasUI> {
           child: FloatingActionButton(
             heroTag: "reset",
             onPressed: () {
-              context.read<DrawingContext>().reset();
+              context.read<Worldspace>().clear();
             },
             child: Icon(Icons.lock_reset_sharp),
           ),
@@ -95,22 +99,23 @@ class _CanvasUIState extends State<CanvasUI> {
                         width: 1,
                         color: context.watch<Settings>().secondaryColor)),
                 child: Column(children: [
+                  // TODO: Implement undo/redo
                   // Redo Button
-                  IconButton(
-                      onPressed: () {
-                        context.read<DrawingContext>().redo();
-                      },
-                      icon: Icon(Icons.redo,
-                          color: context.read<Settings>().secondaryColor)),
-                  // Undo Button
-                  IconButton(
-                      onPressed: () {
-                        context.read<DrawingContext>().undo();
-                      },
-                      icon: Icon(
-                        Icons.undo,
-                        color: context.read<Settings>().secondaryColor,
-                      )),
+                  // IconButton(
+                  //     onPressed: () {
+                  //       context.read<DrawingContext>().redo();
+                  //     },
+                  //     icon: Icon(Icons.redo,
+                  //         color: context.read<Settings>().secondaryColor)),
+                  // // Undo Button
+                  // IconButton(
+                  //     onPressed: () {
+                  //       context.read<DrawingContext>().undo();
+                  //     },
+                  //     icon: Icon(
+                  //       Icons.undo,
+                  //       color: context.read<Settings>().secondaryColor,
+                  //     )),
                 ]))),
       ],
     ));
