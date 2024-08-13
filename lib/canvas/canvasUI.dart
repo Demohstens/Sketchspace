@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/canvas/data/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
@@ -33,22 +34,21 @@ class _CanvasUIState extends State<CanvasUI> {
               heroTag: "home",
               onPressed: () {
                 // TODO: Add auto save on exit
-                // if (context.read<Settings>().autoSaveExistingFiles &&
-                //     context.read<Worldspace>().strokes != []) {
-                //   context
-                //       .read<DrawingContext>()
-                //       .saveFile(context)
-                //       .then((saveSuccess) {
-                //     if (mounted) {
-                //       Navigator.pop(context);
-                //       context.read<DrawFileProvider>().updateFileList();
+                if (context.read<Settings>().autoSaveExistingFiles &&
+                    context.read<Worldspace>().strokes != []) {
+                  context
+                      .read<DrawingContext>()
+                      .saveFile(context)
+                      .then((saveSuccess) {
+                    if (mounted) {
+                      Navigator.pop(context);
+                      context.read<DrawFileProvider>().updateFileList();
 
-                //       context.read<Worldspace>().clear();
-                //     }
-                //   });
-                // } else
-                {
-                  context.read<Worldspace>().clear();
+                      context.read<Worldspace>().clear();
+                    }
+                  });
+                } else {
+                  context.read<DrawingContext>().resetAll();
                   context.read<DrawFileProvider>().updateFileList();
                   Navigator.pop(context);
                 }
@@ -96,21 +96,21 @@ class _CanvasUIState extends State<CanvasUI> {
                 child: Column(children: [
                   // TODO: Implement undo/redo
                   // Redo Button
-                  // IconButton(
-                  //     onPressed: () {
-                  //       context.read<DrawingContext>().redo();
-                  //     },
-                  //     icon: Icon(Icons.redo,
-                  //         color: context.read<Settings>().secondaryColor)),
-                  // // Undo Button
-                  // IconButton(
-                  //     onPressed: () {
-                  //       context.read<DrawingContext>().undo();
-                  //     },
-                  //     icon: Icon(
-                  //       Icons.undo,
-                  //       color: context.read<Settings>().secondaryColor,
-                  //     )),
+                  IconButton(
+                      onPressed: () {
+                        context.read<DrawingContext>().redo();
+                      },
+                      icon: Icon(Icons.redo,
+                          color: context.read<Settings>().secondaryColor)),
+                  // Undo Button
+                  IconButton(
+                      onPressed: () {
+                        context.read<DrawingContext>().undo();
+                      },
+                      icon: Icon(
+                        Icons.undo,
+                        color: context.read<Settings>().secondaryColor,
+                      )),
                 ]))),
       ],
     ));

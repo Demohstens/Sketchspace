@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sketchspace/components/save_file_reminder.dart';
-import 'package:sketchspace/canvas/data/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 
 class DrawFile {
   int? _id;
@@ -129,7 +129,7 @@ DrawFile loadFile(File file) {
       if (strokes.isNotEmpty) {
         print("Loaded file: ${file.path}");
         strokesList = [
-          for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
+          // for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
         ];
         return DrawFile(basename(file.path), file.path, strokesList);
       } else {

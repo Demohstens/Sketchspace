@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/classes/settings.dart';
@@ -83,15 +84,6 @@ class TopBar extends StatelessWidget {
           child: Container(
               margin: EdgeInsets.all(10),
               child: FloatingActionButton(
-                  heroTag: "refresh",
-                  onPressed: () {
-                    context.read<DrawFileProvider>().updateFileList();
-                  },
-                  child: const Icon(Icons.refresh)))),
-      SizedBox(
-          child: Container(
-              margin: EdgeInsets.all(10),
-              child: FloatingActionButton(
                   heroTag: "settingscanvas",
                   child: const Icon(Icons.settings),
                   onPressed: () => Navigator.push(
@@ -145,7 +137,7 @@ class _DrawFileButtonState extends State<DrawFileButton> {
       surfaceTintColor: context.read<Settings>().secondaryColor,
       child: InkWell(
         onTap: () {
-          // context.read<DrawingContext>().loadFileContext(widget.file);
+          context.read<DrawingContext>().loadFileContext(widget.file);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => CanvasPage()),

@@ -2,15 +2,18 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 
 class Stroke {
   final Paint _paint;
   final List<Offset> _points;
+  final Mode _mode;
 
-  Stroke(this._paint, this._points);
+  Stroke(this._paint, this._points, this._mode);
   Paint get paint => _paint;
   double get width => _paint.strokeWidth;
   Color get color => _paint.color;
+  Mode get mode => _mode;
   List<Offset> get points => _points;
   PaintingStyle get style => _paint.style;
 
@@ -23,21 +26,21 @@ class Stroke {
       _points,
       0.05,
     );
-    return Stroke(_paint, optimizedPoints);
+    return Stroke(_paint, optimizedPoints, _mode);
   }
 
   /// Returns a Stroke object from a json object
-  factory Stroke.fromJson(Map<String, dynamic> json) {
-    return Stroke(
-      Paint()
-        ..color = Color(json['paint']['color'])
-        ..strokeWidth = json['paint']['strokeWidth']
-        ..style = json['paint']['style'] == 'fill'
-            ? PaintingStyle.fill
-            : PaintingStyle.stroke,
-      (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
-    );
-  }
+  // factory Stroke.fromJson(Map<String, dynamic> json) {
+  //   return Stroke(
+  //     Paint()
+  //       ..color = Color(json['paint']['color'])
+  //       ..strokeWidth = json['paint']['strokeWidth']
+  //       ..style = json['paint']['style'] == 'fill'
+  //           ? PaintingStyle.fill
+  //           : PaintingStyle.stroke,
+  //     (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
+  //   );
+  // }
 
   /// Returns A string for json serialization
   /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}
@@ -49,6 +52,7 @@ class Stroke {
         "style": _paint.style.toString().split('.').last,
       },
       "points": _points.map((e) => [e.dx, e.dy]).toList(),
+      "Mode": _mode.toString().split('.').last,
     });
   }
 

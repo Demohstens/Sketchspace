@@ -1,4 +1,4 @@
-import 'package:sketchspace/canvas/data/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 import 'package:flutter/widgets.dart';
 
 int? findClosestStrokeIndex(List<Stroke> strokes, Offset touchPoint) {

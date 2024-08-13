@@ -41,6 +41,21 @@ https://pub.dev/packages/share_pluss
     ✔ Scaling is off @done(24-08-11 17:53) ?? 
     - touch support is inconsistant
     ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
+- Rewrite RepaintListener to allow for unloading of Listeners.
+
+# For alpha 1:
+✔ fix undo/redo @done(24-08-13 10:28)
+☐ fix file loading and saving or replace by saving as png 
+✔ fix line tool @started(24-08-13 11:09) @done(24-08-13 11:18) @lasted(9m55s)
+✔ fix reset @started(24-08-13 10:28) @done(24-08-13 12:59) @lasted(2h31m39s)
+✔ Remove reload button on home screen @done(24-08-13 12:59)
+☐ add welcome pop-up?
+☐ update readme
+
+
+☐ fix selecting strokes  | CANCELLED FOR NOW
+☐ fix and make remove stroke more performant
+
 
 ---
 - Moveable, modular Interface

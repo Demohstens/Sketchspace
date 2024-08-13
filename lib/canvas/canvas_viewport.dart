@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:sketchspace/brushes/active_painter.dart';
+import 'package:sketchspace/brushes/error_painter.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/canvas/data/scale.dart';
+import 'package:sketchspace/canvas/stroke_selector/paint_selector.dart';
+import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart';
 import 'package:sketchspace/classes/settings.dart';
@@ -12,11 +15,14 @@ import 'package:sketchspace/classes/settings.dart';
 class CanvasViewport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Widget? selectedStroke;
+    ErrorPainter('No Painter Found');
+    Color background = context.watch<Settings>().background;
     return Stack(
       children: [
         Consumer<ScaleProvier>(builder: (context, scaleContext, _) {
           return Container(
-              color: context.watch<Settings>().background,
+              color: background,
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               constraints: BoxConstraints(
@@ -34,16 +40,25 @@ class CanvasViewport extends StatelessWidget {
                 onDrawEnd: () {
                   context.read<DrawingContext>().endDrawing();
                 },
+                onLongPressStart: (details) {
+                  Offset touchPoint = details.localPosition;
+                  selectedStroke = strokeSelector(
+                      context.read<Worldspace>().strokes, touchPoint);
+                  context.read<DrawingContext>().unSelectStroke();
+                },
+                onLongPressEnd: (details) {
+                  context.read<DrawingContext>().selectedPaint = null;
+                },
                 child: Stack(children: [
                   Positioned.fill(
                       child: RepaintBoundary(
-                    child: CustomPaint(
-                        willChange: false,
-                        isComplex: true,
-                        size: Size.infinite,
-                        painter: LazyPainter(context.read<Worldspace>().strokes,
-                            context.read<DrawingContext>().repaintListener)),
-                  )),
+                          child: CustomPaint(
+                              willChange: false,
+                              isComplex: true,
+                              size: Size.infinite,
+                              painter: context
+                                  .read<Worldspace>()
+                                  .getLazyPainter()))),
                   // Current Path - CurrentLinePainter
                   Container(
                     width: MediaQuery.of(context).size.width,
@@ -63,8 +78,7 @@ class CanvasViewport extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // TODO readd selected stroke
-                  null ?? Container(),
+                  context.watch<DrawingContext>().selectedStroke ?? Container(),
                 ]),
               ));
         })
