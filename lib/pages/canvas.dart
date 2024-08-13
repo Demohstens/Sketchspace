@@ -3,8 +3,6 @@ import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/canvasUI.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
-import 'package:sketchspace/canvas/data/worldspace.dart';
 
 class CanvasPage extends StatelessWidget {
   @override

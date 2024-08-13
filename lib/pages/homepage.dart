@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
-import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:sketchspace/pages/canvas.dart';
 import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -104,10 +104,17 @@ class DrawFileProvider extends ChangeNotifier {
     });
   }
   void updateFileList() {
+    print("Updated file list");
     getFiles().then((value) {
       files = value;
       notifyListeners();
+      print(files);
     });
+  }
+
+  void addFile(File file) {
+    updateFileList();
+    notifyListeners();
   }
 }
 
@@ -199,8 +206,12 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                     top: 0,
                     child: IconButton(
                       onPressed: () {
-                        // Share(file);
-                        context.read<DrawFileProvider>().updateFileList();
+                        // Rename file
+                        showFileRenameDialog(context, file).then((value) {
+                          if (value != null) {
+                            context.read<DrawFileProvider>().addFile(value);
+                          }
+                        });
                       },
                       icon: const Icon(Icons.edit),
                     ),

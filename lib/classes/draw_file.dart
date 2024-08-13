@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sketchspace/components/save_file_reminder.dart';
+import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 
 class DrawFile {
@@ -60,7 +60,6 @@ class DrawFile {
   Future<bool> save(BuildContext context) async {
     bool success = false;
     if (_content == null) {
-      print("No content to save.");
       return success;
     }
     if (_name == null) {
@@ -80,7 +79,6 @@ class DrawFile {
 
     // Write the JSON string to the file
     await file.writeAsString(jsonString);
-    print('Saved file to ${file.path}');
     return success;
   }
 
@@ -132,7 +130,6 @@ DrawFile? loadFile(File file) {
         ];
         return DrawFile(basename(file.path), file.path, strokesList);
       } else {
-        print('File contains no strokes: ${file.path}');
         return DrawFile(basename(file.path), file.path, null);
       }
     } else {}

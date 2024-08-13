@@ -45,12 +45,14 @@ https://pub.dev/packages/share_pluss
 
 # For alpha 1:
 ✔ fix undo/redo @done(24-08-13 10:28)
-☐ fix file loading and saving or replace by saving as png 
+✔ fix file loading and saving @done(24-08-13 15:20)
 ✔ fix line tool @started(24-08-13 11:09) @done(24-08-13 11:18) @lasted(9m55s)
 ✔ fix reset @started(24-08-13 10:28) @done(24-08-13 12:59) @lasted(2h31m39s)
 ✔ Remove reload button on home screen @done(24-08-13 12:59)
 ☐ add welcome pop-up?
 ☐ update readme
+☐ share feature
+✔ rename file feature @started(24-08-13 15:20) @done(24-08-13 16:15) @lasted(55m26s)
 
 
 ☐ fix selecting strokes  | CANCELLED FOR NOW

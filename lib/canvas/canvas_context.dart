@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
-import 'package:sketchspace/components/save_file_reminder.dart';
+import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:flutter/material.dart';
 
 enum Mode { drawing, lifted, erasing, line, fill }
@@ -102,10 +102,9 @@ class DrawingContext with ChangeNotifier {
 
     bool saveSuccess = false;
     if (worldspace.strokes.isEmpty) {
-      print("No content to save.");
       return saveSuccess;
     }
-    if (_name == "" || _name == null || _name == "Untitled") {
+    if (_name == "" || _name == "Untitled") {
       String? fileName = await showFileNameDialog(context);
       if (fileName != null) {
         _name = fileName;
@@ -130,7 +129,6 @@ class DrawingContext with ChangeNotifier {
 
     // Write the JSON string to the file
     await file.writeAsString(jsonString);
-    print('Saved file to ${file.path}');
     return saveSuccess;
   }
 
@@ -140,9 +138,7 @@ class DrawingContext with ChangeNotifier {
     worldspace.loadStrokes(_workingFile.getStrokes());
 
     if (_workingFile.content == null) {
-      print("Error loading file: ${file.path}. Invalid file.");
     } else {
-      print("Loaded file: ${file.path}");
       ui_enabled = true;
       notifyListeners();
     }
@@ -177,14 +173,11 @@ class DrawingContext with ChangeNotifier {
   }
 
   void changeMode(Mode mode) {
-    print("Changing mode: $mode");
     _mode = mode;
     notifyListeners();
   }
 
   void changeColor(Color color) {
-    print("Changing color: $color");
-
     _color = color;
     notifyListeners();
   }
