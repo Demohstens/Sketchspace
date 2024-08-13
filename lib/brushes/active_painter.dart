@@ -36,7 +36,7 @@ class ActivePainter extends CustomPainter {
         drawLine();
       case Mode.fill:
         drawPath();
-      case Mode.lifted:
+      case Mode.lifted || Mode.strokeErasing:
         break;
     }
   }

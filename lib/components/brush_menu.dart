@@ -1,3 +1,4 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +63,8 @@ class BrushMenu extends StatelessWidget {
           PopupMenuItem(
               value: Mode.fill, child: _toolButton(Icons.crop_3_2_rounded)),
           PopupMenuItem(value: Mode.drawing, child: _toolButton(Icons.draw)),
+          PopupMenuItem(
+              value: Mode.erasing, child: _toolButton(FontAwesomeIcons.eraser)),
         ],
         child: Container(
             height: 40,
@@ -75,7 +78,8 @@ class BrushMenu extends StatelessWidget {
                   color: secondary,
                 ),
               Mode.fill => Icon(Icons.crop_3_2_rounded, color: secondary),
-              _ => null,
+              Mode.erasing => FaIcon(FontAwesomeIcons.eraser, color: secondary),
+              _ => Icon(Icons.error),
             }),
       ),
       MenuAnchor(

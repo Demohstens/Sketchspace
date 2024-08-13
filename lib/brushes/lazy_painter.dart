@@ -37,19 +37,36 @@ class LazyPainter extends CustomPainter {
       canvas.drawPath(pathToDraw, paint);
     }
 
+    void erasePath(Stroke stroke) {
+      Path pathToDraw = Path();
+      for (int i = 0; i < stroke.points.length; i++) {
+        if (i == 0) {
+          pathToDraw.moveTo(stroke.points[i].dx, stroke.points[i].dy);
+        } else if (i > 0) {
+          pathToDraw.lineTo(stroke.points[i].dx, stroke.points[i].dy);
+        }
+      }
+      canvas.save();
+      canvas.clipPath(pathToDraw);
+      canvas.restore();
+    }
+
     // Switch through all modes to allow for different handling of the strokes
     for (Stroke stroke in strokes) {
+      // Save the canvas Layer
       switch (stroke.mode) {
         case Mode.drawing:
           drawPath(stroke);
         case Mode.lifted:
           break;
         case Mode.erasing:
-          break;
+          erasePath(stroke);
         case Mode.line:
           drawLine(stroke);
         case Mode.fill:
           drawPath(stroke);
+        case Mode.strokeErasing:
+          continue;
       }
     }
   }

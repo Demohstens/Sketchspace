@@ -76,4 +76,9 @@ class Settings with ChangeNotifier {
 
   bool autoSaveExistingFiles = true;
   bool autoSaveCreatedFiles = false;
+  int drawCooldown = 75;
+  void changeDrawCooldown(int value) {
+    drawCooldown = value;
+    notifyListeners();
+  }
 }

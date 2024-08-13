@@ -27,10 +27,14 @@ class CanvasViewport extends StatelessWidget {
             canvasColor: context.watch<Settings>().background,
             doubleTapZoom: false,
             maxScale: 3,
+            drawCooldown: context.read<Settings>().drawCooldown,
             maxZoomWidth: 2000,
             maxZoomHeight: 2000,
             onDrawUpdate: (point) {
               context.read<DrawingContext>().updateDrawing(point);
+            },
+            onDoubleTap: () {
+              context.read<DrawingContext>().toggleUI();
             },
             onDrawEnd: () {
               context.read<DrawingContext>().endDrawing();

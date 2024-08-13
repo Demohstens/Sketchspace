@@ -7,7 +7,7 @@ import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:flutter/material.dart';
 
-enum Mode { drawing, lifted, erasing, line, fill }
+enum Mode { drawing, lifted, erasing, strokeErasing, line, fill }
 
 /// Everything the active painter needs to draw on the canvas
 /// Also includes everything the
@@ -153,7 +153,8 @@ class DrawingContext with ChangeNotifier {
     Paint pt = Paint()
       ..color = _color
       ..strokeWidth = _width
-      ..style = _getStyle();
+      ..style = _getStyle()
+      ..blendMode = _getBlendMode();
     return pt;
   }
 
@@ -169,6 +170,17 @@ class DrawingContext with ChangeNotifier {
         return PaintingStyle.fill;
       case Mode.lifted:
         return PaintingStyle.stroke;
+      case Mode.strokeErasing:
+        return PaintingStyle.stroke;
+    }
+  }
+
+  BlendMode _getBlendMode() {
+    switch (_mode) {
+      case Mode.erasing:
+        return BlendMode.clear;
+      default:
+        return BlendMode.srcOver;
     }
   }
 
