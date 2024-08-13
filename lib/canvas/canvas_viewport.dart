@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:sketchspace/brushes/current_path_pen.dart';
+import 'package:sketchspace/brushes/active_painter.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/canvas/scale.dart';
@@ -56,7 +56,7 @@ class CanvasViewport extends StatelessWidget {
                     child: CustomPaint(
                       isComplex: true,
                       size: Size.infinite,
-                      painter: CurrentPathPen(
+                      painter: ActivePainter(
                           context.watch<DrawingContext>().points,
                           context.read<DrawingContext>().getPaint(),
                           context.read<DrawingContext>().mode),

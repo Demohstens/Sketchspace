@@ -1,13 +1,11 @@
-import 'dart:ui';
-
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:flutter/material.dart';
 
-class CurrentPathPen extends CustomPainter {
+class ActivePainter extends CustomPainter {
   List<Offset> currentPath;
   Paint strokePaint;
   Mode mode;
-  CurrentPathPen(this.currentPath, this.strokePaint, this.mode);
+  ActivePainter(this.currentPath, this.strokePaint, this.mode);
 
   @override
   void paint(Canvas canvas, Size size) {
