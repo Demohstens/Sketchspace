@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sketchspace/brushes/active_painter.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/scale.dart';
+import 'package:sketchspace/canvas/data/scale.dart';
 
 class CanvasViewport extends StatelessWidget {
   @override

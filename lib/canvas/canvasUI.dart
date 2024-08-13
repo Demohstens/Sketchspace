@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
-import 'package:sketchspace/canvas/scale.dart';
+import 'package:sketchspace/canvas/data/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
