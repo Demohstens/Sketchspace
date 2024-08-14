@@ -1,28 +1,35 @@
 library paint_selector;
 
-import 'package:sketchspace/classes/drawing_context.dart';
-import 'package:sketchspace/components/context_menu/context_menu.dart';
-import 'package:sketchspace/stroke_selector/src/find_closest_stroke.dart';
-import 'package:sketchspace/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/canvas/data/worldspace.dart';
+import 'package:sketchspace/canvas/stroke_selector/src/find_closest_stroke.dart';
+import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-Widget? paintSelector(List<Stroke> strokes, Offset touchPoint) {
+Widget? strokeSelector(List<Stroke> strokes, Offset touchPoint) {
+  print('Selecting Stroke');
   int? indexOfClosestStroke = findClosestStrokeIndex(strokes, touchPoint);
   // If there is no stroke, which is close enough to fit the pramaters, return null
   if (indexOfClosestStroke == null) {
+    print('No stroke found');
     return null;
   }
 
   Stroke closestStroke = strokes[indexOfClosestStroke];
+  Rect boundary = closestStroke.boundary();
+  if (boundary.width == 0 || boundary.height == 0) {
+    print('Invalid boundary dimensions');
+    return null;
+  }
+
   return Stack(children: [
     Positioned(
-        left: 0,
-        top: 0,
+        left: boundary.left,
+        top: boundary.top,
         child: Container(
-          color: Colors.transparent,
-          width: closestStroke.boundary().width,
-          height: closestStroke.boundary().height,
+          color: const Color.fromARGB(232, 255, 17, 17),
+          width: boundary.width,
+          height: boundary.height,
           child: CustomPaint(
             painter: _Painter(closestStroke),
           ),
@@ -77,7 +84,7 @@ class StrokeManipulationMenu extends StatelessWidget {
         left: touchPoint.dx,
         child: FloatingActionButton.small(
             onPressed: () {
-              context.read<DrawingContext>().removeStroke(index);
+              context.read<Worldspace>().removeStrokeAt(index);
             },
             child: Icon(Icons.delete)));
   }

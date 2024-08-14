@@ -2,15 +2,18 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 
 class Stroke {
   final Paint _paint;
   final List<Offset> _points;
+  final Mode _mode;
 
-  Stroke(this._paint, this._points);
+  Stroke(this._paint, this._points, this._mode);
   Paint get paint => _paint;
   double get width => _paint.strokeWidth;
   Color get color => _paint.color;
+  Mode get mode => _mode;
   List<Offset> get points => _points;
   PaintingStyle get style => _paint.style;
 
@@ -23,11 +26,12 @@ class Stroke {
       _points,
       0.05,
     );
-    return Stroke(_paint, optimizedPoints);
+    return Stroke(_paint, optimizedPoints, _mode);
   }
 
   /// Returns a Stroke object from a json object
   factory Stroke.fromJson(Map<String, dynamic> json) {
+    print("Stroke.fromJson: $json");
     return Stroke(
       Paint()
         ..color = Color(json['paint']['color'])
@@ -36,20 +40,25 @@ class Stroke {
             ? PaintingStyle.fill
             : PaintingStyle.stroke,
       (json['points'] as List).map((e) => Offset(e[0], e[1])).toList(),
+      Mode.values.firstWhere(
+          (element) => element.toString().split('.').last == json['mode']),
     );
   }
 
   /// Returns A string for json serialization
-  /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}
+  /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...], "Mode": }
   String toJson() {
-    return jsonEncode({
+    var ret = jsonEncode({
       "paint": {
         "color": _paint.color.value,
         "strokeWidth": _paint.strokeWidth,
         "style": _paint.style.toString().split('.').last,
       },
       "points": _points.map((e) => [e.dx, e.dy]).toList(),
+      "mode": _mode.toString().split('.').last,
     });
+    print("Stroke.toJson: $ret");
+    return ret;
   }
 
   Rect boundary() {

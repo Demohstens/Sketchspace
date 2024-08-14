@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "sketchspace",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "sketchspace (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "sketchspace (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "zoom-widget-drawing",
+            "cwd": "lib\\canvas\\zoom-widget-drawing",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "zoom-widget-drawing (profile mode)",
+            "cwd": "lib\\canvas\\zoom-widget-drawing",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "zoom-widget-drawing (release mode)",
+            "cwd": "lib\\canvas\\zoom-widget-drawing",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

@@ -1,11 +1,11 @@
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/classes/draw_file.dart';
-import 'package:sketchspace/classes/drawing_context.dart';
 import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:sketchspace/pages/canvas.dart';
 import 'package:flutter/material.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -85,15 +85,6 @@ class TopBar extends StatelessWidget {
           child: Container(
               margin: EdgeInsets.all(10),
               child: FloatingActionButton(
-                  heroTag: "refresh",
-                  onPressed: () {
-                    context.read<DrawFileProvider>().updateFileList();
-                  },
-                  child: const Icon(Icons.refresh)))),
-      SizedBox(
-          child: Container(
-              margin: EdgeInsets.all(10),
-              child: FloatingActionButton(
                   heroTag: "settingscanvas",
                   child: const Icon(Icons.settings),
                   onPressed: () => Navigator.push(
@@ -114,10 +105,17 @@ class DrawFileProvider extends ChangeNotifier {
     });
   }
   void updateFileList() {
+    print("Updated file list");
     getFiles().then((value) {
       files = value;
       notifyListeners();
+      print(files);
     });
+  }
+
+  void addFile(File file) {
+    updateFileList();
+    notifyListeners();
   }
 }
 
@@ -198,6 +196,10 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                     child: IconButton(
                       onPressed: () {
                         // Share(file);
+                        Share.share(
+                            "...But in the meantime check out this project's reposity for updates! ",
+                            subject:
+                                "This feature is not yet Implemented: https://github.com/Demohstens/Sketchspace");
                         context.read<DrawFileProvider>().updateFileList();
                       },
                       icon: const Icon(Icons.share),
@@ -209,8 +211,12 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                     top: 0,
                     child: IconButton(
                       onPressed: () {
-                        // Share(file);
-                        context.read<DrawFileProvider>().updateFileList();
+                        // Rename file
+                        showFileRenameDialog(context, file).then((value) {
+                          if (mounted) {
+                            context.read<DrawFileProvider>().addFile(value);
+                          }
+                        });
                       },
                       icon: const Icon(Icons.edit),
                     ),
@@ -234,7 +240,7 @@ class NewFileButton extends StatelessWidget {
           heroTag: tag,
           tooltip: "Create a new file",
           onPressed: () {
-            context.read<DrawingContext>().reset();
+            context.read<DrawingContext>().newFile();
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => CanvasPage()),

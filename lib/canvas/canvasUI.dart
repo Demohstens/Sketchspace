@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/classes/drawing_context.dart';
+import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/data/worldspace.dart';
+import 'package:sketchspace/canvas/data/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
@@ -31,8 +33,9 @@ class _CanvasUIState extends State<CanvasUI> {
           child: FloatingActionButton(
               heroTag: "home",
               onPressed: () {
+                // TODO: Add auto save on exit
                 if (context.read<Settings>().autoSaveExistingFiles &&
-                    context.read<DrawingContext>().buffer != []) {
+                    context.read<Worldspace>().strokes != []) {
                   context
                       .read<DrawingContext>()
                       .saveFile(context)
@@ -41,11 +44,11 @@ class _CanvasUIState extends State<CanvasUI> {
                       Navigator.pop(context);
                       context.read<DrawFileProvider>().updateFileList();
 
-                      context.read<DrawingContext>().reset();
+                      context.read<Worldspace>().clear();
                     }
                   });
                 } else {
-                  context.read<DrawingContext>().reset();
+                  context.read<DrawingContext>().resetAll();
                   context.read<DrawFileProvider>().updateFileList();
                   Navigator.pop(context);
                 }
@@ -75,7 +78,7 @@ class _CanvasUIState extends State<CanvasUI> {
           child: FloatingActionButton(
             heroTag: "reset",
             onPressed: () {
-              context.read<DrawingContext>().reset();
+              context.read<Worldspace>().clear();
             },
             child: Icon(Icons.lock_reset_sharp),
           ),
@@ -90,6 +93,7 @@ class _CanvasUIState extends State<CanvasUI> {
                         width: 1,
                         color: context.watch<Settings>().secondaryColor)),
                 child: Column(children: [
+                  // TODO: Implement undo/redo
                   // Redo Button
                   IconButton(
                       onPressed: () {

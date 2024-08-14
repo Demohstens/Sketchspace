@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sketchspace/components/save_file_reminder.dart';
-import 'package:sketchspace/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/components/file_save_dialogs.dart';
+import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 
 class DrawFile {
   int? _id;
@@ -32,7 +32,7 @@ class DrawFile {
   DrawFile.empty(name, {path}) {
     _name = name;
     if (path == null) {
-      _path = '${appDirectory()}/$name.json';
+      _path = '${getAppDirectory()}/$name.json';
     } else {
       _path = path;
     }
@@ -60,7 +60,6 @@ class DrawFile {
   Future<bool> save(BuildContext context) async {
     bool success = false;
     if (_content == null) {
-      print("No content to save.");
       return success;
     }
     if (_name == null) {
@@ -75,12 +74,11 @@ class DrawFile {
     ];
     final String jsonString = jsonEncode({"Strokes": jsonStrokes});
 
-    final Directory appDir = await appDirectory();
+    final Directory appDir = await getAppDirectory();
     final File file = File('${appDir.path}/$_name');
 
     // Write the JSON string to the file
     await file.writeAsString(jsonString);
-    print('Saved file to ${file.path}');
     return success;
   }
 
@@ -95,7 +93,7 @@ class DrawFile {
   }
 }
 
-Future<Directory> appDirectory() async {
+Future<Directory> getAppDirectory() async {
   final Directory directory = await getApplicationDocumentsDirectory();
   final appDirectory = Directory('${directory.path}/DemoDraw');
   if (!await appDirectory.exists()) {
@@ -107,7 +105,7 @@ Future<Directory> appDirectory() async {
 // Returns a list of files in the app directory.
 Future<List<File>> getFiles() async {
   List<File> files = [];
-  final Directory appDir = await appDirectory();
+  final Directory appDir = await getAppDirectory();
 
   appDir.listSync().forEach((element) {
     if (element is File && element.path.endsWith('.json')) {
@@ -118,7 +116,7 @@ Future<List<File>> getFiles() async {
 }
 
 /// Loads a file and returns a list of strokes
-DrawFile loadFile(File file) {
+DrawFile? loadFile(File file) {
   try {
     final String content = file.readAsStringSync();
     final Map<String, dynamic> json = jsonDecode(content);
@@ -127,20 +125,15 @@ DrawFile loadFile(File file) {
     if (json.containsKey("Strokes") && json["Strokes"] is List) {
       final strokes = json["Strokes"];
       if (strokes.isNotEmpty) {
-        print("Loaded file: ${file.path}");
         strokesList = [
           for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
         ];
         return DrawFile(basename(file.path), file.path, strokesList);
       } else {
-        print('File contains no strokes: ${file.path}');
         return DrawFile(basename(file.path), file.path, null);
       }
-    } else {
-      print('Invalid JSON structure in file: ${file.path}');
-    }
+    } else {}
   } catch (e) {
     print('Error loading file: ${file.path}, Error: $e');
   }
-  return DrawFile.empty(basename(file.path));
 }
