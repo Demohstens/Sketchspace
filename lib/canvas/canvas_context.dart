@@ -44,6 +44,11 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void addPoint(Offset p) {
+    _points.add(p);
+    notifyListeners();
+  }
+
   void endDrawing() {
     if (_points.isNotEmpty) {
       worldspace.addStrokeFromPoints(_points, getPaint(), _mode);

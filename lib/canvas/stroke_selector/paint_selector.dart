@@ -11,13 +11,12 @@ Widget? strokeSelector(List<Stroke> strokes, Offset touchPoint) {
   int? indexOfClosestStroke = findClosestStrokeIndex(strokes, touchPoint);
   // If there is no stroke, which is close enough to fit the pramaters, return null
   if (indexOfClosestStroke == null) {
+    print('No stroke found');
     return null;
   }
 
   Stroke closestStroke = strokes[indexOfClosestStroke];
   Rect boundary = closestStroke.boundary();
-  print('Boundary: $boundary');
-
   if (boundary.width == 0 || boundary.height == 0) {
     print('Invalid boundary dimensions');
     return null;
