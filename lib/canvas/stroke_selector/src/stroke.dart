@@ -8,8 +8,16 @@ class Stroke {
   final Paint _paint;
   final List<Offset> _points;
   final Mode _mode;
+  late Path _path;
 
-  Stroke(this._paint, this._points, this._mode);
+  Stroke(this._paint, this._points, this._mode) {
+    _path = Path()..moveTo(_points.first.dx, _points.first.dy);
+    for (int i = 1; i < _points.length; i++) {
+      _path.lineTo(_points[i].dx, _points[i].dy);
+    }
+  }
+
+  Path get path => _path;
   Paint get paint => _paint;
   double get width => _paint.strokeWidth;
   Color get color => _paint.color;
@@ -27,6 +35,38 @@ class Stroke {
       0.05,
     );
     return Stroke(_paint, optimizedPoints, _mode);
+  }
+
+  /// Returns whether or not the point is within the stroke
+  /// Takes in the point and the maximum allowed distance in pixels
+  bool contains(Offset point, {double? maximumAllowedDistance}) {
+    if (maximumAllowedDistance != null) {
+      Offset closestPoint = getClosestPoint(point);
+      return ((closestPoint - point).distance < maximumAllowedDistance) ||
+          _path.contains(point);
+    } else {
+      return _path.contains(point);
+    }
+  }
+
+  /// Returns the closest point to the provided point
+  Offset getClosestPoint(Offset point) {
+    double minDistance = double.maxFinite;
+    Offset closestPoint = Offset.zero;
+    for (Offset p in _points) {
+      double distance = (p - point).distance;
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestPoint = p;
+      }
+    }
+    return closestPoint;
+  }
+
+  /// calculates the distance between the stroke and a point
+  double getDistanceToPoint(Offset point) {
+    Offset closestPoint = getClosestPoint(point);
+    return (closestPoint - point).distance;
   }
 
   /// Returns a Stroke object from a json object

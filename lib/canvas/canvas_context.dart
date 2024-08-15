@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
@@ -18,16 +19,21 @@ class DrawingContext with ChangeNotifier {
   List<Offset> _points = [];
   Mode _mode = Mode.drawing;
   DrawFile _workingFile = DrawFile.empty("Untitled");
+  Widget? _selectedStrokeWidget; // TODO replace with proper context menu ASAP
+  Stroke? _selectedStroke;
 
   // * Paint Attributes * //
   Color _color = Colors.orange;
   double _width = 10.0;
-  Widget? selectedPaint;
 
   bool ui_enabled = true;
 
   // GETTERS
   Color get color => _color;
+  Widget get selectedStrokeWidget =>
+      _selectedStrokeWidget ??
+      Container(); // Empty Container is a placeholder for null
+  Stroke? get selectedStroke => _selectedStroke;
   Mode get mode => _mode;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
@@ -204,14 +210,45 @@ class DrawingContext with ChangeNotifier {
   }
 
   // * SELECTION * //
-  Widget? selectedStroke;
-  void setSelectedStroke(Widget w) {
-    selectedStroke = w;
+  void selectStroke(Offset touchPoint) {
+    double maxAllowedDistance =
+        50; // The maximum distance allowed to select a stroke in pixels
+    for (Stroke stroke in worldspace.strokes.reversed) {
+      if (stroke.contains(touchPoint,
+              maximumAllowedDistance: maxAllowedDistance) &&
+          stroke.getDistanceToPoint(touchPoint) < maxAllowedDistance) {
+        setSelectedStroke(stroke);
+        return;
+      }
+    }
+  }
+
+  void setSelectedStroke(Stroke s) {
+    _selectedStroke = s;
+    _selectedStrokeWidget = getSelectedStrokeWidget();
     notifyListeners();
   }
 
   void unSelectStroke() {
-    selectedStroke = null;
+    _selectedStroke = null;
     notifyListeners();
+  }
+
+  Widget? getSelectedStrokeWidget() {
+    if (_selectedStroke == null) {
+      return null;
+    } else {
+      Rect bounds = _selectedStroke!.boundary();
+      return Container(
+        width: bounds.width,
+        height: bounds.height,
+        child: CustomPaint(
+          painter: SelectedStrokePainter(
+              _selectedStroke!,
+              Colors.grey
+                  .withAlpha(150)), // TODO properly handle the selection color
+        ),
+      );
+    }
   }
 }
