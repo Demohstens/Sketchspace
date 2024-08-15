@@ -42,37 +42,37 @@ class SettingsPage extends StatelessWidget {
                 child: ListTile(
                   minVerticalPadding: 50,
                   leading: const Icon(Icons.timer),
-                  title: const Text("Draw Cooldown (1h = 100ms, 1s = 1ms)"),
+                  title: const Text("Draw Cooldown After Scaling"),
                   subtitle: Text(
                       "Current cooldown: ${context.watch<Settings>().drawCooldown} ms"),
                   onTap: () {
                     showDialog(
                         context: context,
                         builder: (BuildContext context) {
+                          final cooldownController = TextEditingController();
+
                           return AlertDialog(
                             title: const Text("Draw Cooldown"),
                             content: TextField(
-                              controller: TextEditingController.fromValue(
-                                  TextEditingValue(
-                                      text: context
-                                          .watch<Settings>()
-                                          .drawCooldown
-                                          .toString())),
-                              onSubmitted: (String value) {
-                                if (value == "") {
-                                  value = "0";
-                                }
-                                context
-                                    .read<Settings>()
-                                    .changeDrawCooldown(int.parse(value) ?? 0);
-                              },
+                              focusNode: FocusNode(),
+                              keyboardType: TextInputType.number,
+                              canRequestFocus: true,
+                              autofocus: true,
+                              controller: cooldownController,
                             ),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () {
+                                  // Update state when the "Close" button is pressed
+                                  int parsedValue =
+                                      int.tryParse(cooldownController.text) ??
+                                          0;
+                                  context
+                                      .read<Settings>()
+                                      .changeDrawCooldown(parsedValue);
                                   Navigator.of(context).pop();
                                 },
-                                child: const Text('Close'),
+                                child: const Text('Close and Save'),
                               ),
                             ],
                           );

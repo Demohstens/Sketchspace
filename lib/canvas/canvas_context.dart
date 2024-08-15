@@ -212,11 +212,10 @@ class DrawingContext with ChangeNotifier {
   // * SELECTION * //
   void selectStroke(Offset touchPoint) {
     double maxAllowedDistance =
-        50; // The maximum distance allowed to select a stroke in pixels
+        125; // The maximum distance allowed to select a stroke in pixels
     for (Stroke stroke in worldspace.strokes.reversed) {
       if (stroke.contains(touchPoint,
-              maximumAllowedDistance: maxAllowedDistance) &&
-          stroke.getDistanceToPoint(touchPoint) < maxAllowedDistance) {
+          maximumAllowedDistance: maxAllowedDistance)) {
         setSelectedStroke(stroke);
         return;
       }
