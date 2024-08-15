@@ -64,11 +64,14 @@ class DrawingContext with ChangeNotifier {
   }
 
   void resetDrawing() {
+    unSelectStroke();
+    worldspace.clear();
     _points.clear();
     notifyListeners();
   }
 
   void resetAll() {
+    unSelectStroke();
     _points.clear();
     worldspace.clear();
     notifyListeners();
@@ -103,6 +106,8 @@ class DrawingContext with ChangeNotifier {
 
   // File logic
   void newFile() {
+    _workingFile = DrawFile.empty("");
+
     resetAll();
   }
 
@@ -212,7 +217,7 @@ class DrawingContext with ChangeNotifier {
   // * SELECTION * //
   void selectStroke(Offset touchPoint) {
     double maxAllowedDistance =
-        125; // The maximum distance allowed to select a stroke in pixels
+        10; // The maximum distance allowed to select a stroke in pixels
     for (Stroke stroke in worldspace.strokes.reversed) {
       if (stroke.contains(touchPoint,
           maximumAllowedDistance: maxAllowedDistance)) {
@@ -223,31 +228,26 @@ class DrawingContext with ChangeNotifier {
   }
 
   void setSelectedStroke(Stroke s) {
-    _selectedStroke = s;
-    _selectedStrokeWidget = getSelectedStrokeWidget();
+    _selectedStrokeWidget = getSelectedStrokeWidget(s);
     notifyListeners();
   }
 
   void unSelectStroke() {
-    _selectedStroke = null;
+    _selectedStrokeWidget = Container();
     notifyListeners();
   }
 
-  Widget? getSelectedStrokeWidget() {
-    if (_selectedStroke == null) {
-      return null;
-    } else {
-      Rect bounds = _selectedStroke!.boundary();
-      return Container(
-        width: bounds.width,
-        height: bounds.height,
-        child: CustomPaint(
-          painter: SelectedStrokePainter(
-              _selectedStroke!,
-              Colors.grey
-                  .withAlpha(150)), // TODO properly handle the selection color
-        ),
-      );
-    }
+  Widget? getSelectedStrokeWidget(Stroke s) {
+    Rect bounds = s.boundary();
+    return Container(
+      width: bounds.width,
+      height: bounds.height,
+      child: CustomPaint(
+        painter: SelectedStrokePainter(
+            s,
+            Colors.grey
+                .withAlpha(150)), // TODO properly handle the selection color
+      ),
+    );
   }
 }

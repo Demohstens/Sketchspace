@@ -18,7 +18,6 @@ class LazyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
-    print("Painting ${strokes.length} strokes");
     void drawLine(Stroke stroke) {
       canvas.drawLine(stroke.points.first, stroke.points.last, stroke.paint);
     }

@@ -37,9 +37,6 @@ class CanvasViewport extends StatelessWidget {
             onTapDown: (touchPoint) {
               if (context.read<DrawingContext>().selectedStroke != null) {
                 context.read<DrawingContext>().unSelectStroke();
-              } else {
-                context.read<DrawingContext>().addPoint(touchPoint);
-                context.read<DrawingContext>().endDrawing();
               }
             },
             onDrawUpdate: (point) {
@@ -84,8 +81,7 @@ class CanvasViewport extends StatelessWidget {
                   ),
                 ),
               ),
-              context.watch<DrawingContext>().getSelectedStrokeWidget() ??
-                  Container(),
+              context.watch<DrawingContext>().selectedStrokeWidget,
             ]),
           ))
     ]);
