@@ -32,16 +32,18 @@ https://pub.dev/packages/share_pluss
 ✔ will exit canvas instead of cancelling saving @done(24-08-10 19:34)
 ✔ Doesn't check for invalid file names properly :SOB: maybe use prebuilt solution @done(24-08-10 19:34)
 ✔ saving an untitled file will save it as "Untitled" @done(24-08-10 19:34)
-- Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. 
-    - Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue
+✔ Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. @done(24-08-15 00:32)
+    ✔ Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue @done(24-08-15 00:32)
 ✔ cannot exit without saving, due to the way the file is saved. @done(24-08-11 15:08)
 ✔ FileSaveDialog too... tall? Odd. @done(24-08-11 20:20)
 - Selection color hardcoded. Darkmode makes it invisible.
 - Android doesn't work: 
     ✔ Scaling is off @done(24-08-11 17:53) ?? 
-    - touch support is inconsistant
+    ✔ touch support is inconsistant @done(24-08-15 00:32)
     ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
 ✔ Rewrite RepaintListener to allow for unloading of Listeners. @done(24-08-13 14:21) replaced with ValueNotifier
+
+
 
 # For alpha 1:
 ✔ fix undo/redo @done(24-08-13 10:28)
@@ -53,9 +55,23 @@ https://pub.dev/packages/share_pluss
 ☐ update readme
 ☐ share feature
 ✔ rename file feature @started(24-08-13 15:20) @done(24-08-13 16:15) @lasted(55m26s)
+☐ check out packages & impl?
+    - sizer
+    - file picker
+    - color picker
+    - share
+    - floating draggable wudget 
+    - flutter_svg: ^2.0.10+1
+    - shared_preferences
+    - syncfusion_flutter_sliders: ^26.2.9
+    - fluttertoast: ^8.2.8
+    - flutter_whatsnew
+
+# could update https://github.com/xqwzts/flutter_radial_menu to dart 3
 
 
-☐ fix selecting strokes  | CANCELLED FOR NOW
+
+✔ fix selecting strokes  | CANCELLED FOR NOW @done(24-08-15 00:32)
 ☐ fix and make remove stroke more performant
 
 
