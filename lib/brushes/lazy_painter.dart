@@ -25,6 +25,9 @@ class LazyPainter extends CustomPainter {
 
     void drawPath(Stroke stroke) {
       Paint paint = stroke.paint;
+      if (strokes.length == 1) {
+        canvas.drawPoints(PointMode.points, stroke.points, stroke.paint);
+      }
 
       Path pathToDraw = Path();
       for (int i = 0; i < stroke.points.length; i++) {
@@ -46,9 +49,7 @@ class LazyPainter extends CustomPainter {
           pathToDraw.lineTo(stroke.points[i].dx, stroke.points[i].dy);
         }
       }
-      canvas.save();
       canvas.clipPath(pathToDraw);
-      canvas.restore();
     }
 
     // Switch through all modes to allow for different handling of the strokes
