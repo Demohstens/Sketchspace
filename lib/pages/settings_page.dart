@@ -37,30 +37,46 @@ class SettingsPage extends StatelessWidget {
                           context.read<Settings>().toggleAutoSaveOnExit();
                         })),
                 Center(
-                  child: ListTile(
-                    minVerticalPadding: 50,
-                    leading: const Icon(Icons.timer),
-                    title: const Text("Draw Cooldown (1h = 100ms, 1m = 1ms)"),
-                    subtitle: Text(
-                        "Current cooldown: ${context.watch<Settings>().drawCooldown} ms"),
-                    onTap: () async {
-                      TimeOfDay? pickedTime = await showTimePicker(
+                    child: ListTile(
+                  minVerticalPadding: 50,
+                  leading: const Icon(Icons.timer),
+                  title: const Text("Draw Cooldown (1h = 100ms, 1s = 1ms)"),
+                  subtitle: Text(
+                      "Current cooldown: ${context.watch<Settings>().drawCooldown} ms"),
+                  onTap: () {
+                    showDialog(
                         context: context,
-                        initialTime: TimeOfDay(
-                          hour: 0,
-                          minute: 0,
-                        ), // Start at 00:00
-                      );
-                      if (pickedTime != null) {
-                        int cooldownMilliseconds =
-                            (pickedTime.hour * 100) + (pickedTime.minute);
-                        context
-                            .read<Settings>()
-                            .changeDrawCooldown(cooldownMilliseconds);
-                      }
-                    },
-                  ),
-                ),
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text("Draw Cooldown"),
+                            content: TextField(
+                              controller: TextEditingController.fromValue(
+                                  TextEditingValue(
+                                      text: context
+                                          .watch<Settings>()
+                                          .drawCooldown
+                                          .toString())),
+                              onSubmitted: (String value) {
+                                if (value == "") {
+                                  value = "0";
+                                }
+                                context
+                                    .read<Settings>()
+                                    .changeDrawCooldown(int.parse(value) ?? 0);
+                              },
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text('Close'),
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                )),
               ]))));
     });
   }
