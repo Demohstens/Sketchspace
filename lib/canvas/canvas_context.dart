@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
@@ -18,16 +19,21 @@ class DrawingContext with ChangeNotifier {
   List<Offset> _points = [];
   Mode _mode = Mode.drawing;
   DrawFile _workingFile = DrawFile.empty("Untitled");
+  Widget? _selectedStrokeWidget; // TODO replace with proper context menu ASAP
+  Stroke? _selectedStroke;
 
   // * Paint Attributes * //
   Color _color = Colors.orange;
   double _width = 10.0;
-  Widget? selectedPaint;
 
   bool ui_enabled = true;
 
   // GETTERS
   Color get color => _color;
+  Widget get selectedStrokeWidget =>
+      _selectedStrokeWidget ??
+      Container(); // Empty Container is a placeholder for null
+  Stroke? get selectedStroke => _selectedStroke;
   Mode get mode => _mode;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
@@ -58,11 +64,14 @@ class DrawingContext with ChangeNotifier {
   }
 
   void resetDrawing() {
+    unSelectStroke();
+    worldspace.clear();
     _points.clear();
     notifyListeners();
   }
 
   void resetAll() {
+    unSelectStroke();
     _points.clear();
     worldspace.clear();
     notifyListeners();
@@ -97,6 +106,8 @@ class DrawingContext with ChangeNotifier {
 
   // File logic
   void newFile() {
+    _workingFile = DrawFile.empty("");
+
     resetAll();
   }
 
@@ -204,14 +215,39 @@ class DrawingContext with ChangeNotifier {
   }
 
   // * SELECTION * //
-  Widget? selectedStroke;
-  void setSelectedStroke(Widget w) {
-    selectedStroke = w;
+  void selectStroke(Offset touchPoint) {
+    double maxAllowedDistance =
+        10; // The maximum distance allowed to select a stroke in pixels
+    for (Stroke stroke in worldspace.strokes.reversed) {
+      if (stroke.contains(touchPoint,
+          maximumAllowedDistance: maxAllowedDistance)) {
+        setSelectedStroke(stroke);
+        return;
+      }
+    }
+  }
+
+  void setSelectedStroke(Stroke s) {
+    _selectedStrokeWidget = getSelectedStrokeWidget(s);
     notifyListeners();
   }
 
   void unSelectStroke() {
-    selectedStroke = null;
+    _selectedStrokeWidget = Container();
     notifyListeners();
+  }
+
+  Widget? getSelectedStrokeWidget(Stroke s) {
+    Rect bounds = s.boundary();
+    return Container(
+      width: bounds.width,
+      height: bounds.height,
+      child: CustomPaint(
+        painter: SelectedStrokePainter(
+            s,
+            Colors.grey
+                .withAlpha(150)), // TODO properly handle the selection color
+      ),
+    );
   }
 }

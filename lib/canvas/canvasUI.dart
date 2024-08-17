@@ -78,7 +78,7 @@ class _CanvasUIState extends State<CanvasUI> {
           child: FloatingActionButton(
             heroTag: "reset",
             onPressed: () {
-              context.read<Worldspace>().clear();
+              context.read<DrawingContext>().resetDrawing();
             },
             child: Icon(Icons.lock_reset_sharp),
           ),

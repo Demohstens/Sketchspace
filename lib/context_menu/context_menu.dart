@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sketchspace/context_menu/manual_draggable.dart' as sketchspace;
 
 /// Flutter code sample for [Draggable].
 
@@ -24,12 +25,59 @@ class BG extends StatefulWidget {
 }
 
 class _BGState extends State<BG> {
-  Widget? _ContextMenu;
+  OverlayEntry? _overlayEntry;
+  void _onLongPressStart(LongPressStartDetails details) {
+    _showOverlay(details.globalPosition);
+  }
 
-  void _onLongPress(details) {
-    setState(() {
-      _ContextMenu = RadialContextMenu(details.localPosition);
-    });
+  void _onLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    print("Long Press Move Update");
+    _updateOverlayPosition(details.globalPosition);
+  }
+
+  void _onLongPressEnd(LongPressEndDetails details) {
+    _removeOverlay();
+  }
+
+  void _showOverlay(Offset globalPosition) {
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        return _buildOverlayContent(globalPosition);
+      },
+    );
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _updateOverlayPosition(Offset globalPosition) {
+    _overlayEntry?.markNeedsBuild(); // Trigger a rebuild to update position
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  Widget _buildOverlayContent(Offset globalPosition) {
+    final RenderBox overlayBox =
+        Overlay.of(context).context.findRenderObject()! as RenderBox;
+    final Offset localPosition = overlayBox.globalToLocal(globalPosition);
+
+    return Positioned(
+      left: localPosition.dx,
+      top: localPosition.dy,
+      child: GestureDetector(
+        onTap: () {
+          // Handle tap on the injected widget
+          _removeOverlay();
+        },
+        child: Container(
+          // Your injected widget (e.g., InkWell)
+          width: 100,
+          height: 100,
+          color: Colors.red,
+        ),
+      ),
+    );
   }
 
   @override
@@ -46,23 +94,38 @@ class _BGState extends State<BG> {
               ),
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onLongPressStart: (details) {
-                  _onLongPress(details);
-                },
-                onTap: () {
-                  setState(() {
-                    _ContextMenu = null;
-                  });
-                },
-                child: _ContextMenu,
+                onLongPressStart: _onLongPressStart,
+                onLongPressMoveUpdate: _onLongPressMoveUpdate,
+                onLongPressEnd: _onLongPressEnd,
               )))
     ]);
   }
 }
 
+Widget _spawnGestureDetector2() {
+  return Focus(
+      focusNode: FocusNode(),
+      canRequestFocus: true,
+      autofocus: true,
+      child: GestureDetector(
+        onTap: () {
+          print("Tapped 2");
+        },
+        onPanUpdate: (details) {
+          print("Pan Update 2");
+        },
+        child: Container(
+          width: 100,
+          height: 100,
+          color: Colors.red,
+        ),
+      ));
+}
+
 class RadialContextMenu extends StatefulWidget {
   final Offset position;
-  const RadialContextMenu(this.position, {super.key});
+  RadialContextMenu(this.position, {super.key});
+  final sketchspace.DragNotifier dragNotifier = sketchspace.DragNotifier();
 
   @override
   State<RadialContextMenu> createState() => _RadialContextMenuState();
@@ -70,6 +133,21 @@ class RadialContextMenu extends StatefulWidget {
 
 class _RadialContextMenuState extends State<RadialContextMenu> {
   bool _isSelected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.dragNotifier.addListener(_handleDragStateChange);
+  }
+
+  void _handleDragStateChange() {
+    if (widget.dragNotifier.canDrag) {
+      widget.dragNotifier.initiateDrag(widget.position);
+
+      widget.dragNotifier.setDragibility(false); // Reset the flag
+    }
+    // ... (handle other state changes if needed)
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +159,8 @@ class _RadialContextMenuState extends State<RadialContextMenu> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Draggable<bool>(
+                sketchspace.ManualDraggable<bool>(
+                  dragNotifier: widget.dragNotifier,
                   onDragStarted: () {},
                   // Data is the value this Draggable stores.
                   data: true,

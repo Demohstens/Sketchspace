@@ -76,6 +76,7 @@ class Worldspace extends ChangeNotifier {
     return stroke;
   }
 
+  /// Clears all the strokes from the worldspace.
   void clear() {
     strokes.clear();
 

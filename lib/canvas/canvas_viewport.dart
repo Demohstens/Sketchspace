@@ -30,8 +30,18 @@ class CanvasViewport extends StatelessWidget {
             drawCooldown: context.read<Settings>().drawCooldown,
             maxZoomWidth: 2000,
             maxZoomHeight: 2000,
+            onDrawStart: (point) {
+              context.read<DrawingContext>().addPoint(point);
+              context.read<DrawingContext>().unSelectStroke();
+            },
+            onTapDown: (touchPoint) {
+              if (context.read<DrawingContext>().selectedStroke != null) {
+                context.read<DrawingContext>().unSelectStroke();
+              }
+            },
             onDrawUpdate: (point) {
               context.read<DrawingContext>().updateDrawing(point);
+              context.read<DrawingContext>().unSelectStroke();
             },
             onDoubleTap: () {
               context.read<DrawingContext>().toggleUI();
@@ -39,15 +49,10 @@ class CanvasViewport extends StatelessWidget {
             onDrawEnd: () {
               context.read<DrawingContext>().endDrawing();
             },
-            onLongPressStart: (details) {
-              Offset touchPoint = details.localPosition;
-              selectedStroke = strokeSelector(
-                  context.read<Worldspace>().strokes, touchPoint);
-              context.read<DrawingContext>().unSelectStroke();
+            onLongPressStart: (touchPoint) {
+              context.read<DrawingContext>().selectStroke(touchPoint);
             },
-            onLongPressEnd: (details) {
-              context.read<DrawingContext>().selectedPaint = null;
-            },
+            onLongPressEnd: (details) {},
             child: Stack(children: [
               Positioned.fill(
                   child: RepaintBoundary(
@@ -76,7 +81,7 @@ class CanvasViewport extends StatelessWidget {
                   ),
                 ),
               ),
-              context.watch<DrawingContext>().selectedStroke ?? Container(),
+              context.watch<DrawingContext>().selectedStrokeWidget,
             ]),
           ))
     ]);

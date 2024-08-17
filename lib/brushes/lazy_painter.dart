@@ -17,14 +17,17 @@ class LazyPainter extends CustomPainter {
   final ValueNotifier<bool> repaintNotifier;
   @override
   void paint(Canvas canvas, Size size) {
+    canvas.drawColor(Colors.transparent, BlendMode.color);
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
-    print("Painting ${strokes.length} strokes");
     void drawLine(Stroke stroke) {
       canvas.drawLine(stroke.points.first, stroke.points.last, stroke.paint);
     }
 
     void drawPath(Stroke stroke) {
       Paint paint = stroke.paint;
+      if (strokes.length == 1) {
+        canvas.drawPoints(PointMode.points, stroke.points, stroke.paint);
+      }
 
       Path pathToDraw = Path();
       for (int i = 0; i < stroke.points.length; i++) {
@@ -38,6 +41,12 @@ class LazyPainter extends CustomPainter {
     }
 
     void erasePath(Stroke stroke) {
+      Paint erasePaint = Paint()
+        ..color = Colors.white
+        ..strokeWidth = stroke.paint.strokeWidth +
+            2 // Slightly increase for better coverage
+        ..style = PaintingStyle.stroke
+        ..blendMode = BlendMode.dstOut;
       Path pathToDraw = Path();
       for (int i = 0; i < stroke.points.length; i++) {
         if (i == 0) {
@@ -46,9 +55,7 @@ class LazyPainter extends CustomPainter {
           pathToDraw.lineTo(stroke.points[i].dx, stroke.points[i].dy);
         }
       }
-      canvas.save();
-      canvas.clipPath(pathToDraw);
-      canvas.restore();
+      canvas.drawPath(pathToDraw, erasePaint);
     }
 
     // Switch through all modes to allow for different handling of the strokes
