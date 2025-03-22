@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sketchspace/canvas/Actions.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/canvas/data/scale.dart';
@@ -17,14 +18,22 @@ class _CanvasUIState extends State<CanvasUI> {
   void toggleVisibilty() {
     setState(() {});
   }
+  
 
   @override
   Widget build(BuildContext context) {
+    final drawingContext = context.read<DrawingContext>(); 
+
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Visibility(
-        child: Stack(
+        child: Actions(
+          actions: <Type, Action<Intent>>{
+            UndoAction: UndoAction(drawingContext),
+            RedoAction: RedoAction(drawingContext),
+          },
+          child:Stack(
       children: [
         // Button to return Home and save if needed / allowed
         Positioned(
@@ -78,7 +87,7 @@ class _CanvasUIState extends State<CanvasUI> {
           child: FloatingActionButton(
             heroTag: "reset",
             onPressed: () {
-              context.read<DrawingContext>().resetDrawing();
+              Actions.invoke(context, const ResetIntent());
             },
             child: Icon(Icons.lock_reset_sharp),
           ),
@@ -97,14 +106,14 @@ class _CanvasUIState extends State<CanvasUI> {
                   // Redo Button
                   IconButton(
                       onPressed: () {
-                        context.read<DrawingContext>().redo();
+                          Actions.invoke<RedoIntent>(context, const RedoIntent());
                       },
                       icon: Icon(Icons.redo,
                           color: context.read<Settings>().secondaryColor)),
                   // Undo Button
                   IconButton(
                       onPressed: () {
-                        context.read<DrawingContext>().undo();
+                        Actions.invoke<UndoIntent>(context, const UndoIntent());
                       },
                       icon: Icon(
                         Icons.undo,
@@ -112,6 +121,6 @@ class _CanvasUIState extends State<CanvasUI> {
                       )),
                 ]))),
       ],
-    ));
+    )));
   }
 }

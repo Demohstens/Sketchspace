@@ -1,3 +1,5 @@
+import 'package:sketchspace/actions/menu_actions.dart';
+import 'package:sketchspace/canvas/Actions.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/classes/settings.dart';
@@ -24,18 +26,20 @@ void main() {
             update: (context, canvasSpace, worldSpace) =>
                 worldSpace ?? DrawingContext(canvasSpace)),
       ],
-      child: Sketchspace(),
+      child: const Sketchspace(),
     ),
   );
 }
 
 class Sketchspace extends StatelessWidget {
+  const Sketchspace({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sketchspace',
       theme: ThemeData(
-          brightness: Brightness.light,
+          brightness: Brightness.dark,
           pageTransitionsTheme: const PageTransitionsTheme(
               builders: <TargetPlatform, PageTransitionsBuilder>{
                 // Set the predictive back transitions for Android.
@@ -45,7 +49,12 @@ class Sketchspace extends StatelessWidget {
       themeMode: context.watch<Settings>().darkModeEnabled
           ? ThemeMode.dark
           : ThemeMode.light,
-      home: HomePage(),
+      home: Actions(actions: 
+      {
+        OpenMenuIntent: OpenMenuAction(),
+        ResetIntent: ResetAction(context.read<DrawingContext>()),
+      }, 
+      child: HomePage(),)
     );
   }
 }
