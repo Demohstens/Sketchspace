@@ -376,6 +376,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
+  perfect_freehand:
+    dependency: "direct main"
+    description:
+      name: perfect_freehand
+      sha256: "6ced289209b3b26dc23c8d21960ceff3d39442cebd8e12ce722c4385c63553e5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.2"
   petitparser:
     dependency: transitive
     description:

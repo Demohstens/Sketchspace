@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:english_words/english_words.dart';
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
@@ -221,34 +222,41 @@ class DrawingContext with ChangeNotifier {
     for (Stroke stroke in worldspace.strokes.reversed) {
       if (stroke.contains(touchPoint,
           maximumAllowedDistance: maxAllowedDistance)) {
-        setSelectedStroke(stroke);
+            print("Selected Stroke");
+        _selectedStrokeWidget = getSelectedStrokeWidget(stroke, touchPoint);
         return;
       }
     }
   }
 
-  void setSelectedStroke(Stroke s) {
-    _selectedStrokeWidget = getSelectedStrokeWidget(s);
-    notifyListeners();
-  }
+  // void setSelectedStroke(Stroke s) {
+  //   s.transform(Offset(50, 10));
+  //   _selectedStrokeWidget = getSelectedStrokeWidget(s);
+  //   notifyListeners();
+  // }
 
   void unSelectStroke() {
     _selectedStrokeWidget = Container();
     notifyListeners();
   }
 
-  Widget? getSelectedStrokeWidget(Stroke s) {
+  Widget? getSelectedStrokeWidget(Stroke s, Offset touchPoint) {
     Rect bounds = s.boundary();
-    return Container(
+    return SizedBox(
       width: bounds.width,
       height: bounds.height,
       child: Stack(children: [
+          Positioned(
+            left: touchPoint.dx,
+            top: touchPoint.dy,
+            child: const Text("Selected Stroke"),),
+          Positioned.fill(child: 
           CustomPaint(
-        painter: SelectedStrokePainter(
-            s,
+            painter: SelectedStrokePainter(
+                s,
             Colors.grey
                 .withAlpha(150)), // TODO properly handle the selection color
-      ),],)
+      ),)],)
     );
   }
 }

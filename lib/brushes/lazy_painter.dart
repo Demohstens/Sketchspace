@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:perfect_freehand/perfect_freehand.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
 import 'package:flutter/material.dart';
@@ -29,12 +30,14 @@ class LazyPainter extends CustomPainter {
         canvas.drawPoints(PointMode.points, stroke.points, stroke.paint);
       }
 
+      var st = getStroke(stroke.points.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: paint.strokeWidth, end: StrokeEndOptions.end(cap: false), thinning: 0.05));
+
       Path pathToDraw = Path();
-      for (int i = 0; i < stroke.points.length; i++) {
+      for (int i = 0; i < st.length; i++) {
         if (i == 0) {
-          pathToDraw.moveTo(stroke.points[i].dx, stroke.points[i].dy);
+          pathToDraw.moveTo(st[i].dx, st[i].dy);
         } else if (i > 0) {
-          pathToDraw.lineTo(stroke.points[i].dx, stroke.points[i].dy);
+          pathToDraw.lineTo(st[i].dx, st[i].dy);
         }
       }
       canvas.drawPath(pathToDraw, paint);
@@ -60,6 +63,10 @@ class LazyPainter extends CustomPainter {
 
     // Switch through all modes to allow for different handling of the strokes
     for (Stroke stroke in strokes) {
+      if (!stroke.enabled) {
+        // Skips drawing for disabled Strokes
+        continue;
+      }
       // Save the canvas Layer
       switch (stroke.mode) {
         case Mode.drawing:

@@ -4,7 +4,6 @@ import 'package:sketchspace/brushes/active_painter.dart';
 import 'package:sketchspace/brushes/error_painter.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/stroke_selector/paint_selector.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart';
 import 'package:sketchspace/classes/settings.dart';

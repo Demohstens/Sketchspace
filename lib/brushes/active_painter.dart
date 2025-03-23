@@ -1,3 +1,4 @@
+import 'package:perfect_freehand/perfect_freehand.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:flutter/material.dart';
 
@@ -14,17 +15,18 @@ class ActivePainter extends CustomPainter {
 
       canvas.drawLine(currentPath.first, currentPath.last, strokePaint);
     }
-
     void drawPath() {
-      if (currentPath.isNotEmpty) {
-        Paint paint = strokePaint;
-        Path currentPathToDraw = Path();
-        currentPathToDraw.moveTo(currentPath.first.dx, currentPath.first.dy);
-        for (int i = 1; i < currentPath.length; i++) {
-          currentPathToDraw.lineTo(currentPath[i].dx, currentPath[i].dy);
+      var st = getStroke(currentPath.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: strokePaint.strokeWidth, end: StrokeEndOptions.end(cap: false), thinning: 0.05));
+
+      Path pathToDraw = Path();
+      for (int i = 0; i < st.length; i++) {
+        if (i == 0) {
+          pathToDraw.moveTo(st[i].dx, st[i].dy);
+        } else if (i > 0) {
+          pathToDraw.lineTo(st[i].dx, st[i].dy);
         }
-        canvas.drawPath(currentPathToDraw, paint);
       }
+      canvas.drawPath(pathToDraw, strokePaint);
     }
 
     switch (mode) {

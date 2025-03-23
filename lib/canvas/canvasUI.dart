@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/Actions.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
-import 'package:sketchspace/canvas/data/scale.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
@@ -81,17 +80,7 @@ class _CanvasUIState extends State<CanvasUI> {
             left: screenWidth / 2 - 50,
             child: BrushMenu()),
         // Reset Button
-        Positioned(
-          bottom: 0,
-          left: 0,
-          child: FloatingActionButton(
-            heroTag: "reset",
-            onPressed: () {
-              Actions.invoke(context, const ResetIntent());
-            },
-            child: Icon(Icons.lock_reset_sharp),
-          ),
-        ),
+        
         // Redo/undo
         Positioned(
             top: screenHeight * 0.45,
@@ -102,18 +91,17 @@ class _CanvasUIState extends State<CanvasUI> {
                         width: 1,
                         color: context.watch<Settings>().secondaryColor)),
                 child: Column(children: [
-                  // TODO: Implement undo/redo
                   // Redo Button
                   IconButton(
                       onPressed: () {
-                          Actions.invoke<RedoIntent>(context, const RedoIntent());
+                          context.read<DrawingContext>().redo();
                       },
                       icon: Icon(Icons.redo,
                           color: context.read<Settings>().secondaryColor)),
                   // Undo Button
                   IconButton(
                       onPressed: () {
-                        Actions.invoke<UndoIntent>(context, const UndoIntent());
+                        context.read<DrawingContext>().undo();
                       },
                       icon: Icon(
                         Icons.undo,

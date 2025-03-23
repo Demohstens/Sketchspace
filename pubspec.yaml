@@ -28,6 +28,7 @@ dependencies:
   shared_preferences: ^2.3.1
   syncfusion_flutter_sliders: ^26.2.9
   flutter_whatsnew: ^1.0.5+2
+  perfect_freehand: ^2.3.2
 
 dev_dependencies:
   flutter_test:

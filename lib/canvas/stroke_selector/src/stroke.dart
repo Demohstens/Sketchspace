@@ -9,8 +9,10 @@ class Stroke {
   final List<Offset> _points;
   final Mode _mode;
   late Path _path;
+  bool enabled = true; 
 
-  Stroke(this._paint, this._points, this._mode) {
+  Stroke(this._paint, this._points, this._mode,) {
+
     _path = Path()..moveTo(_points.first.dx, _points.first.dy);
     for (int i = 1; i < _points.length; i++) {
       _path.lineTo(_points[i].dx, _points[i].dy);
@@ -35,6 +37,16 @@ class Stroke {
       0.05,
     );
     return Stroke(_paint, optimizedPoints, _mode);
+  }
+
+  void transform(Offset offset) {
+    for (int i = 0; i < _points.length; i++) {
+      _points[i] += offset;
+    }
+    _path = Path()..moveTo(_points.first.dx, _points.first.dy);
+    for (int i = 1; i < _points.length; i++) {
+      _path.lineTo(_points[i].dx, _points[i].dy);
+    }
   }
 
   /// Returns whether or not the point is within the stroke
