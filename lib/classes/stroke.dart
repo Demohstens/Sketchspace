@@ -99,8 +99,8 @@ class Stroke {
 
   /// Returns A string for json serialization
   /// Format: {paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...], "Mode": }
-  String toJson() {
-    var ret = jsonEncode({
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> ret = {
       "paint": {
         "color": _paint.color.value,
         "strokeWidth": _paint.strokeWidth,
@@ -108,7 +108,7 @@ class Stroke {
       },
       "points": _points.map((e) => [e.dx, e.dy]).toList(),
       "mode": _mode.toString().split('.').last,
-    });
+    };
     print("Stroke.toJson: $ret");
     return ret;
   }

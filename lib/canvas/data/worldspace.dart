@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
-import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/classes/stroke.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 /// The "World" in which all Strokes are stored in relation to the 0,0 coordinates.
@@ -101,7 +101,7 @@ class Worldspace extends ChangeNotifier {
 
   LazyPainter getLazyPainter() {
     return LazyPainter(strokes, _repaintNotifier);
-  }
+  } //TODO Replace this whole class with a Compositer
 
   /// Loads a file into the worldspace.
   void loadStrokes(List<Stroke> strokes) {
@@ -158,7 +158,6 @@ class CanvasSpace extends ChangeNotifier {
   Offset convertPoint(Offset point) {
     return Offset(
             _translationMatrix.transform(Vector4(point.dx, point.dy, 0, 1)).x,
-            _translationMatrix.transform(Vector4(point.dx, point.dy, 0, 1)).y)
-        as Offset;
+            _translationMatrix.transform(Vector4(point.dx, point.dy, 0, 1)).y);
   }
 }

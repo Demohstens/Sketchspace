@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:english_words/english_words.dart';
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
-import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/classes/layer.dart';
+import 'package:sketchspace/classes/stroke.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ enum Mode { drawing, lifted, erasing, strokeErasing, line, fill }
 /// Everything the active painter needs to draw on the canvas
 /// Also includes everything the
 class DrawingContext with ChangeNotifier {
-  DrawingContext(this.worldspace);
+  DrawingContext(this.worldspace, {Layer? activeLayer}) : activeLayer = activeLayer ?? Layer(id: 0, strokes: []);
   // * ATTRIBUTES * //
   Worldspace worldspace;
   List<Offset> _points = [];
@@ -22,6 +22,8 @@ class DrawingContext with ChangeNotifier {
   DrawFile _workingFile = DrawFile.empty("Untitled");
   Widget? _selectedStrokeWidget; // TODO replace with proper context menu ASAP
   Stroke? _selectedStroke;
+  List<Layer> layers = [];
+  Layer activeLayer;
 
   // * Paint Attributes * //
   Color _color = Colors.orange;
@@ -39,6 +41,7 @@ class DrawingContext with ChangeNotifier {
   List<Offset> get points => _points;
   double get strokeWidth => _width;
   DrawFile? get workingFile => _workingFile;
+  
 
   // Drawing logic
   void toggleUI() {
@@ -56,9 +59,29 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void newLayer() {
+    // Id is equal to the length of the list as the first layer is 0
+    var newLayer = Layer(id: layers.length, strokes: []);
+    layers.add(newLayer);
+    changeActiveLayer(newLayer);
+    notifyListeners();
+  }
+
+  void changeActiveLayer(Layer layer) {
+    print("Changed active layer to ${layer.id}");
+    activeLayer = layer;
+    notifyListeners();
+  }
+
+  void deleteLayer(Layer layer) {
+    layers.remove(layer);
+    notifyListeners();
+  }
+
   void endDrawing() {
     if (_points.isNotEmpty) {
       worldspace.addStrokeFromPoints(_points, getPaint(), _mode);
+      activeLayer.addStroke(worldspace.strokes.last);
       _points.clear();
       notifyListeners();
     }
@@ -87,12 +110,13 @@ class DrawingContext with ChangeNotifier {
       Stroke undoneStroke = undoBuffer.removeLast();
       worldspace.addStroke(undoneStroke);
       redoBuffer.add(undoneStroke);
-      _workingFile.content =
-          worldspace.strokes; // Replace with a method to handle this properly.
+      _workingFile.content = layers;
+          // worldspace.strokes; // Replace with a method to handle this properly.
       notifyListeners();
     } else if (worldspace.strokes.isNotEmpty) {
       redoBuffer.add(worldspace.removeStrokeAt(-1));
-      _workingFile.content = worldspace.strokes; // Again: Don't do this.
+      _workingFile.content = layers;
+      //  worldspace.strokes; // Again: Don't do this.
       notifyListeners();
     }
   }
@@ -100,7 +124,8 @@ class DrawingContext with ChangeNotifier {
   void redo() {
     if (redoBuffer.isNotEmpty) {
       worldspace.addStroke(redoBuffer.removeLast());
-      _workingFile.content = worldspace.strokes; // Again: Don't do this.
+      _workingFile.content = layers;
+       worldspace.strokes; // Again: Don't do this.
       notifyListeners();
     }
   }
@@ -108,6 +133,8 @@ class DrawingContext with ChangeNotifier {
   // File logic
   void newFile() {
     _workingFile = DrawFile.empty("");
+    layers = [Layer(id: 0, strokes: [])];
+    activeLayer = layers[0];
 
     resetAll();
   }
@@ -130,10 +157,13 @@ class DrawingContext with ChangeNotifier {
       }
     }
     // Convert strokes to JSON list
-    final List<String> jsonStrokes = [
-      for (var stroke in worldspace.strokes) stroke.toJson()
+    print("STARTING SAVE: ${layers.length} layers");
+    print("ACTIVE LAYER: ${layers[0].strokes.length} strokes");
+    final List<Map<String, dynamic>> jsonLayers = [
+      for (var layer in layers) layer.toJson()
     ];
-    final String jsonString = jsonEncode({"Strokes": jsonStrokes});
+    print(jsonLayers);
+    final String jsonString = jsonEncode({"Layers": jsonLayers});
 
     final Directory appDir = await getAppDirectory();
     String filePath;
@@ -152,7 +182,7 @@ class DrawingContext with ChangeNotifier {
   void loadFileContext(File file) {
     resetAll(); // TODO check if this is necessary
     _workingFile = loadFile(file) ?? DrawFile.empty("Untitled");
-    worldspace.loadStrokes(_workingFile.getStrokes());
+    layers = _workingFile.getLayers();
 
     if (_workingFile.content == null) {
     } else {

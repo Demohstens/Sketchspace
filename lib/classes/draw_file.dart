@@ -3,25 +3,26 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sketchspace/classes/layer.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
-import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/classes/stroke.dart';
 
 class DrawFile {
   int? _id;
   String? _path;
   String? _name;
 
-  List<Stroke>?
+  List<Layer>?
       _content; // Strokes:[{paint: {color: , strokeWidth: }, points: [(x, y), (x, y), ...]}, ...]
 
   // GETTERS
   int? get id => _id;
   String? get name => _name;
   String? get path => _path;
-  List<Stroke>? get content => _content;
+  List<Layer>? get content => _content;
 
-  set content(List<Stroke>? strokes) {
-    _content = strokes;
+  set content(List<Layer>? layers) {
+    _content = layers;
   }
 
   DrawFile(String name, String path, content) {
@@ -52,7 +53,7 @@ class DrawFile {
   //   };
   // }
 
-  List<Stroke> getStrokes() {
+  List<Layer> getLayers() {
     return _content ?? [];
   }
 
@@ -69,10 +70,10 @@ class DrawFile {
       }
     }
     // Convert strokes to JSON list
-    final List<String> jsonStrokes = [
+    final List<Map<String, dynamic>> jsonStrokes = [
       for (var stroke in _content!) stroke.toJson()
     ];
-    final String jsonString = jsonEncode({"Strokes": jsonStrokes});
+    final String jsonString = jsonEncode({"Layers": jsonStrokes});
 
     final Directory appDir = await getAppDirectory();
     final File file = File('${appDir.path}/$_name');
@@ -82,15 +83,15 @@ class DrawFile {
     return success;
   }
 
-  void addStroke(Stroke stroke) {
-    _content ??= [];
-    _content!.add(stroke);
-  }
+  // void addStroke(Stroke stroke) {
+  //   _content ??= [];
+  //   _content!.add(stroke);
+  // }
 
-  void addStrokes(List<Stroke> strokes) {
-    _content ??= [];
-    _content!.addAll(strokes);
-  }
+  // void addStrokes(List<Stroke> strokes) {
+  //   _content ??= [];
+  //   _content!.addAll(strokes);
+  // }
 }
 
 Future<Directory> getAppDirectory() async {
@@ -118,21 +119,27 @@ Future<List<File>> getFiles() async {
 /// Loads a file and returns a list of strokes
 DrawFile? loadFile(File file) {
   try {
+    print('Loading file: ${file.path}');
     final String content = file.readAsStringSync();
     final Map<String, dynamic> json = jsonDecode(content);
-    List<Stroke> strokesList = [];
+    List<Layer> layersList = [];
 
-    if (json.containsKey("Strokes") && json["Strokes"] is List) {
-      final strokes = json["Strokes"];
-      if (strokes.isNotEmpty) {
-        strokesList = [
-          for (var stroke in strokes) Stroke.fromJson(jsonDecode(stroke))
+    print("JSON: $json");
+
+    if (json.containsKey("Layers") && json["Layers"] is List) {
+      final layers = json["Layers"];
+      print("LAYERS: $layers");
+      if (layers.isNotEmpty) {
+        layersList = [
+          for (var layer in layers) Layer.fromJson(layer) 
         ];
-        return DrawFile(basename(file.path), file.path, strokesList);
+        return DrawFile(basename(file.path), file.path, layersList);
       } else {
         return DrawFile(basename(file.path), file.path, null);
       }
-    } else {}
+    } else {
+      print("Invalid file format");
+    }
   } catch (e) {
     print('Error loading file: ${file.path}, Error: $e');
   }

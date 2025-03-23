@@ -92,6 +92,7 @@ class TopBar extends StatelessWidget {
                       MaterialPageRoute(
                           builder: (context) => SettingsPage()))))),
     ]);
+    
   }
 }
 

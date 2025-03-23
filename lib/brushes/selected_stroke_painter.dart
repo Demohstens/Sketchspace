@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/canvas/stroke_selector/src/stroke.dart';
+import 'package:sketchspace/classes/stroke.dart';
 
 class SelectedStrokePainter extends CustomPainter {
   final Stroke stroke;
