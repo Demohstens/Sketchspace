@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:sketchspace/brushes/active_painter.dart';
 import 'package:sketchspace/brushes/error_painter.dart';
+import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/canvas/canvas_context.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/canvas/data/worldspace.dart';
@@ -59,8 +60,8 @@ class CanvasViewport extends StatelessWidget {
                           willChange: false,
                           isComplex: true,
                           size: Size.infinite,
-                          painter:
-                              context.read<Worldspace>().getLazyPainter()))),
+                          painter: LazyPainter(context.read<DrawingContext>().layers.first.strokes, context.read<Worldspace>().repaintNotifier)))), //TODO also fix the use of a temporary lazy painter here.
+                              // context.read<Worldspace>().getLazyPainter()))),
               // Current Path - CurrentLinePainter
               Container(
                 width: MediaQuery.of(context).size.width,
