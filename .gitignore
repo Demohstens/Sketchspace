@@ -45,3 +45,4 @@ app.*.map.json
 # Custom
 /test
 sketchspace.iml
+/.vscode

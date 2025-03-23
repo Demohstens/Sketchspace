@@ -30,8 +30,8 @@ class _CanvasUIState extends State<CanvasUI> {
     return Visibility(
         child: Actions(
           actions: <Type, Action<Intent>>{
-            UndoAction: UndoAction(drawingContext),
-            RedoAction: RedoAction(drawingContext),
+            UndoIntent: UndoAction(drawingContext),
+            RedoIntent: RedoAction(drawingContext),
           },
           child:Stack(
       children: [

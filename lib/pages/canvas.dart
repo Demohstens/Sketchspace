@@ -19,16 +19,16 @@ class CanvasPage extends StatelessWidget {
     // context.read<Worldspace>().loadFile([]);
     return Shortcuts(
       shortcuts: {
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ): UndoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY): RedoIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ): const UndoIntent(),
+          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY): const RedoIntent(),
           LogicalKeySet(LogicalKeyboardKey.escape): OpenMenuIntent(context),
           },
         child: Actions(
           actions: {
-            RedoIntent: RedoAction(context.read<DrawingContext>()),
-            UndoIntent: UndoAction(context.read<DrawingContext>()),
+            RedoIntent: RedoAction(drawingContext),
+            UndoIntent: UndoAction(drawingContext),
             OpenMenuIntent: OpenMenuAction(),
-            ResetIntent: ResetAction(context.read<DrawingContext>()),
+            ResetIntent: ResetAction(drawingContext),
           },
             child: GestureDetector(child:  Focus(
             autofocus: true,

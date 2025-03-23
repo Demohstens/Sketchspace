@@ -49,7 +49,15 @@ class Worldspace extends ChangeNotifier {
 
   void addStrokeFromPoints(List<Offset> points, Paint paint, mode) {
     List<Offset> worldSpacePoints = canvasSpace.convertPoints(points);
-    addStroke(Stroke(paint, worldSpacePoints, mode));
+    // TODO Add optimization of points. Every third point is axed for now.
+    print(worldSpacePoints);
+    List<Offset> new_points = [];
+    for (int i = 0; i < worldSpacePoints.length; i++) {
+      if (i % 3 == 0) {
+        new_points.add(worldSpacePoints[i]);
+      }
+    }
+    addStroke(Stroke(paint, new_points, mode));
   }
 
   Stroke removeLastStroke() {

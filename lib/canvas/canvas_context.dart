@@ -242,12 +242,13 @@ class DrawingContext with ChangeNotifier {
     return Container(
       width: bounds.width,
       height: bounds.height,
-      child: CustomPaint(
+      child: Stack(children: [
+          CustomPaint(
         painter: SelectedStrokePainter(
             s,
             Colors.grey
                 .withAlpha(150)), // TODO properly handle the selection color
-      ),
+      ),],)
     );
   }
 }
