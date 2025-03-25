@@ -1,0 +1,2 @@
+C:/Users/demoh/Documents/Code/New folder/sketchspace/android/app/.cxx/RelWithDebInfo/3a5c6u3b/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/demoh/Documents/Code/New folder/sketchspace/android/app/.cxx/RelWithDebInfo/3a5c6u3b/x86_64/CMakeFiles/rebuild_cache.dir
