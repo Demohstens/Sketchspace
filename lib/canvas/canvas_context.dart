@@ -54,6 +54,10 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void repaint() {
+    notifyListeners();
+  }
+
   void addPoint(Offset p) {
     _points.add(p);
     notifyListeners();

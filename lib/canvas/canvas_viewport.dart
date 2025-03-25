@@ -53,14 +53,30 @@ class CanvasViewport extends StatelessWidget {
               context.read<DrawingContext>().selectStroke(touchPoint);
             },
             onLongPressEnd: (details) {},
-            child: Stack(children: [
-              Positioned.fill(
-                  child: RepaintBoundary(
-                      child: CustomPaint(
-                          willChange: false,
-                          isComplex: true,
-                          size: Size.infinite,
-                          painter: LazyPainter(context.read<DrawingContext>().layers.first.strokes, context.read<Worldspace>().repaintNotifier)))), //TODO also fix the use of a temporary lazy painter here.
+            child: Stack(
+              children: [
+                ...context.read<DrawingContext>().layers.map((layer) {
+                  if (layer.strokes.isEmpty) {
+                    return Container();
+                  } 
+                  if (layer.visible == false) {
+                    return Container();
+                  }
+                  return Positioned.fill(
+                      child: RepaintBoundary(
+                          child: CustomPaint(
+                              willChange: false,
+                              isComplex: true,
+                              size: Size.infinite,
+                              painter: LazyPainter(layer.strokes, context.read<Worldspace>().repaintNotifier))));
+                }),
+                // Positioned.fill(
+                //   child: RepaintBoundary(
+                //       child: CustomPaint(
+                //           willChange: false,
+                //           isComplex: true,
+                //           size: Size.infinite,
+                //           painter: LazyPainter(context.read<DrawingContext>().layers.first.strokes, context.read<Worldspace>().repaintNotifier)))), //TODO also fix the use of a temporary lazy painter here.
                               // context.read<Worldspace>().getLazyPainter()))),
               // Current Path - CurrentLinePainter
               Container(

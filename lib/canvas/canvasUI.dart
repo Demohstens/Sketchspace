@@ -5,6 +5,7 @@ import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
+import 'package:sketchspace/components/context_menu/layer_context.dart';
 import 'package:sketchspace/pages/homepage.dart';
 import 'package:sketchspace/pages/settings_page.dart';
 
@@ -26,13 +27,12 @@ class _CanvasUIState extends State<CanvasUI> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Visibility(
-        child: Actions(
+    return Actions(
           actions: <Type, Action<Intent>>{
             UndoIntent: UndoAction(drawingContext),
             RedoIntent: RedoAction(drawingContext),
           },
-          child:Stack(
+          child: Stack(
       children: [
          // Layer
         Positioned(
@@ -51,13 +51,22 @@ class _CanvasUIState extends State<CanvasUI> {
               reverse: true,
               itemCount: context.read<DrawingContext>().layers.length,
               itemBuilder: (context, index) {
+                var controller = PositionedContextController();
+                var layer = context.read<DrawingContext>().layers[index];
+                var isActive = context.watch<DrawingContext>().activeLayer.id == layer.id;
+                var isVisible = layer.visible;
+                var backgroundOpacity = isVisible ? 255 : 100;
+                var background = isActive ? Colors.red : layer.visible ? context.read<Settings>().background : Colors.grey;
                 return GestureDetector(
-                  onLongPress: () => print("NOT IMPL: OPEN CONTEXT"), // TODO
-                  onSecondaryTap: () => print("NOT IMPL: OPEN CONTEXT"), // TODO
+                  onLongPress: () => controller.show(), // TODO
+                  onSecondaryTapUp: (details) => {
+                    controller.setPosition(details.globalPosition),
+                    controller.show() 
+                    },
                   child: 
                 Container(
                     decoration: BoxDecoration(
-                        color: context.read<DrawingContext>().activeLayer?.id == index ?  Colors.red :context.read<Settings>().background,
+                        color: background.withAlpha(backgroundOpacity),
                         border: Border.all(
                             width: 1,
                             color: context.watch<Settings>().secondaryColor)),
@@ -66,20 +75,25 @@ class _CanvasUIState extends State<CanvasUI> {
                       // Toggle layer visibility
                       IconButton(
                         tooltip: 'Toggle visibility',
-                        onPressed: () {}, 
-                        icon: Icon(Icons.visibility,
+                        onPressed: () {
+                          layer.toggleVisibilty();
+                          context.read<DrawingContext>().repaint();
+                        }, 
+                        icon: Icon(isVisible? Icons.visibility : Icons.visibility_off,
                           size: 15,
                           color: context.read<Settings>().secondaryColor)),
                       // Change Layer
-                      IconButton(
+                      LayerContextMenu(controller, IconButton(
                         tooltip: context.read<DrawingContext>().layers[index].name,
                         onPressed: () {
                           context.read<DrawingContext>().changeActiveLayer(context.read<DrawingContext>().layers[index]);
                         },
                         icon: Icon(Icons.layers,
-                        color: context.read<Settings>().secondaryColor))])));}))
+                        color: context.read<Settings>().secondaryColor
+                        )),)
+                        ])));}))
             ],
-          ) 
+          )
           ,),
                 
         // Button to return Home and save if needed / allowed
@@ -157,6 +171,6 @@ class _CanvasUIState extends State<CanvasUI> {
                       )),
                 ]))),
       ],
-    )));
+    ));
   }
 }

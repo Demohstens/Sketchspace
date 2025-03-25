@@ -23,6 +23,7 @@ class SettingsPopup extends StatelessWidget {
               },
               child: const Text("Reset canvas"),
             ),
+            TextButton(onPressed: () {context.read<DrawingContext>().toggleUI();}, child: const Text("Toggle UI")),
             TextButton(
                 onPressed: () {
                   Navigator.pop(context);

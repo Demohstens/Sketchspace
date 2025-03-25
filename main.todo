@@ -9,14 +9,24 @@
 ☐ Share 
 https://pub.dev/packages/share_pluss
 ☐ Interface
-    ☐ Custom Context Menu
+    ☐ Custom Context Menu @done(24-08-11 18:45)
 ☐ toasts 
 ☐ Android / IOS 
 ☐ Button to hot switch between the last two brushes
 ☐ Custom Color palette
 ☐ Custom Brush settings 
     ✔ Adjustable size @done(24-08-11 01:15) alpha v.0.0.2
-☐ Layers (Moveable, hideable, etc) using caching
+☐ Layers (Moveable, hideable, etc) using caching 
+    ✔ Layer selection @done(25-03-25 21:45)
+    ✔ Layer visibility @done(25-03-25 21:45)
+    ☐ Layer reordering
+    ☐ Layer merging
+    ☐ Layer CRUD
+    ☐ Layer locking
+    ☐ Layer opacity
+    ☐ Layer blending modes
+    ☐ Layer masks
+    ☐ Layer Moving
 ☐ Images
 ☐ Text
 ☐ Shapes (Arcs, squares, circles, etc)
