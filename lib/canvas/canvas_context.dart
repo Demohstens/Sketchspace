@@ -6,6 +6,8 @@ import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:sketchspace/classes/stroke.dart';
+import 'package:sketchspace/components/brush_menu.dart';
+import 'package:sketchspace/components/context_menu/stroke_context.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:flutter/material.dart';
 
@@ -42,6 +44,11 @@ class DrawingContext with ChangeNotifier {
   double get strokeWidth => _width;
   DrawFile? get workingFile => _workingFile;
   
+  @override
+  void notifyListeners() {
+    worldspace.notifyListeners();
+    super.notifyListeners();
+  }
 
   // Drawing logic
   void toggleUI() {
@@ -138,7 +145,7 @@ class DrawingContext with ChangeNotifier {
   void newFile() {
     _workingFile = DrawFile.empty("");
     layers = [Layer(id: 0, strokes: [])];
-    activeLayer = layers[0];
+    activeLayer = layers.last;
 
     resetAll();
   }
@@ -249,6 +256,17 @@ class DrawingContext with ChangeNotifier {
     return;
   }
 
+  void deleteStroke(Stroke s) {
+    for (Layer layer in layers) {
+      if (layer.strokes.contains(s)) {
+        if (layer.strokes.remove(s)) {
+            repaint();
+        } 
+        return;
+      }
+    }
+  }
+
   // * SELECTION * //
   void selectStroke(Offset touchPoint) {
     double maxAllowedDistance =
@@ -258,6 +276,7 @@ class DrawingContext with ChangeNotifier {
           maximumAllowedDistance: maxAllowedDistance)) {
             print("Selected Stroke");
         _selectedStrokeWidget = getSelectedStrokeWidget(stroke, touchPoint);
+        notifyListeners();
         return;
       }
     }
@@ -275,22 +294,45 @@ class DrawingContext with ChangeNotifier {
   }
 
   Widget? getSelectedStrokeWidget(Stroke s, Offset touchPoint) {
-    Rect bounds = s.boundary();
-    return SizedBox(
-      width: bounds.width,
-      height: bounds.height,
-      child: Stack(children: [
-          Positioned(
-            left: touchPoint.dx,
-            top: touchPoint.dy,
-            child: const Text("Selected Stroke"),),
-          Positioned.fill(child: 
+    var child = Stack(
+      children: [
+      Positioned.fill(child: 
           CustomPaint(
             painter: SelectedStrokePainter(
                 s,
             Colors.grey
                 .withAlpha(150)), // TODO properly handle the selection color
-      ),)],)
+      ),),
+      Positioned(
+        left: touchPoint.dx,
+        top: touchPoint.dy,
+        child: Container( 
+           decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(120),
+                  blurRadius: 5,
+                  offset: const Offset(0, 2),
+                )
+              ]
+            ),
+            child: Row(
+              children: [
+                IconButton(onPressed: () {
+                  deleteStroke(s);
+                  unSelectStroke();
+                }, icon: const Icon(Icons.delete)),
+                ColorSelector((Color color){
+                  s.color = color;
+                }),
+                // WidthSelector()
+              ],
+            ),)),
+      ],
     );
+      return child;
+
   }
 }

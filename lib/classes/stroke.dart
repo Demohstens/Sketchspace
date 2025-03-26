@@ -27,6 +27,10 @@ class Stroke {
   List<Offset> get points => _points;
   PaintingStyle get style => _paint.style;
 
+  set color(Color color) {
+    _paint.color = color;
+  }
+
   /// Ramer-Douglas-Peucker Algorithm. Returns an optimized Stroke
   Stroke optimize() {
     if (_points.length < 3) {

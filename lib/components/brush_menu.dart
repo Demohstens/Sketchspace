@@ -110,15 +110,6 @@ class BrushMenu extends StatelessWidget {
     );
   }
 
-  Widget _widthButton(double width) {
-    return Container(
-      child: Icon(
-        Icons.circle_sharp,
-        size: width,
-      ),
-    );
-  }
-
   Widget _widthSlider(BuildContext context) {
     return Slider(
       value: context.read<DrawingContext>().strokeWidth,
@@ -157,5 +148,81 @@ ColorButton ColorToColotButton(Color color) {
     return ColorButton.blue;
   } else {
     return ColorButton.red;
+  }
+}
+
+
+class ColorSelector extends StatelessWidget {
+  void Function (Color color) changeColor;
+  ColorSelector(this.changeColor);
+  
+  Widget _colorButton(Color color) {
+    return Container(height: 30, width: 30, color: color, child: null);
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Material(child: PopupMenuButton<ColorButton>(
+        constraints: BoxConstraints(maxWidth: 50),
+        shape: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(),
+        ),
+        position: PopupMenuPosition.over,
+        initialValue: ColorToColotButton(context.read<DrawingContext>().color),
+        onSelected: (ColorButton result) {
+          changeColor(ColorEnumToColorType(result));
+        },
+        tooltip: "Change Color",
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<ColorButton>>[
+          PopupMenuItem(
+              value: ColorButton.red, child: _colorButton(Colors.red)),
+          PopupMenuItem(
+              value: ColorButton.green, child: _colorButton(Colors.green)),
+          PopupMenuItem(
+              value: ColorButton.blue, child: _colorButton(Colors.blue)),
+        ],
+        child: Container(
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+              color: context.watch<DrawingContext>().color,
+              border: Border.all(width: 1, color: context.watch<Settings>().secondaryColor)),
+        ),
+    ));
+  }
+}
+
+class WidthSelector extends StatelessWidget {
+  final MenuController _menuController = MenuController();
+
+  Widget _widthSlider(BuildContext context) {
+    return Slider(
+      value: context.read<DrawingContext>().strokeWidth,
+      min: 1,
+      max: 20,
+      divisions: 19,
+      label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
+      onChanged: (double value) {
+        context.read<DrawingContext>().changeWidth(value);
+      },
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    return MenuAnchor(
+          controller: _menuController,
+          menuChildren: <Widget>[_widthSlider(context)],
+          child: GestureDetector(
+              onTap: () {
+                _menuController.open();
+              },
+              child: Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: context.watch<Settings>().secondaryColor)),
+                  child: Icon(Icons.circle,
+                      size: context.read<DrawingContext>().strokeWidth,
+                      color: context.watch<Settings>().secondaryColor))));
   }
 }
