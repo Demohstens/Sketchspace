@@ -1,6 +1,21 @@
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:uuid/uuid.dart';
 
+/// A layer represents a collection of strokes in a drawing canvas.
+/// 
+/// Each layer can contain multiple strokes and has properties to control its visibility
+/// and editing capabilities.
+/// 
+/// Properties:
+/// * [id] - Unique identifier for the layer
+/// * [strokes] - List of stroke objects contained in the layer
+/// * [visible] - Controls whether the layer is visible in the canvas
+/// * [locked] - Controls whether the layer can be edited
+/// * [name] - Display name of the layer
+/// 
+/// The layer supports JSON serialization through [toJson] and [Layer.fromJson] methods
+/// for persistence and data transfer.
+
 class Layer {
   String id;
   List<Stroke> strokes;

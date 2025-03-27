@@ -3,6 +3,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
 
+/// A class representing a stroke drawn on a canvas
+/// 
+/// A stroke consists of a series of points, a paint style, and a drawing mode.
+/// It provides functionality for:
+/// - Stroke optimization using Ramer-Douglas-Peucker algorithm
+/// - Point containment testing
+/// - Distance calculations
+/// - JSON serialization/deserialization
+/// - Geometric transformations
+/// - Boundary calculations
+
 class Stroke {
   final Paint _paint;
   final List<Offset> _points;

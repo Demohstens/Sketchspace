@@ -4,6 +4,20 @@ import 'dart:io';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:uuid/uuid.dart';
 
+
+/// A canvas class that represents a drawing surface with multiple layers.
+/// 
+/// The SketchCanvas manages:
+/// - Canvas dimensions (width and height)
+/// - Multiple drawing layers
+/// - Active layer selection
+/// - File operations (save/load)
+/// - Canvas state tracking (dirty state)
+/// 
+/// Each canvas has a unique ID and can be associated with a file on disk.
+/// The canvas maintains a list of [Layer] objects and tracks which layer
+/// is currently active for drawing operations.
+
 class SketchCanvas {
   // Canvas properties
   String id; // UUID - used for actual management of the canvas and data storage
