@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:sketchspace/actions/menu_actions.dart';
 import 'package:sketchspace/canvas/actions.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/canvas/canvasUI.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

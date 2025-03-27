@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:sketchspace/brushes/active_painter.dart';
 import 'package:sketchspace/brushes/error_painter.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/data/worldspace.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart';
 import 'package:sketchspace/classes/settings.dart';
 
@@ -55,8 +54,9 @@ class CanvasViewport extends StatelessWidget {
             onLongPressEnd: (details) {},
             child: Stack(
               children: [
-                ...context.read<DrawingContext>().layers.map((layer) {
+                ...context.read<DrawingContext>().canvas.layers.map((layer) {
                   if (layer.strokes.isEmpty) {
+                    print("Empty Layer");
                     return Container();
                   } 
                   if (layer.visible == false) {
@@ -68,7 +68,7 @@ class CanvasViewport extends StatelessWidget {
                               willChange: false,
                               isComplex: true,
                               size: Size.infinite,
-                              painter: LazyPainter(layer.strokes, context.read<Worldspace>().repaintNotifier))));
+                              painter: LazyPainter(layer.strokes, context.read<DrawingContext>().repaintNotifier))));
                 }),
                 // Positioned.fill(
                 //   child: RepaintBoundary(

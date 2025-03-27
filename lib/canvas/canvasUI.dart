@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/Actions.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
-import 'package:sketchspace/canvas/data/worldspace.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
@@ -104,26 +103,22 @@ class _CanvasUIState extends State<CanvasUI> {
               heroTag: "home",
               onPressed: () {
                 // TODO: Add auto save on exit
-                if (context.read<Settings>().autoSaveExistingFiles &&
-                    context.read<Worldspace>().strokes != []) {
+                if (context.read<Settings>().autoSaveExistingFiles ){
                   context
                       .read<DrawingContext>()
                       .saveFile(context)
                       .then((saveSuccess) {
                     if (mounted) {
-                      context.read<DrawFileProvider>().updateFileList();
-                      context.read<Worldspace>().clear();
+                      // TODO load files
                       Navigator.pop(context);
 
                     }
                   });
                 } else {
                   context.read<DrawingContext>().resetAll();
-                  context.read<DrawFileProvider>().updateFileList();
+                  // TODO UPDATE files
                   Navigator.pop(context);
                 }
-
-                context.read<DrawFileProvider>().updateFileList();
               },
               child: Icon(Icons.home)),
         ),

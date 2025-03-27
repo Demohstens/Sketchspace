@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
-import 'package:sketchspace/canvas/data/worldspace.dart';
+import 'package:sketchspace/classes/sketch_canvas.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:sketchspace/components/brush_menu.dart';
-import 'package:sketchspace/components/context_menu/stroke_context.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:flutter/material.dart';
 
@@ -16,16 +15,15 @@ enum Mode { drawing, lifted, erasing, strokeErasing, line, fill }
 /// Everything the active painter needs to draw on the canvas
 /// Also includes everything the
 class DrawingContext with ChangeNotifier {
-  DrawingContext(this.worldspace, {Layer? activeLayer}) : activeLayer = activeLayer ?? Layer(id: 0, strokes: []);
   // * ATTRIBUTES * //
-  Worldspace worldspace;
   List<Offset> _points = [];
   Mode _mode = Mode.drawing;
-  DrawFile _workingFile = DrawFile.empty("Untitled");
   Widget? _selectedStrokeWidget; // TODO replace with proper context menu ASAP
   Stroke? _selectedStroke;
-  List<Layer> layers = [];
-  Layer activeLayer;
+  SketchCanvas canvas;
+  ValueNotifier<bool> repaintNotifier = ValueNotifier(false);
+
+  DrawingContext() : canvas = SketchCanvas();
 
   // * Paint Attributes * //
   Color _color = Colors.orange;
@@ -42,11 +40,13 @@ class DrawingContext with ChangeNotifier {
   Mode get mode => _mode;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
-  DrawFile? get workingFile => _workingFile;
+  // * LAYERS * //
+  List<Layer> get layers => canvas.layers;
+  Layer get activeLayer => canvas.activeLayer;
   
   @override
   void notifyListeners() {
-    worldspace.notifyListeners();
+    repaintNotifier.value = !repaintNotifier.value;
     super.notifyListeners();
   }
 
@@ -72,15 +72,13 @@ class DrawingContext with ChangeNotifier {
 
   void newLayer() {
     // Id is equal to the length of the list as the first layer is 0
-    var newLayer = Layer(id: layers.length, strokes: []);
-    layers.add(newLayer);
-    changeActiveLayer(newLayer);
+    canvas.addLayer();
     notifyListeners();
   }
 
   void changeActiveLayer(Layer layer) {
     print("Changed active layer to ${layer.id}");
-    activeLayer = layer;
+    canvas.activeLayer = layer;
     notifyListeners();
   }
 
@@ -91,16 +89,21 @@ class DrawingContext with ChangeNotifier {
 
   void endDrawing() {
     if (_points.isNotEmpty) {
-      worldspace.addStrokeFromPoints(_points, getPaint(), _mode);
-      activeLayer.addStroke(worldspace.strokes.last);
+      // Create a copy of the points before clearing
+      List<Offset> pointsCopy = List.from(_points);
       _points.clear();
+      
+      // Only add the stroke if there are enough points
+      if (pointsCopy.length >= 2) {
+        canvas.activeLayer.addStroke(Stroke(getPaint(), pointsCopy, mode));
+      }
+      
       notifyListeners();
     }
   }
 
   void resetDrawing() {
     unSelectStroke();
-    worldspace.clear();
     _points.clear();
     notifyListeners();
   }
@@ -108,7 +111,6 @@ class DrawingContext with ChangeNotifier {
   void resetAll() {
     unSelectStroke();
     _points.clear();
-    worldspace.clear();
     notifyListeners();
   }
 
@@ -117,48 +119,31 @@ class DrawingContext with ChangeNotifier {
   List<Stroke> undoBuffer = [];
   // Undo / redo logic
   void undo() {
-    if (undoBuffer.isNotEmpty) {
       Stroke undoneStroke = undoBuffer.removeLast();
-      worldspace.addStroke(undoneStroke);
       redoBuffer.add(undoneStroke);
-      _workingFile.content = layers;
-          // worldspace.strokes; // Replace with a method to handle this properly.
       notifyListeners();
-    } else if (worldspace.strokes.isNotEmpty) {
-      redoBuffer.add(worldspace.removeStrokeAt(-1));
-      _workingFile.content = layers;
-      //  worldspace.strokes; // Again: Don't do this.
+    
       notifyListeners();
     }
-  }
 
   void redo() {
-    if (redoBuffer.isNotEmpty) {
-      worldspace.addStroke(redoBuffer.removeLast());
-      _workingFile.content = layers;
-       worldspace.strokes; // Again: Don't do this.
-      notifyListeners();
-    }
+    // TODO
+
   }
 
   // File logic
   void newFile() {
-    _workingFile = DrawFile.empty("");
-    layers = [Layer(id: 0, strokes: [])];
-    activeLayer = layers.last;
-
-    resetAll();
+    canvas = SketchCanvas();
+    notifyListeners();
   }
 
   Future<bool> saveFile(BuildContext context, {String? name}) async {
     // return await _workingFile.save(context);
     String _name;
-    _name = name ?? _workingFile.name ?? "";
+    _name = name ?? canvas.fileName ?? "";
 
     bool saveSuccess = false;
-    if (worldspace.strokes.isEmpty) {
-      return saveSuccess;
-    }
+
     if (_name == "" || _name == "Untitled") {
       String? fileName = await showFileNameDialog(context);
       if (fileName != null) {
@@ -192,14 +177,9 @@ class DrawingContext with ChangeNotifier {
 
   void loadFileContext(File file) {
     resetAll(); // TODO check if this is necessary
-    _workingFile = loadFile(file) ?? DrawFile.empty("Untitled");
-    layers = _workingFile.getLayers();
-
-    if (_workingFile.content == null) {
-    } else {
-      ui_enabled = true;
-      notifyListeners();
-    }
+    canvas = SketchCanvas.fromFile(file);
+    ui_enabled = true;
+    notifyListeners();
   }
 
   void changeWidth(double width) {
@@ -269,17 +249,25 @@ class DrawingContext with ChangeNotifier {
 
   // * SELECTION * //
   void selectStroke(Offset touchPoint) {
+    print("SELECTING STROKE");
     double maxAllowedDistance =
         10; // The maximum distance allowed to select a stroke in pixels
-    for (Stroke stroke in worldspace.strokes.reversed) {
-      if (stroke.contains(touchPoint,
-          maximumAllowedDistance: maxAllowedDistance)) {
-            print("Selected Stroke");
-        _selectedStrokeWidget = getSelectedStrokeWidget(stroke, touchPoint);
-        notifyListeners();
-        return;
+    // TODO optimize the shit out of this
+    for (Layer l in canvas.layers.reversed) {
+      for (Stroke stroke in l.strokes) {
+        if (stroke.contains(touchPoint,
+            maximumAllowedDistance: maxAllowedDistance)) {
+          print("SELECTED STROKE");
+          _selectedStrokeWidget = getSelectedStrokeWidget(stroke, touchPoint);
+          _selectedStroke = stroke;
+          notifyListeners();
+          return;
+        } 
       }
     }
+    _selectedStroke = null;
+    notifyListeners();
+    print("No stroke selected");
   }
 
   // void setSelectedStroke(Stroke s) {

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/classes/draw_file.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
@@ -40,20 +40,20 @@ class FileGrid extends StatefulWidget {
 // A display of all available Pages/windows. Hardcoded for now.
 class _FileGridState extends State<FileGrid> {
   List<File> files = [];
-  @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   getFiles().then((value) {
-  //     setState(() {
-  //       files = value;
-  //     });
-  //   });
-  // }
+  
+  void setFiles(List<File> files) {
+    setState(() {
+      files = files;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    files = context.watch<DrawFileProvider>().files;
+    getFiles().then((value) {
+      setState(() {
+        files = value;
+      });
+    });
     if (files.isEmpty) {
       return Expanded(child: Center(child: NewFileButton(tag: "newfileGrid")));
     } else {
@@ -63,7 +63,7 @@ class _FileGridState extends State<FileGrid> {
                 maxCrossAxisExtent: 200,
                 childAspectRatio: 3 / 2,
               ),
-              children: files.map((e) => DrawFileButton(e)).toList()));
+              children: files.map((e) => DrawFileButton(e, setFiles)).toList()));
     }
   }
 }
@@ -96,34 +96,11 @@ class TopBar extends StatelessWidget {
   }
 }
 
-class DrawFileProvider extends ChangeNotifier {
-  List<File> files = [];
-
-  DrawFileProvider() {
-    getFiles().then((value) {
-      files = value;
-      notifyListeners();
-    });
-  }
-  void updateFileList() {
-    print("Updated file list");
-    getFiles().then((value) {
-      files = value;
-      notifyListeners();
-      print(files);
-    });
-  }
-
-  void addFile(File file) {
-    updateFileList();
-    notifyListeners();
-  }
-}
-
 class DrawFileButton extends StatefulWidget {
   final File file;
+  final Function setFiles;
   @override
-  DrawFileButton(this.file);
+  DrawFileButton(this.file, this.setFiles);
   _DrawFileButtonState createState() => _DrawFileButtonState(file);
 }
 
@@ -185,7 +162,11 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                     child: IconButton(
                       onPressed: () {
                         widget.file.delete();
-                        context.read<DrawFileProvider>().updateFileList();
+                        getFiles().then((value) {
+                          setState(() {
+                            widget.setFiles(value);
+                          });
+                        });
                       },
                       icon: const Icon(Icons.delete),
                     ),
@@ -201,7 +182,11 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                             "...But in the meantime check out this project's reposity for updates! ",
                             subject:
                                 "This feature is not yet Implemented: https://github.com/Demohstens/Sketchspace");
-                        context.read<DrawFileProvider>().updateFileList();
+                        getFiles().then((value) {
+                          setState(() {
+                            widget.setFiles(value);
+                          });
+                        });
                       },
                       icon: const Icon(Icons.share),
                     ),
@@ -215,7 +200,7 @@ class _DrawFileButtonState extends State<DrawFileButton> {
                         // Rename file
                         showFileRenameDialog(context, file).then((value) {
                           if (mounted) {
-                            context.read<DrawFileProvider>().addFile(value);
+                            // TODO
                           }
                         });
                       },

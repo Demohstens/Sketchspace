@@ -1,5 +1,5 @@
 import 'package:perfect_freehand/perfect_freehand.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:flutter/material.dart';
 
 class ActivePainter extends CustomPainter {

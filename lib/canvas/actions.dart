@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 
 class RedoIntent extends Intent {
   const RedoIntent();

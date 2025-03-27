@@ -1,5 +1,5 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:sketchspace/canvas/canvas_context.dart';
+import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
