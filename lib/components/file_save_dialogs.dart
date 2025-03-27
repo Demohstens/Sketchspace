@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/classes/draw_file.dart';
+import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/pages/homepage.dart';
 import 'package:path/path.dart' as path;
 

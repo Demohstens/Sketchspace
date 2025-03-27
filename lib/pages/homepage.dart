@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
-import 'package:sketchspace/classes/draw_file.dart';
+import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:sketchspace/pages/canvas.dart';

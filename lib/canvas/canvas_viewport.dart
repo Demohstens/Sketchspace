@@ -27,8 +27,8 @@ class CanvasViewport extends StatelessWidget {
             doubleTapZoom: false,
             maxScale: 3,
             drawCooldown: context.read<Settings>().drawCooldown,
-            maxZoomWidth: 2000,
-            maxZoomHeight: 2000,
+            maxZoomWidth: context.read<DrawingContext>().canvas.width,
+            maxZoomHeight: context.read<DrawingContext>().canvas.height,
             onDrawStart: (point) {
               context.read<DrawingContext>().addPoint(point);
               context.read<DrawingContext>().unSelectStroke();

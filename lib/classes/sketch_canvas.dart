@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:uuid/uuid.dart';
@@ -28,15 +29,20 @@ class SketchCanvas {
   }
   // Constructor
   SketchCanvas({
-    this.width = 1920,
-    this.height = 1080,
     this.isDirty = false,
+    double? width,
+    double? height,
     List<Layer>? layers, 
     Layer? activeLayer,
     String? id,
     String? fileName,
     String? filePath,
-  }) : _activeLayer = activeLayer?? Layer.empty(), id = id?? const Uuid().v4(), fileName = fileName?? "Untitled", layers = layers?? [Layer.empty()];
+  }) : _activeLayer = activeLayer?? Layer.empty(),
+      id = id?? const Uuid().v4(),
+      fileName = fileName?? "Untitled",
+      layers = layers?? [Layer.empty()],
+      width = width ??  1080,
+      height = height?? 1920;
   
   factory SketchCanvas.empty(){
     return SketchCanvas();

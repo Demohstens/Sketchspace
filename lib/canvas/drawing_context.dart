@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/classes/sketch_canvas.dart';
-import 'package:sketchspace/classes/draw_file.dart';
+import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:sketchspace/components/brush_menu.dart';
