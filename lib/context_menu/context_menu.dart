@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/context_menu/manual_draggable.dart' as sketchspace;
 
 /// Flutter code sample for [Draggable].
 
@@ -98,111 +97,6 @@ class _BGState extends State<BG> {
                 onLongPressMoveUpdate: _onLongPressMoveUpdate,
                 onLongPressEnd: _onLongPressEnd,
               )))
-    ]);
-  }
-}
-
-Widget _spawnGestureDetector2() {
-  return Focus(
-      focusNode: FocusNode(),
-      canRequestFocus: true,
-      autofocus: true,
-      child: GestureDetector(
-        onTap: () {
-          print("Tapped 2");
-        },
-        onPanUpdate: (details) {
-          print("Pan Update 2");
-        },
-        child: Container(
-          width: 100,
-          height: 100,
-          color: Colors.red,
-        ),
-      ));
-}
-
-class RadialContextMenu extends StatefulWidget {
-  final Offset position;
-  RadialContextMenu(this.position, {super.key});
-  final sketchspace.DragNotifier dragNotifier = sketchspace.DragNotifier();
-
-  @override
-  State<RadialContextMenu> createState() => _RadialContextMenuState();
-}
-
-class _RadialContextMenuState extends State<RadialContextMenu> {
-  bool _isSelected = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.dragNotifier.addListener(_handleDragStateChange);
-  }
-
-  void _handleDragStateChange() {
-    if (widget.dragNotifier.canDrag) {
-      widget.dragNotifier.initiateDrag(widget.position);
-
-      widget.dragNotifier.setDragibility(false); // Reset the flag
-    }
-    // ... (handle other state changes if needed)
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    print('Building RadialContextMenu');
-    return Stack(children: [
-      Positioned(
-          left: widget.position.dx,
-          top: widget.position.dy,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                sketchspace.ManualDraggable<bool>(
-                  dragNotifier: widget.dragNotifier,
-                  onDragStarted: () {},
-                  // Data is the value this Draggable stores.
-                  data: true,
-                  feedback: Container(
-                    color: Colors.deepOrange,
-                    height: 100,
-                    width: 100,
-                    child: const Icon(Icons.directions_run),
-                  ),
-                  childWhenDragging: Container(
-                    height: 100.0,
-                    width: 100.0,
-                    color: const Color.fromARGB(156, 174, 28, 77),
-                  ),
-                  child: Container(
-                    height: 100.0,
-                    width: 100.0,
-                    color: const Color.fromARGB(155, 96, 255, 64),
-                  ),
-                ),
-                DragTarget<bool>(
-                  builder: (
-                    BuildContext context,
-                    List<dynamic> accepted,
-                    List<dynamic> rejected,
-                  ) {
-                    return Container(
-                      height: 100.0,
-                      width: 100.0,
-                      color: Colors.cyan,
-                      child: Center(
-                        child: Text('Value is updated to: $_isSelected'),
-                      ),
-                    );
-                  },
-                  onAcceptWithDetails: (DragTargetDetails<bool> details) {
-                    setState(() {
-                      _isSelected = details.data;
-                    });
-                  },
-                ),
-              ]))
     ]);
   }
 }

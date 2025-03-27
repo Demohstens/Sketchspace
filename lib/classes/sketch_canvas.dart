@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:uuid/uuid.dart';
 

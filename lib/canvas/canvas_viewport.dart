@@ -11,7 +11,6 @@ import 'package:sketchspace/classes/settings.dart';
 class CanvasViewport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Widget? selectedStroke;
     ErrorPainter('No Painter Found');
     Color background = context.watch<Settings>().background;
     return Stack(children: [

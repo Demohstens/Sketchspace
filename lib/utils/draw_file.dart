@@ -5,7 +5,6 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
-import 'package:sketchspace/classes/stroke.dart';
 
 class DrawFile {
   int? _id;
@@ -45,13 +44,7 @@ class DrawFile {
     // return Image.asset('assets/images/thumbnail.png');
   }
 
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     'name': _name,
-  //     'path': _path,
-  //     'content': _content,
-  //   };
-  // }
+
 
   List<Layer> getLayers() {
     return _content ?? [];
@@ -82,16 +75,6 @@ class DrawFile {
     await file.writeAsString(jsonString);
     return success;
   }
-
-  // void addStroke(Stroke stroke) {
-  //   _content ??= [];
-  //   _content!.add(stroke);
-  // }
-
-  // void addStrokes(List<Stroke> strokes) {
-  //   _content ??= [];
-  //   _content!.addAll(strokes);
-  // }
 }
 
 Future<Directory> getAppDirectory() async {
@@ -119,16 +102,13 @@ Future<List<File>> getFiles() async {
 /// Loads a file and returns a list of strokes
 DrawFile? loadFile(File file) {
   try {
-    print('Loading file: ${file.path}');
     final String content = file.readAsStringSync();
     final Map<String, dynamic> json = jsonDecode(content);
     List<Layer> layersList = [];
 
-    print("JSON: $json");
 
     if (json.containsKey("Layers") && json["Layers"] is List) {
       final layers = json["Layers"];
-      print("LAYERS: $layers");
       if (layers.isNotEmpty) {
         layersList = [
           for (var layer in layers) Layer.fromJson(layer) 
@@ -138,9 +118,11 @@ DrawFile? loadFile(File file) {
         return DrawFile(basename(file.path), file.path, null);
       }
     } else {
-      print("Invalid file format");
+      print("Error loading file: $json");
+      return null; // Return null if the JSON is invalid or doesn't have the expected format
     }
   } catch (e) {
-    print('Error loading file: ${file.path}, Error: $e');
+    print("Error loading file: $e");
+    return null;
   }
 }

@@ -5,7 +5,6 @@ import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/components/brush_menu.dart';
 import 'package:sketchspace/components/context_menu/layer_context.dart';
-import 'package:sketchspace/pages/homepage.dart';
 import 'package:sketchspace/pages/settings_page.dart';
 
 class CanvasUI extends StatefulWidget {
