@@ -30,7 +30,7 @@ class LazyPainter extends CustomPainter {
         canvas.drawPoints(PointMode.points, stroke.points, stroke.paint);
       }
 
-      var st = getStroke(stroke.points.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: paint.strokeWidth, end: StrokeEndOptions.end(cap: false), thinning: 0.05));
+      var st = getStroke(stroke.points.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: paint.strokeWidth, end: StrokeEndOptions.end(), thinning: 0, isComplete: true));
 
       Path pathToDraw = Path();
       for (int i = 0; i < st.length; i++) {

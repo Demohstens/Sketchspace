@@ -16,7 +16,7 @@ class ActivePainter extends CustomPainter {
       canvas.drawLine(currentPath.first, currentPath.last, strokePaint);
     }
     void drawPath() {
-      var st = getStroke(currentPath.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: strokePaint.strokeWidth, end: StrokeEndOptions.end(cap: false), thinning: 0.05));
+        var st = getStroke(currentPath.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: strokePaint.strokeWidth, end: StrokeEndOptions.end(), thinning: 0, isComplete: true));
 
       Path pathToDraw = Path();
       for (int i = 0; i < st.length; i++) {
