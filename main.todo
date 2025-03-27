@@ -11,7 +11,6 @@ https://pub.dev/packages/share_pluss
 ☐ Interface
     ☐ Custom Context Menu @done(24-08-11 18:45)
 ☐ toasts 
-☐ Android / IOS 
 ☐ Button to hot switch between the last two brushes
 ☐ Custom Color palette
 ☐ Custom Brush settings 
@@ -46,8 +45,8 @@ https://pub.dev/packages/share_pluss
     ✔ Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue @done(24-08-15 00:32)
 ✔ cannot exit without saving, due to the way the file is saved. @done(24-08-11 15:08)
 ✔ FileSaveDialog too... tall? Odd. @done(24-08-11 20:20)
-- Selection color hardcoded. Darkmode makes it invisible.
-- Android doesn't work: 
+✔ Selection color hardcoded. Darkmode makes it invisible. @done(25-03-27 20:51)
+✔ Android doesn't work: @done(25-03-27 20:51)
     ✔ Scaling is off @done(24-08-11 17:53) ?? 
     ✔ touch support is inconsistant @done(24-08-15 00:32)
     ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
