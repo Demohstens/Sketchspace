@@ -13,14 +13,15 @@ class SketchCanvas {
   String? filePath; 
   double width; 
   double height;
-  List<Layer> layers;
+  List<Layer> _layers;
   
   // Current state
   bool isDirty; // Whether the canvas has been modified since last save
-  Layer _activeLayer; 
+  late Layer _activeLayer; 
   
   // Getters
   Layer get activeLayer => _activeLayer;
+  List<Layer> get layers => _layers;
 
   // Setters 
   set activeLayer(Layer layer) {
@@ -33,16 +34,18 @@ class SketchCanvas {
     double? width,
     double? height,
     List<Layer>? layers, 
-    Layer? activeLayer,
     String? id,
     String? fileName,
     String? filePath,
-  }) : _activeLayer = activeLayer?? Layer.empty(),
+  }) :
       id = id?? const Uuid().v4(),
       fileName = fileName?? "Untitled",
-      layers = layers?? [Layer.empty()],
+      _layers = layers ?? [Layer.empty()],
       width = width ??  1080,
-      height = height?? 1920;
+      height = height?? 1920 
+      {
+        _activeLayer = _layers.first ;
+      }
   
   factory SketchCanvas.empty(){
     return SketchCanvas();
