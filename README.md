@@ -1,6 +1,9 @@
 # Sketchspace - A drawing app
 
-A demonstrative drawing app built in flutter by me
+A Drawing app built with Flutter.
+I was inspured by how annoying and bad Onenote is at times. Another major inspiration was [Saber](https://github.com/saber-notes/saber). I wanted to practice my flutter skills and build something that I could possibly use.
+My plans for the feature include a proper uI as well as folders and tags. I want to also include pictures and pdfs and maybe some other stuff.
+And storing files - even though open source formats are great - i will likely move to a small database like SQLite for fast and easy access to individual strokes. iterating over every stroke is not ideal. Hashmaps might be an alternative.
 
 ## Methods
 
