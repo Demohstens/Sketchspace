@@ -1,3 +1,4 @@
+import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:uuid/uuid.dart';
 

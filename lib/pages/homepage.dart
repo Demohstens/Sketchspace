@@ -150,7 +150,7 @@ class _DrawFileButtonState extends State<DrawFileButton> {
               right: 4,
               bottom: 4,
               child:
-                  Center(child: Text(basename(widget.file.path.split(".")[0]))),
+                  Center(child: Text(basename(widget.file.path).replaceFirst(".json", ""))),
             ),
             // Hover context menu
             Visibility(

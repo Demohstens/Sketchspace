@@ -13,8 +13,8 @@ class NewFileDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController widthController = TextEditingController(text: MediaQuery.of(context).size.width.round().toString()); 
-    final TextEditingController heightController = TextEditingController(text: MediaQuery.of(context).size.height.round().toString()); 
+    final TextEditingController widthController = TextEditingController(text: (MediaQuery.of(context).size.width.round() * 2).toString()); 
+    final TextEditingController heightController = TextEditingController(text: (MediaQuery.of(context).size.height.round() * 2).toString()); 
     return AlertDialog(
       title: Text("New File"), 
       content: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/stroke.dart';
 
 class SelectedStrokePainter extends CustomPainter {
@@ -10,23 +11,24 @@ class SelectedStrokePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = stroke.paint;
-    List<Offset> points = stroke.points;
-    if (points.isEmpty) {
-      return;
-    }
+    Path path = stroke.path.path;
+    // List<Offset> points = stroke.points;
+    // if (points.isEmpty) {
+    //   return;
+    // }
     Paint shadowPaint = Paint()
       ..color = selectionColor
       ..strokeWidth = paint.strokeWidth * 2.5
       ..style = PaintingStyle.stroke;
-    Path shadowPath = Path()..moveTo(points.first.dx, points.first.dy);
-    for (int i = 1; i < points.length; i++) {
-      shadowPath.lineTo(points[i].dx, points[i].dy);
-    }
-    canvas.drawPath(shadowPath, shadowPaint);
-    Path path = Path()..moveTo(points.first.dx, points.first.dy);
-    for (int i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
-    }
+    // Path shadowPath = Path()..moveTo(points.first.dx, points.first.dy);
+    // for (int i = 1; i < points.length; i++) {
+    //   shadowPath.lineTo(points[i].dx, points[i].dy);
+    // }
+    canvas.drawPath(path, shadowPaint);
+    // Path path = Path()..moveTo(points.first.dx, points.first.dy);
+    // for (int i = 1; i < points.length; i++) {
+    //   path.lineTo(points[i].dx, points[i].dy);
+    // }
     canvas.drawPath(path, paint);
   }
 

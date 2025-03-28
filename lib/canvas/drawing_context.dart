@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
+import 'package:sketchspace/classes/element.dart';
+import 'package:sketchspace/classes/path.dart';
 import 'package:sketchspace/classes/sketch_canvas.dart';
 import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
@@ -100,7 +102,7 @@ class DrawingContext with ChangeNotifier {
       
       // Only add the stroke if there are enough points
       if (pointsCopy.length >= 2) {
-        canvas.activeLayer.addStroke(Stroke(getPaint(), pointsCopy, mode));
+        canvas.activeLayer.addStroke(Stroke(paint: getPaint(), path: SketchPath(pointsCopy), mode: mode, layerId: activeLayer.id));
       }
       
       notifyListeners();
@@ -142,37 +144,30 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> saveFile(BuildContext context, {String? name}) async {
+  /// Attempts to save the current canvas to the given path
+  /// Returns true if the file was saved successfully 
+  Future<bool> saveFile(BuildContext context) async {
     // return await _workingFile.save(context);
-    String _name;
-    _name = name ?? canvas.fileName ?? "";
+    String _name =  canvas.fileName ?? "";
 
     bool saveSuccess = false;
-
+    print("SAVING FILE: $_name");
     if (_name == "" || _name == "Untitled") {
       String? fileName = await showFileNameDialog(context);
-      if (fileName != null) {
-        _name = fileName;
+      if (fileName != null || fileName != "") {
+        canvas.fileName = fileName;
       } else {
         return saveSuccess;
       }
     }
     // Convert strokes to JSON list
-    print("STARTING SAVE: ${layers.length} layers");
-    print("ACTIVE LAYER: ${layers[0].strokes.length} strokes");
-    final List<Map<String, dynamic>> jsonLayers = [
-      for (var layer in layers) layer.toJson()
-    ];
-    print(jsonLayers);
-    final String jsonString = jsonEncode({"Layers": jsonLayers});
+    Map<String, dynamic> jsonData = canvas.toJson();
+    final String jsonString = jsonEncode(jsonData);
 
     final Directory appDir = await getAppDirectory();
     String filePath;
-    if (_name.endsWith(".json")) {
-      filePath = '${appDir.path}/$_name';
-    } else {
-      filePath = '${appDir.path}/$_name.json';
-    }
+    filePath = '${appDir.path}/${canvas.fileName}.json';
+    
     File file = File(filePath);
 
     // Write the JSON string to the file
@@ -260,8 +255,7 @@ class DrawingContext with ChangeNotifier {
     // TODO optimize the shit out of this
     for (Layer l in canvas.layers.reversed) {
       for (Stroke stroke in l.strokes) {
-        if (stroke.contains(touchPoint,
-            maximumAllowedDistance: maxAllowedDistance)) {
+        if (stroke.hitTest(touchPoint)) {
           print("SELECTED STROKE");
           _selectedStrokeWidget = getSelectedStrokeWidget(stroke, touchPoint);
           _selectedStroke = stroke;

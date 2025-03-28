@@ -51,7 +51,7 @@ class SketchCanvas {
     String? filePath,
   }) :
       id = id?? const Uuid().v4(),
-      fileName = fileName?? "Untitled",
+      fileName = fileName?? "",
       _layers = layers ?? [Layer.empty()],
       width = width ??  1080,
       height = height?? 1920 
@@ -96,46 +96,44 @@ class SketchCanvas {
   void setActiveLayer(Layer layer) {
     activeLayer = layer;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": fileName,
+      "width": width,
+      "height": height,
+      "id": id,
+      "Layers": layers.map((layer) => layer.toJson()).toList(),
+    };
+  }
 }
 
 SketchCanvas getCanvasFromFile(File file) {
   try {
-    print('Loading file: ${file.path}');
+    // print('Loading file: ${file.path}');
+    // print('File content: ${file.readAsStringSync()}');
     final String content = file.readAsStringSync();
     final Map<String, dynamic> json = jsonDecode(content);
     List<Layer> layersList = [];
-
-    print("JSON: $json");
-
+    
     if (json.containsKey("Layers") && json["Layers"] is List) {
       final layers = json["Layers"];
-      print("LAYERS: $layers");
       if (layers.isNotEmpty) {
         layersList = [
           for (var layer in layers) Layer.fromJson(layer) 
         ];
-        return SketchCanvas(
-          layers: layersList,
-          fileName: basename(file.path),
-          filePath: file.path
-        );
-      } else {
-        return SketchCanvas(
-          layers: [],
-          fileName: basename(file.path),
-          filePath: file.path
-        );
       }
-    } else {
-      print("Invalid file format");
-      return SketchCanvas.empty();
-    }
+    } 
+    return SketchCanvas(
+      fileName: json["name"],
+      filePath: file.path,
+      width: json["width"] ?? 1080,
+      height: json["height"] ?? 1920,
+      layers: layersList,
+      id: json["id"] ?? const Uuid().v4(),
+    );
   } catch (e) {
     print('Error loading file: ${file.path}, Error: $e');
       return SketchCanvas.empty();
   }
-}
-
-String basename(String path) {
-  return path.split(Platform.pathSeparator).last;
 }

@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 Future<Directory> getAppDirectory() async {
   final Directory directory = await getApplicationDocumentsDirectory();
-  final appDirectory = Directory('${directory.path}/DemoDraw');
+  final appDirectory = Directory('${directory.path}${Platform.pathSeparator}sketches');
   if (!await appDirectory.exists()) {
     await appDirectory.create();
   }
