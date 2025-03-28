@@ -47,3 +47,4 @@ app.*.map.json
 sketchspace.iml
 /.vscode
 /android/app/.cxx
+/inno setup.iss

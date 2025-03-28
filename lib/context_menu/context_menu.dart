@@ -100,23 +100,3 @@ class _BGState extends State<BG> {
     ]);
   }
 }
-
-Widget _spawnGestureDetector2() {
-  return Focus(
-      focusNode: FocusNode(),
-      canRequestFocus: true,
-      autofocus: true,
-      child: GestureDetector(
-        onTap: () {
-          print("Tapped 2");
-        },
-        onPanUpdate: (details) {
-          print("Pan Update 2");
-        },
-        child: Container(
-          width: 100,
-          height: 100,
-          color: Colors.red,
-        ),
-      ));
-}

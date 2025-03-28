@@ -87,6 +87,11 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void pushCanvas(SketchCanvas canvas) {
+    this.canvas = canvas;
+    notifyListeners();
+  }
+
   void endDrawing() {
     if (_points.isNotEmpty) {
       // Create a copy of the points before clearing

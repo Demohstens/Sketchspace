@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/components/new_file_dialog.dart';
 import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
@@ -212,28 +213,5 @@ class _DrawFileButtonState extends State<DrawFileButton> {
         ),
       ),
     );
-  }
-}
-
-class NewFileButton extends StatelessWidget {
-  final String tag;
-  NewFileButton({this.tag = "newfile"});
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        margin: EdgeInsets.all(10),
-        child: FloatingActionButton.extended(
-          heroTag: tag,
-          tooltip: "Create a new file",
-          onPressed: () {
-            context.read<DrawingContext>().newFile();
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CanvasPage()),
-            );
-          },
-          label: const Text("New File"),
-          icon: FaIcon(FontAwesomeIcons.plus),
-        ));
   }
 }
