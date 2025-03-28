@@ -162,7 +162,7 @@ class ColorSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(child: PopupMenuButton<ColorButton>(
-        constraints: BoxConstraints(maxWidth: 50),
+        constraints: BoxConstraints(maxWidth: 40),
         shape: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(),
@@ -182,8 +182,8 @@ class ColorSelector extends StatelessWidget {
               value: ColorButton.blue, child: _colorButton(Colors.blue)),
         ],
         child: Container(
-          height: 40,
-          width: 40,
+          height: 30,
+          width: 30,
           decoration: BoxDecoration(
               color: context.watch<DrawingContext>().color,
               border: Border.all(width: 1, color: context.watch<Settings>().secondaryColor)),

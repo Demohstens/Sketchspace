@@ -34,6 +34,7 @@ https://pub.dev/packages/share_pluss
 
 ----
 # Bugs 
+☐ Fix Renaming (file name used as name but canvas uses JSON property)
 ✔ Loading files broke again - FIXED @done(24-08-10 00:48)
 ✔ saving files might be broken? see above. - FIXED @done(24-08-10 00:48)
 ✔ able to save empty file names - FIXED but introduced: @done(24-08-10 00:48)

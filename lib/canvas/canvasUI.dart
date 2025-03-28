@@ -47,10 +47,10 @@ class _CanvasUIState extends State<CanvasUI> {
             width: 100,
             child:  ListView.builder(
               reverse: true,
-              itemCount: context.read<DrawingContext>().layers.length,
+              itemCount: context.read<DrawingContext>().canvas.layers.length,
               itemBuilder: (context, index) {
                 var controller = PositionedContextController();
-                var layer = context.read<DrawingContext>().layers[index];
+                var layer = context.read<DrawingContext>().canvas.layers.values.toList()[index];
                 var isActive = context.watch<DrawingContext>().activeLayer.id == layer.id;
                 var isVisible = layer.visible;
                 var backgroundOpacity = isVisible ? 255 : 100;
@@ -82,9 +82,9 @@ class _CanvasUIState extends State<CanvasUI> {
                           color: context.read<Settings>().secondaryColor)),
                       // Change Layer
                       LayerContextMenu(controller, IconButton(
-                        tooltip: context.read<DrawingContext>().layers[index].name,
+                        tooltip: layer.name,
                         onPressed: () {
-                          context.read<DrawingContext>().changeActiveLayer(context.read<DrawingContext>().layers[index]);
+                          context.read<DrawingContext>().changeActiveLayer(layer);
                         },
                         icon: Icon(Icons.layers,
                         color: context.read<Settings>().secondaryColor

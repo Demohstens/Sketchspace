@@ -101,7 +101,7 @@ class Stroke extends DrawingElement {
   }
   @override
   void translate(Offset offset) {
-    path.path = path.path.shift(offset) ;
+    path.shift(offset);
   }
 
   @override
@@ -111,7 +111,7 @@ class Stroke extends DrawingElement {
 
   @override
   void transform(Matrix4 transform) {
-    path.path = path.path.transform(transform.storage);
+    path.transform(transform);
   }
 
   @override

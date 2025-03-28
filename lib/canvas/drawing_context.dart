@@ -20,8 +20,7 @@ class DrawingContext with ChangeNotifier {
   // * ATTRIBUTES * //
   List<Offset> _points = [];
   Mode _mode = Mode.drawing;
-  Widget? _selectedStrokeWidget; // TODO replace with proper context menu ASAP
-  Stroke? _selectedStroke;
+  String? _selectedStrokeId;
   SketchCanvas canvas;
   ValueNotifier<bool> repaintNotifier = ValueNotifier(false);
 
@@ -35,15 +34,11 @@ class DrawingContext with ChangeNotifier {
 
   // GETTERS
   Color get color => _color;
-  Widget get selectedStrokeWidget =>
-      _selectedStrokeWidget ??
-      Container(); // Empty Container is a placeholder for null
-  Stroke? get selectedStroke => _selectedStroke;
+  String? get selectedStrokeId => _selectedStrokeId;
   Mode get mode => _mode;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
   // * LAYERS * //
-  List<Layer> get layers => canvas.layers;
   Layer get activeLayer => canvas.activeLayer;
   
   @override
@@ -80,12 +75,12 @@ class DrawingContext with ChangeNotifier {
 
   void changeActiveLayer(Layer layer) {
     print("Changed active layer to ${layer.id}");
-    canvas.activeLayer = layer;
+    canvas.activeLayer = canvas.layers[layer.id] ?? layer;
     notifyListeners();
   }
 
   void deleteLayer(Layer layer) {
-    layers.remove(layer);
+    canvas.layers.remove(layer);
     notifyListeners();
   }
 
@@ -237,89 +232,29 @@ class DrawingContext with ChangeNotifier {
   }
 
   void deleteStroke(Stroke s) {
-    for (Layer layer in layers) {
-      if (layer.strokes.contains(s)) {
-        if (layer.strokes.remove(s)) {
-            repaint();
-        } 
-        return;
-      }
-    }
+    canvas.deleteStroke(s);
   }
 
   // * SELECTION * //
   void selectStroke(Offset touchPoint) {
-    print("SELECTING STROKE");
-    double maxAllowedDistance =
-        10; // The maximum distance allowed to select a stroke in pixels
     // TODO optimize the shit out of this
-    for (Layer l in canvas.layers.reversed) {
-      for (Stroke stroke in l.strokes) {
+    for (Layer l in canvas.layers.values.toList().reversed) {
+      for (Stroke stroke in l.strokes.values) {
         if (stroke.hitTest(touchPoint)) {
-          print("SELECTED STROKE");
-          _selectedStrokeWidget = getSelectedStrokeWidget(stroke, touchPoint);
-          _selectedStroke = stroke;
+          _selectedStrokeId = stroke.id;
           notifyListeners();
           return;
         } 
       }
     }
-    _selectedStroke = null;
+    _selectedStrokeId = null;
     notifyListeners();
-    print("No stroke selected");
   }
-
-  // void setSelectedStroke(Stroke s) {
-  //   s.transform(Offset(50, 10));
-  //   _selectedStrokeWidget = getSelectedStrokeWidget(s);
-  //   notifyListeners();
-  // }
 
   void unSelectStroke() {
-    _selectedStrokeWidget = Container();
+    _selectedStrokeId = null;
     notifyListeners();
   }
 
-  Widget? getSelectedStrokeWidget(Stroke s, Offset touchPoint) {
-    var child = Stack(
-      children: [
-      Positioned.fill(child: 
-          CustomPaint(
-            painter: SelectedStrokePainter(
-                s,
-            Colors.grey
-                .withAlpha(150)), // TODO properly handle the selection color
-      ),),
-      Positioned(
-        left: touchPoint.dx,
-        top: touchPoint.dy,
-        child: Container( 
-           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(120),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
-                )
-              ]
-            ),
-            child: Row(
-              children: [
-                IconButton(onPressed: () {
-                  deleteStroke(s);
-                  unSelectStroke();
-                }, icon: const Icon(Icons.delete)),
-                ColorSelector((Color color){
-                  s.color = color;
-                }),
-                // WidthSelector()
-              ],
-            ),)),
-      ],
-    );
-      return child;
-
-  }
 }
+

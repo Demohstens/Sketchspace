@@ -19,23 +19,30 @@ import 'package:uuid/uuid.dart';
 
 class Layer {
   String id;
-  List<Stroke> strokes;
+  int index;
+  // List<Stroke> strokes;
+  Map<String, Stroke> strokes = {};
   bool visible = true;
   bool locked = false;
   late String name;
 
-  Layer({String? id, required this.strokes, this.name = "Layer", this.visible = true, this.locked = false}) 
-    : id = id ?? const Uuid().v4();
+  Layer(this.index, {String? id, Map<String, Stroke>? strokes, this.name = "Layer", this.visible = true, this.locked = false}) 
+    : id = id ?? const Uuid().v4(), strokes = strokes ?? {};
+  
   void addStroke(Stroke stroke) {
-    strokes.add(stroke);
+    strokes[stroke.id] =  stroke;
   }
 
-  factory Layer.empty() {
-    return Layer(strokes: []);
+  factory Layer.empty(int index) {
+    return Layer(index);
+  }
+
+  void updateStroke(Stroke s) {
+    strokes[s.id] = s;
   }
 
   void removeStroke(Stroke stroke) {
-    strokes.remove(stroke);
+    strokes.remove(stroke.id);
   }
 
   void toggleVisibilty() {
@@ -48,8 +55,9 @@ class Layer {
 
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
+      'index': index,
       'id': id,
-      'strokes': strokes.map((e) => e.toJson()).toList(),
+      'strokes': strokes.values.map((e) => e.toJson()).toList(),
       'visible': visible,
       'locked': locked,
       'name': name
@@ -57,9 +65,16 @@ class Layer {
   }
 
   factory Layer.fromJson(Map<String, dynamic> json) {
+    Map<String, Stroke> strokesTemp = {};
+    for (var el in (json['strokes'] as List)) {
+      final stroke = Stroke.fromJson(el);
+      strokesTemp[stroke.id] = stroke;
+    }
+    
     return Layer(
+      json["zIndex"] ?? 0,
       id: json['id'],
-      strokes: json['strokes'].map<Stroke>((e) => Stroke.fromJson(e)).toList(),
+      strokes: strokesTemp,
       visible: json['visible'],
       locked: json['locked'],
       name: json['name']

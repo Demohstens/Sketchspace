@@ -133,6 +133,9 @@ class _DrawFileButtonState extends State<DrawFileButton> {
         onHover: (hover) {
           _onHover(hover);
         },
+        onLongPress: () {
+          hovering = true;
+        },
         // child: Visibility(visible: hovering, child: Icon(Icons.image)),
         child: Stack(
           children: [

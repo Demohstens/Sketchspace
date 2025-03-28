@@ -5,25 +5,32 @@ import 'package:sketchspace/brushes/error_painter.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart';
+import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
 import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/components/camvas_overlay.dart';
 
-class CanvasViewport extends StatelessWidget {
+class CanvasViewport extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    ErrorPainter('No Painter Found');
-    Color background = context.watch<Settings>().background;
-    return Stack(children: [
-      Container(
-          color: background,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width,
-              minHeight: MediaQuery.of(context).size.height),
-          child: Zoom(
+  State<CanvasViewport> createState() => _CanvasViewportState();
+}
+
+class _CanvasViewportState extends State<CanvasViewport> {
+  final zoom.TransformationController controller = zoom.TransformationController();
+
+  @override
+  void dispose() {
+    controller.dispose(); // IMPORTANT: Dispose the controller!
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {    
+    return RepaintBoundary(
+      child: Stack(children: [
+        zoom.Zoom(
+            transformationController: controller,
             canvasColor: context.watch<Settings>().background,
             doubleTapZoom: false,
+            centerOnScale: false,
             maxScale: 3,
             drawCooldown: context.read<Settings>().drawCooldown,
             maxZoomWidth: context.read<DrawingContext>().canvas.width,
@@ -33,7 +40,7 @@ class CanvasViewport extends StatelessWidget {
               context.read<DrawingContext>().unSelectStroke();
             },
             onTapDown: (touchPoint) {
-              if (context.read<DrawingContext>().selectedStroke != null) {
+              if (context.read<DrawingContext>().selectedStrokeId != null) {
                 context.read<DrawingContext>().unSelectStroke();
               }
             },
@@ -53,52 +60,58 @@ class CanvasViewport extends StatelessWidget {
             onLongPressEnd: (details) {},
             child: Stack(
               children: [
-                ...context.read<DrawingContext>().canvas.layers.map((layer) {
-                  if (layer.strokes.isEmpty) {
-                    print("Empty Layer");
-                    return Container();
-                  } 
-                  if (layer.visible == false) {
-                    return Container();
-                  }
-                  return Positioned.fill(
-                      child: RepaintBoundary(
-                          child: CustomPaint(
+                // Use ValueListenableBuilder to rebuild layers when repaintNotifier changes
+                ValueListenableBuilder<bool>(
+                  valueListenable: context.read<DrawingContext>().repaintNotifier,
+                  builder: (context, value, child) {
+                    return Stack(
+                      children: context.read<DrawingContext>().canvas.layers.values.toList().map((layer) {
+                        if (layer.strokes.isEmpty) {
+                          return Container();
+                        } 
+                        if (layer.visible == false) {
+                          return Container();
+                        }
+                        return Positioned.fill(
+                          child: RepaintBoundary(
+                            child: CustomPaint(
                               willChange: false,
                               isComplex: true,
                               size: Size.infinite,
-                              painter: LazyPainter(layer.strokes, context.read<DrawingContext>().repaintNotifier))));
-                }),
-                // Positioned.fill(
-                //   child: RepaintBoundary(
-                //       child: CustomPaint(
-                //           willChange: false,
-                //           isComplex: true,
-                //           size: Size.infinite,
-                //           painter: LazyPainter(context.read<DrawingContext>().layers.first.strokes, context.read<Worldspace>().repaintNotifier)))), //TODO also fix the use of a temporary lazy painter here.
-                              // context.read<Worldspace>().getLazyPainter()))),
-              // Current Path - CurrentLinePainter
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                color: Colors.transparent,
-                child: CustomPaint(
-                  isComplex: true,
-                  size: Size.infinite,
-                  painter: ActivePainter(
-                      context.watch<DrawingContext>().points,
-                      context.read<DrawingContext>().getPaint(),
-                      context.read<DrawingContext>().mode),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    color: Colors.transparent,
+                              painter: LazyPainter(layer.strokes.values.toList(), context.read<DrawingContext>().repaintNotifier)
+                            )
+                          )
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.transparent,
+                  child: CustomPaint(
+                    isComplex: true,
+                    size: Size.infinite,
+                    painter: ActivePainter(
+                        context.watch<DrawingContext>().points,
+                        context.read<DrawingContext>().getPaint(),
+                        context.read<DrawingContext>().mode),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      color: Colors.transparent,
+                    ),
                   ),
                 ),
-              ),
-              context.watch<DrawingContext>().selectedStrokeWidget,
-            ]),
-          ))
-    ]);
+              ],
+            ),
+          ),
+          CanvasOverlay(
+            controller: controller,
+          )
+      ]),
+    );
   }
 }
+
