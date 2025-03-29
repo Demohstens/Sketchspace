@@ -142,31 +142,54 @@ class DrawingContext with ChangeNotifier {
   /// Attempts to save the current canvas to the given path
   /// Returns true if the file was saved successfully 
   Future<bool> saveFile(BuildContext context) async {
-    // return await _workingFile.save(context);
-    String _name =  canvas.fileName ?? "";
-
+    String _name = canvas.fileName ?? "";
     bool saveSuccess = false;
+    
     print("SAVING FILE: $_name");
     if (_name == "" || _name == "Untitled") {
       String? fileName = await showFileNameDialog(context);
-      if (fileName != null || fileName != "") {
+      if (fileName != null && fileName != "") {
         canvas.fileName = fileName;
       } else {
         return saveSuccess;
       }
     }
-    // Convert strokes to JSON list
-    Map<String, dynamic> jsonData = canvas.toJson();
-    final String jsonString = jsonEncode(jsonData);
-
-    final Directory appDir = await getAppDirectory();
-    String filePath;
-    filePath = '${appDir.path}/${canvas.fileName}.json';
     
-    File file = File(filePath);
+    try {
+      // First validate the canvas data
+      bool isValid = canvas.validate();
+      if (!isValid) {
+        throw Exception("Canvas contains invalid data (NaN values)");
+      }
 
-    // Write the JSON string to the file
-    await file.writeAsString(jsonString);
+      // Convert strokes to JSON list
+      Map<String, dynamic> jsonData = canvas.toJson();
+      final String jsonString = jsonEncode(jsonData);
+
+      final Directory appDir = await getAppDirectory();
+      String filePath = '${appDir.path}/${canvas.fileName}.json';
+      
+      File file = File(filePath);
+      await file.writeAsString(jsonString);
+      saveSuccess = true;
+      print("File saved successfully to: $filePath");
+    } catch (e) {
+      print("Error saving file: $e");
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error Saving File"),
+          content: Text("An error occurred while saving the file: $e"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("OK"),
+            ),
+          ],
+        ),
+      );
+    }
+    
     return saveSuccess;
   }
 

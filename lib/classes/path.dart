@@ -72,37 +72,18 @@ class SketchPath {
       }
   }
   void transform(Matrix4 transform) {
-    for (int i = 0; i < points.length; i++) {
-      final Vector4 transformed = transform.transform(Vector4(points[i].dx, points[i].dy, 0, 1));
-      points[i] = Offset(transformed.x, transformed.y);
-    }
-
-    // Also transform original points to maintain consistency
+    // Transform original points first since they are the source of truth
     for (int i = 0; i < _originalPoints.length; i++) {
-      final Vector4 transformed = transform.transform(Vector4(_originalPoints[i].dx, _originalPoints[i].dy, 0, 1));
-      _originalPoints[i] = Offset(transformed.x, transformed.y);
+      // Create a Vector3 instead of Vector4 to avoid perspective issues
+      final Vector3 point3 = Vector3(_originalPoints[i].dx, _originalPoints[i].dy, 0);
+      // Apply the transformation directly to the Vector3
+      transform.transform3(point3);
+      // Update the original point with the transformed coordinates
+      _originalPoints[i] = Offset(point3.x, point3.y);
     }
-
-    // Recalculate the path with transformed points
-    _path = Path();
-    if (points.isNotEmpty) {
-      final processedPoints = getStroke(
-        points.map((e) => PointVector(e.dx, e.dy)).toList(),
-        options: StrokeOptions(
-          size: 1,
-          end: StrokeEndOptions.end(),
-          thinning: 0,
-          isComplete: true
-        )
-      );
-
-      if (processedPoints.isNotEmpty) {
-        _path.moveTo(processedPoints.first.dx, processedPoints.first.dy);
-        for (int i = 1; i < processedPoints.length; i++) {
-          _path.lineTo(processedPoints[i].dx, processedPoints[i].dy);
-        }
-      }
-    }
+    // Recalculate the path with the transformed points
+    recalculatePath();
+    // _path = _path.transform(transform.storage);
   }
 
   Map<String, dynamic> toJson() {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
+import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/components/brush_menu.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3, Matrix4;
 
@@ -52,6 +53,8 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
         final double screenWidth = maxX - minX;
         final double screenHeight = maxY - minY;
 
+        // --- Screen rectangle for positioning the drag detector ---
+        final Rect screenRect = Rect.fromLTWH(minX, minY, screenWidth, screenHeight);
         // --- Calculate coordinates relative to the screen bounding box for painters ---
         // This makes painters draw correctly within their positioned container
         final Offset relativeP1 = screenP1 - Offset(minX, minY);
@@ -63,6 +66,7 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
         final Offset screenTopCenter = (screenP1 + screenP2) / 2.0;
         const double buttonSize = 50.0;
         const double buttonPadding = 5.0;
+        const double padding = 10.0; // Padding between button and boundary
 
         return Stack( // Use Stack for layering all overlay elements
           children: [
@@ -89,6 +93,9 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
                   context.read<DrawingContext>().canvas.updateStroke(selectedStroke); // Persist
                   context.read<DrawingContext>().repaint();
                   // context.read<DrawingContext>().repaint(); // May not be needed if updateStroke notifies
+                },
+                onLongPress: () => {
+                  context.read<DrawingContext>().unSelectStroke() // Trigger visual update
                 },
                 // Optional but recommended: Use CustomPaint for accurate hit-testing area
                 child: CustomPaint(
@@ -143,11 +150,180 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
                     })
                 ],)
                 ),
-            // --- Add other handles (resize, rotate) as Positioned widgets here ---
+            // --- Add other handles (resize, rotate) as Positioned widgets here 
+              DragHandle(origin: screenP1, opposite: screenP3, position: Position.topLeft, element: selectedStroke),
+              DragHandle(origin: screenP2, opposite: screenP4, position: Position.topRight, element: selectedStroke),
+              DragHandle(origin: screenP3, opposite: screenP1, position: Position.bottomRight, element: selectedStroke),
+              DragHandle(origin: screenP4, opposite: screenP2, position: Position.bottomLeft, element: selectedStroke),
+           
           ],
         );
       },
     );
+  }
+}
+
+enum Position {
+  topLeft,
+  topRight,
+  bottomRight,
+  bottomLeft,
+}
+class DragHandle extends StatefulWidget {
+  final Position position;
+  final Offset origin;
+  final Offset opposite;
+  final double size;
+  final DrawingElement element;
+
+  
+  
+  DragHandle({
+    required this.position, 
+    required this.origin, 
+    required this.opposite,
+    required this.element, 
+    this.size = 20,
+    Key? key
+  }) : super(key: key);
+
+  @override
+  State<DragHandle> createState() => _DragHandleState();
+}
+
+class _DragHandleState extends State<DragHandle> {
+  Offset? initialTouchPosition;
+  Offset? lastPanPosition;
+  
+  @override
+  Widget build(BuildContext context) {
+    // Choose appropriate icon based on position
+    IconData iconData;
+    double rotationAngle = 0;
+    
+    switch (widget.position) {
+      case Position.topLeft:
+        iconData = Icons.drag_indicator;
+        rotationAngle = -45 * (math.pi / 180);
+        break;
+      case Position.topRight:
+        iconData = Icons.drag_indicator;
+        rotationAngle = 45 * (math.pi / 180);
+        break;
+      case Position.bottomRight:
+        iconData = Icons.drag_indicator;
+        rotationAngle = 135 * (math.pi / 180);
+        break;
+      case Position.bottomLeft:
+        iconData = Icons.drag_indicator;
+        rotationAngle = -135 * (math.pi / 180);
+        break;
+    }
+    
+    return Positioned(
+      left: widget.origin.dx - (widget.size / 2),
+      top: widget.origin.dy - (widget.size / 2),
+      child: GestureDetector(
+        onPanStart: (details) {
+          initialTouchPosition = details.globalPosition;
+          lastPanPosition = details.globalPosition;
+        },
+        onPanUpdate: (details) {
+          if (initialTouchPosition == null || lastPanPosition == null) return;
+
+          final Offset delta = details.globalPosition - lastPanPosition!;
+          
+          // Get the center of the element for scaling around center
+          final Rect bounds = widget.element.boundary;
+          final Offset center = bounds.center;
+          
+          // Calculate scale factors based on drag direction and handle position
+          double scaleX = 1.0;
+          double scaleY = 1.0;
+          const double scaleFactor = 0.003; // Adjusted for better stability
+          
+          // Limit scale changes per frame to prevent extreme transformations
+          scaleX = (1.0 + delta.dx * scaleFactor).clamp(0.95, 1.05);
+          scaleY = (1.0 + delta.dy * scaleFactor).clamp(0.95, 1.05);
+          
+          switch (widget.position) {
+            case Position.topLeft:
+              scaleX = 2.0 - scaleX; // Invert for top-left
+              scaleY = 2.0 - scaleY; // Invert for top-left
+              break;
+            case Position.topRight:
+              scaleY = 2.0 - scaleY; // Invert for top
+              break;
+            case Position.bottomRight:
+              // No inversion needed
+              break;
+            case Position.bottomLeft:
+              scaleX = 2.0 - scaleX; // Invert for left
+              break;
+          }
+          
+          // Create transformation matrix that scales around the center
+          final Matrix4 transform = Matrix4.identity()
+            ..translate(center.dx, center.dy)
+            ..scale(scaleX, scaleY, 1.0)
+            ..translate(-center.dx, -center.dy);
+          
+          widget.element.transform(transform);
+          context.read<DrawingContext>().repaint();
+
+          lastPanPosition = details.globalPosition;
+        },
+        onPanEnd: (details) {
+          initialTouchPosition = null;
+          lastPanPosition = null;
+          // Make sure to update the stroke in the canvas to persist changes
+          // context.read<DrawingContext>().canvas.updateStroke(widget.element as Stroke);
+        },
+        onPanCancel: () {
+          initialTouchPosition = null;
+          lastPanPosition = null;
+        },
+        child: Container(
+          width: widget.size + 10,
+          height: widget.size + 10,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey, width: 1.5),
+            borderRadius: BorderRadius.circular((widget.size + 10) / 2),
+          ),
+          child: Transform.rotate(
+            angle: rotationAngle,
+            child: Icon(
+              iconData,
+              size: widget.size + 5,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DistancePainter extends CustomPainter {
+  final Offset origin, result; // Relative coordinates
+
+  DistancePainter({required this.result, required this.origin});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+    final path = Path()
+      ..moveTo(origin.dx, origin.dy)..lineTo(result.dx, result.dy);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant DistancePainter oldDelegate) {
+    return true;
   }
 }
 
@@ -183,7 +359,7 @@ class HitTestPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.transparent // Invisible fill for hit-testing
+      ..color = const Color.fromARGB(91, 74, 74, 74) // Invisible fill for hit-testing
       // Or use a very faint color for debugging: Colors.blue.withOpacity(0.1)
       ..style = PaintingStyle.fill;
     final path = Path()
@@ -191,7 +367,7 @@ class HitTestPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-   @override
+  @override
   bool shouldRepaint(covariant HitTestPainter oldDelegate) {
      // Only repaint if the shape changes
     return oldDelegate.p1 != p1 || oldDelegate.p2 != p2 || oldDelegate.p3 != p3 || oldDelegate.p4 != p4;

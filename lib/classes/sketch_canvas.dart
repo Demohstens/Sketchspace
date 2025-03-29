@@ -82,6 +82,32 @@ class SketchCanvas {
     isDirty = false;
   }
 
+  bool validate() {
+    // Validate canvas has required properties
+    if (width <= 0 || height <= 0) {
+      return false;
+    }
+    
+    // Validate canvas has at least one layer
+    if (_layers.isEmpty) {
+      return false;
+    }
+    
+    // Validate active layer exists and is in layers map
+    if (!_layers.containsKey(_activeLayer.id)) {
+      return false;
+    }
+    
+    // Validate all layers have valid data
+    // for (var layer in _layers.values) {
+    //   if (!layer.validate()) {
+    //     return false;
+    //   }
+    // }
+    
+    return true;
+  }
+
   void load(String fileId) {
     // Load canvas data from file
   }
