@@ -20,11 +20,22 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Page - Sketchspace'),
+        actions: [
+          SizedBox(
+        child: NewFileButton(),
+      ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SettingsPage()))
+          ),
+        ],
       ),
       body: Container(
         child: Column(
           children: [
-            TopBar(),
             FileGrid(),
           ],
         ),
@@ -66,34 +77,6 @@ class _FileGridState extends State<FileGrid> {
               ),
               children: files.map((e) => DrawFileButton(e, setFiles)).toList()));
     }
-  }
-}
-
-class TopBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return // Top row of buttons: New File, Refresh
-        Row(children: [
-      SizedBox(
-        child: NewFileButton(),
-      ),
-      Expanded(
-        child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.5,
-        ),
-      ),
-      SizedBox(
-          child: Container(
-              margin: EdgeInsets.all(10),
-              child: FloatingActionButton(
-                  heroTag: "settingscanvas",
-                  child: const Icon(Icons.settings),
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SettingsPage()))))),
-    ]);
-    
   }
 }
 
