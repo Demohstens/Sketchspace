@@ -1,11 +1,13 @@
 import 'package:flutter/services.dart';
 import 'package:sketchspace/actions/menu_actions.dart';
 import 'package:sketchspace/canvas/actions.dart';
+import 'package:sketchspace/canvas/canvas_mobile_ui.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
-import 'package:sketchspace/canvas/canvasUI.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
+import 'package:sketchspace/canvas/canvas_desktop_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sketchspace/providers/settings.dart';
 
 class CanvasPage extends StatelessWidget {
   final _focusNode = FocusNode();
@@ -40,7 +42,9 @@ class CanvasPage extends StatelessWidget {
                 ),
                 Visibility(
                   visible: context.watch<DrawingContext>().ui_enabled,
-                  child: CanvasUI(),
+                  child: context.watch<Settings>().useMobile == true
+                      ? CanvasUIMobile()
+                      : CanvasUIDesktop(),
                 ),
               ],
             )))));

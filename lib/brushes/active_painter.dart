@@ -1,46 +1,19 @@
 import 'package:perfect_freehand/perfect_freehand.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:flutter/material.dart';
+import 'package:sketchspace/classes/element.dart';
+import 'package:sketchspace/classes/path.dart';
 
 class ActivePainter extends CustomPainter {
   List<Offset> currentPath;
   Paint strokePaint;
-  Mode mode;
-  ActivePainter(this.currentPath, this.strokePaint, this.mode);
+  ActivePainter(this.currentPath, this.strokePaint);
 
   @override
   void paint(Canvas canvas, Size size) {
-    void drawLine() {
-      if (currentPath.length < 2) return;
-
-      canvas.drawLine(currentPath.first, currentPath.last, strokePaint);
-    }
-    void drawPath() {
-        var st = getStroke(currentPath.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: strokePaint.strokeWidth, end: StrokeEndOptions.end(), thinning: 0, isComplete: true));
-
-      Path pathToDraw = Path();
-      for (int i = 0; i < st.length; i++) {
-        if (i == 0) {
-          pathToDraw.moveTo(st[i].dx, st[i].dy);
-        } else if (i > 0) {
-          pathToDraw.lineTo(st[i].dx, st[i].dy);
-        }
-      }
-      canvas.drawPath(pathToDraw, strokePaint);
-    }
-
-    switch (mode) {
-      case Mode.drawing:
-        drawPath();
-      case Mode.erasing:
-        drawPath();
-      case Mode.line:
-        drawLine();
-      case Mode.fill:
-        drawPath();
-      case Mode.lifted || Mode.strokeErasing:
-        break;
-    }
+      var stroke = Stroke(path: SketchPath(currentPath) , paint: strokePaint, layerId: "");
+      var path = stroke.path;
+      canvas.drawPath(path.path, strokePaint);   
   }
 
   @override

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 
 class SettingsPopup extends StatelessWidget {
   const SettingsPopup({super.key});

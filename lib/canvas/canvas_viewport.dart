@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:sketchspace/brushes/active_painter.dart';
 import 'package:sketchspace/brushes/error_painter.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
-import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/components/camvas_overlay.dart';
 
 class CanvasViewport extends StatefulWidget {
@@ -95,8 +95,8 @@ class _CanvasViewportState extends State<CanvasViewport> {
                     size: Size.infinite,
                     painter: ActivePainter(
                         context.watch<DrawingContext>().points,
-                        context.read<DrawingContext>().getPaint(),
-                        context.read<DrawingContext>().mode),
+                        context.read<DrawingContext>().getPaint())
+                        ,
                     child: Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,

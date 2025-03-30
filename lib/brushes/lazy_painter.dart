@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:perfect_freehand/perfect_freehand.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:flutter/material.dart';
@@ -21,68 +21,7 @@ class LazyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawColor(Colors.transparent, BlendMode.color);
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
-    // void drawLine(Stroke stroke) {
-    //   canvas.drawLine(stroke.points.first, stroke.points.last, stroke.paint);
-    // }
-
-    // void drawPath(Stroke stroke) {
-    //   Paint paint = stroke.paint;
-    //   if (strokes.length == 1) {
-    //     canvas.drawPoints(PointMode.points, stroke.points, stroke.paint);
-    //   }
-
-    //   var st = getStroke(stroke.points.map((e) => PointVector(e.dx, e.dy)).toList(), options: StrokeOptions(size: paint.strokeWidth, end: StrokeEndOptions.end(), thinning: 0, isComplete: true));
-
-    //   Path pathToDraw = Path();
-    //   for (int i = 0; i < st.length; i++) {
-    //     if (i == 0) {
-    //       pathToDraw.moveTo(st[i].dx, st[i].dy);
-    //     } else if (i > 0) {
-    //       pathToDraw.lineTo(st[i].dx, st[i].dy);
-    //     }
-    //   }
-    //   canvas.drawPath(pathToDraw, paint);
-    // }
-
-    // void erasePath(Stroke stroke) {
-    //   Paint erasePaint = Paint()
-    //     ..color = Colors.white
-    //     ..strokeWidth = stroke.paint.strokeWidth +
-    //         2 // Slightly increase for better coverage
-    //     ..style = PaintingStyle.stroke
-    //     ..blendMode = BlendMode.dstOut;
-    //   Path pathToDraw = Path();
-    //   for (int i = 0; i < stroke.points.length; i++) {
-    //     if (i == 0) {
-    //       pathToDraw.moveTo(stroke.points[i].dx, stroke.points[i].dy);
-    //     } else if (i > 0) {
-    //       pathToDraw.lineTo(stroke.points[i].dx, stroke.points[i].dy);
-    //     }
-    //   }
-    //   canvas.drawPath(pathToDraw, erasePaint);
-    // }
-
-    // Switch through all modes to allow for different handling of the strokes
     for (Stroke stroke in strokes) {
-      // if (!stroke.enabled) {
-      //   // Skips drawing for disabled Strokes
-      //   continue;
-      // }
-      // Save the canvas Layer
-      // switch (stroke.mode) {
-      //   case Mode.drawing:
-      //     drawPath(stroke);
-      //   case Mode.lifted:
-      //     break;
-      //   case Mode.erasing:
-      //     erasePath(stroke);
-      //   case Mode.line:
-      //     drawLine(stroke);
-      //   case Mode.fill:
-      //     drawPath(stroke);
-      //   case Mode.strokeErasing:
-      //     continue;
-      // }
       stroke.draw(canvas);
     }
   }

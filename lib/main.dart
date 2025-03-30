@@ -1,7 +1,7 @@
 import 'package:sketchspace/actions/menu_actions.dart';
 import 'package:sketchspace/canvas/actions.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
-import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
+import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/pages/homepage.dart';
 import 'package:flutter/material.dart';
 

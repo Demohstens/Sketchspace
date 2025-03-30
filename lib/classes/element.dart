@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/classes/path.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:ui' as ui; 
@@ -30,10 +30,8 @@ abstract class DrawingElement {
 class Stroke extends DrawingElement {
   SketchPath path;
   Paint paint;
-  Mode mode; 
 
   Stroke({
-    required this.mode,
     required this.path,
     required this.paint,
     required super.layerId,
@@ -96,7 +94,6 @@ class Stroke extends DrawingElement {
         "strokeWidth": paint.strokeWidth,
         "style": paint.style.toString().split('.').last,
       },
-      "mode": mode.toString(), 
     };
   }
   @override
@@ -117,7 +114,6 @@ class Stroke extends DrawingElement {
   @override
   factory Stroke.fromJson(Map<String, dynamic> json) {
     return Stroke(
-      mode: Mode.values.firstWhere((element) => element.toString() == json["mode"]),
       path: SketchPath.fromJson(json["path"]),
       paint: Paint()
         ..color = Color(json["paint"]["color"])

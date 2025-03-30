@@ -5,6 +5,7 @@ import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/path.dart';
 import 'package:sketchspace/classes/sketch_canvas.dart';
+import 'package:sketchspace/tools/tools.dart';
 import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:sketchspace/classes/stroke.dart';
@@ -19,7 +20,7 @@ enum Mode { drawing, lifted, erasing, strokeErasing, line, fill }
 class DrawingContext with ChangeNotifier {
   // * ATTRIBUTES * //
   List<Offset> _points = [];
-  Mode _mode = Mode.drawing;
+  Tool _tool = Tool.mouse;
   String? _selectedStrokeId;
   SketchCanvas canvas;
   ValueNotifier<bool> repaintNotifier = ValueNotifier(false);
@@ -32,10 +33,16 @@ class DrawingContext with ChangeNotifier {
 
   bool ui_enabled = true;
 
+  // * GETTERS & SETTERS * //
+  set selecedStrokeId(String? id) {
+    _selectedStrokeId = id;
+    notifyListeners();
+  }
+
   // GETTERS
   Color get color => _color;
   String? get selectedStrokeId => _selectedStrokeId;
-  Mode get mode => _mode;
+  Tool get tool => _tool;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
   // * LAYERS * //
@@ -48,6 +55,11 @@ class DrawingContext with ChangeNotifier {
   }
 
   // Drawing logic
+  void setTool(Tool tool) {
+    _tool = tool;
+    notifyListeners();
+  }
+
   void toggleUI() {
     ui_enabled = !ui_enabled;
     notifyListeners();
@@ -97,7 +109,7 @@ class DrawingContext with ChangeNotifier {
       
       // Only add the stroke if there are enough points
       if (pointsCopy.length >= 2) {
-        canvas.activeLayer.addStroke(Stroke(paint: getPaint(), path: SketchPath(pointsCopy), mode: mode, layerId: activeLayer.id));
+        canvas.activeLayer.addStroke(Stroke(paint: getPaint(), path: SketchPath(pointsCopy), layerId: activeLayer.id));
       }
       
       notifyListeners();
@@ -215,34 +227,12 @@ class DrawingContext with ChangeNotifier {
   }
 
   PaintingStyle _getStyle() {
-    switch (_mode) {
-      case Mode.drawing:
         return PaintingStyle.stroke;
-      case Mode.erasing:
-        return PaintingStyle.stroke;
-      case Mode.line:
-        return PaintingStyle.stroke;
-      case Mode.fill:
-        return PaintingStyle.fill;
-      case Mode.lifted:
-        return PaintingStyle.stroke;
-      case Mode.strokeErasing:
-        return PaintingStyle.stroke;
-    }
   }
 
   BlendMode _getBlendMode() {
-    switch (_mode) {
-      case Mode.erasing:
-        return BlendMode.clear;
-      default:
-        return BlendMode.srcOver;
-    }
-  }
-
-  void changeMode(Mode mode) {
-    _mode = mode;
-    notifyListeners();
+    return BlendMode.srcOver;
+    
   }
 
   void changeColor(Color color) {

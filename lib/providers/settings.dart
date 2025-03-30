@@ -2,9 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class Settings with ChangeNotifier {
   static const Color mainColor = Color(0xffbb86fc);
+
+  //* ALL SETTINGS *// 
+  bool useMobile = true;
+  bool autoSave = false;
+  bool darkModeEnabled = true;
 
   // Theme and Color Settings
   ThemeMode themeMode = ThemeMode.system;
@@ -26,7 +32,7 @@ class Settings with ChangeNotifier {
   // Default Settings
   Settings() {
     _populate();
-    themeMode = ThemeMode.system;
+    darkModeEnabled = true;
     _background = colorScheme.surface;
     _primaryColor = colorScheme.primary;
     _secondaryColor = colorScheme.secondary;
@@ -39,21 +45,16 @@ class Settings with ChangeNotifier {
     notifyListeners();
   }
 
-  bool get darkModeEnabled => themeMode == ThemeMode.dark;
   ColorScheme get colorScheme => scheme;
   Color get background => _background;
   Color get primaryColor => _primaryColor;
   Color get secondaryColor => _secondaryColor;
   Color get tertiaryColor => _tertiaryColor;
-  void toggleAutoSaveOnExit() {
-    autoSaveExistingFiles = !autoSaveExistingFiles;
-    notifyListeners();
-  }
 
   void toggleDarkMode() {
-    themeMode = themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    darkModeEnabled = !darkModeEnabled;
     brightness =
-        themeMode == ThemeMode.dark ? Brightness.dark : Brightness.light;
+        darkModeEnabled ? Brightness.dark : Brightness.light;
     scheme = ColorScheme.fromSeed(seedColor: mainColor, brightness: brightness);
 
     switch (themeMode) {
@@ -74,11 +75,26 @@ class Settings with ChangeNotifier {
     notifyListeners();
   }
 
-  bool autoSaveExistingFiles = true;
-  bool autoSaveCreatedFiles = false;
+  void toggleMobile() {
+    useMobile = !useMobile;
+    notifyListeners();
+  }
+
+  void toggleAutoSave() {
+    autoSave = !autoSave;
+    notifyListeners();
+  }
   int drawCooldown = 75;
   void changeDrawCooldown(int value) {
     drawCooldown = value;
     notifyListeners();
   }
+
+  void update() {
+    // Update the settings
+    notifyListeners();
+  }
 }
+
+
+

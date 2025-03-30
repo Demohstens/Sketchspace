@@ -2,7 +2,7 @@ import 'dart:math' as math; // For min/max
 import 'package:flutter/gestures.dart'; // For HitTestBehavior
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/canvas/drawing_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/components/brush_menu.dart';

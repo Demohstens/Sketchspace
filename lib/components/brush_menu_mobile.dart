@@ -11,25 +11,28 @@ import 'package:sketchspace/tools/mouse.dart';
 
 enum MenuEntry { width }
 
-class BrushMenu extends StatelessWidget {
-  final MenuController _menuController = MenuController();
+class BrushMenuMobile extends StatefulWidget {
+
+  const BrushMenuMobile({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<BrushMenuMobile> createState() => BrushMenuMobileState();
+}
+
+class BrushMenuMobileState extends State<BrushMenuMobile> {
+  final MenuController _widthMenuController = MenuController();
+  final MenuController menuController = MenuController();
   @override
   Widget build(BuildContext context) {
     Color secondary = context.watch<Settings>().secondaryColor;
     return Material(
-        child: Container(
-          padding: EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: context.watch<Settings>().background,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(width: 1, color: secondary),
-          ),
-        child: 
-          Row(
-            spacing: 10,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              MouseToolButton(),
+      color: Colors.transparent,
+      child: MenuAnchor(
+        controller: menuController,
+        menuChildren: [
+          MouseToolButton(),
               BrushToolButton(),
               PopupMenuButton<ColorButton>(
                 constraints: BoxConstraints(maxWidth: 50),
@@ -62,17 +65,17 @@ class BrushMenu extends StatelessWidget {
               ),
               
               MenuAnchor(
-                controller: _menuController,
+                controller: _widthMenuController,
                 menuChildren: <Widget>[_widthSlider(context)],
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque, // Ensures the entire area is clickable
                   onTap: () {
-                    switch (_menuController.isOpen) {
+                    switch (_widthMenuController.isOpen) {
                       case true:
-                        _menuController.close();
+                        _widthMenuController.close();
                         break;
                       case false:
-                        _menuController.open();
+                        _widthMenuController.open();
                         break;
                     }
                   },
@@ -87,7 +90,34 @@ class BrushMenu extends StatelessWidget {
                   ),
                 ),
         )
-    ])));
+      ],
+        child:CircleAvatar( 
+          backgroundColor: Colors.transparent, 
+          child: IconButton(
+          tooltip: "Brush Menu",
+          color: context.read<Settings>().secondaryColor,
+          onPressed: () {
+          switch (menuController.isOpen) {
+            case true: 
+              {
+                setState(() {
+                  menuController.close();
+
+                });
+              }
+              break;
+            case false:
+              {
+                setState(() {
+                  menuController.open();
+
+                });
+              }
+              break;
+            
+          }
+        }, icon: menuController.isOpen ? Icon(Icons.close) : Icon(Icons.menu)),
+    )));
   }
 
   Widget _colorButton(Color color) {
@@ -95,12 +125,6 @@ class BrushMenu extends StatelessWidget {
       backgroundColor: color,
       radius: 15,
       child: null,
-    );
-  }
-
-  Widget _toolButton(IconData icon) {
-    return Container(
-      child: Icon(icon),
     );
   }
 
@@ -128,8 +152,6 @@ Color ColorEnumToColorType(ColorButton color) {
       return Colors.green;
     case ColorButton.blue:
       return Colors.blue;
-    default:
-      return Colors.black;
   }
 }
 
@@ -155,7 +177,9 @@ class ColorSelector extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return Material(child: PopupMenuButton<ColorButton>(
+    return Material(
+      color: Colors.transparent,
+      child: PopupMenuButton<ColorButton>(
         constraints: BoxConstraints(maxWidth: 40),
         shape: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),

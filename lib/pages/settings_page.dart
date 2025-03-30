@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/classes/settings.dart';
+import 'package:sketchspace/providers/settings.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -15,10 +15,13 @@ class SettingsPage extends StatelessWidget {
               left: MediaQuery.of(context).size.width * 0.1,
               right: MediaQuery.of(context).size.width * 0.1,
               top: MediaQuery.of(context).size.height * 0.05),
-          child:
-              // Wrap the content that should expand in an Expanded
+          child: 
               Column(
             children: [
+            //   ...context.read<Settings>().options.values.map((option) {
+            //     return option.construct(context);
+                
+            //   }),
               // Toggle Dark Mode
               Center(
                   child: SwitchListTile(
@@ -27,17 +30,25 @@ class SettingsPage extends StatelessWidget {
                       value: context.watch<Settings>().darkModeEnabled,
                       onChanged: (bool newValue) {
                         context.read<Settings>().toggleDarkMode();
-                      })),
+              })),
               // Toggle Auto Save
               Center(
                   child: SwitchListTile(
                       title: const Text("Auto save on exit"),
                       subtitle: const Text(
                           "Automatically save your work when you exit the canvas."),
-                      value: context.watch<Settings>().autoSaveExistingFiles,
+                      value: context.watch<Settings>().autoSave,
                       onChanged: (bool newValue) {
-                        context.read<Settings>().toggleAutoSaveOnExit();
+                        context.read<Settings>().toggleAutoSave();
                       })),
+              SwitchListTile(
+                title: const Text("Use Mobile"),
+                subtitle: const Text("Use the mobile layout designed for verical touchscreens."),
+                value: context.watch<Settings>().useMobile,
+                onChanged: (value) {
+                  context.read<Settings>().toggleMobile();
+                }
+              ),
               Center(
                 child: ListTile(
                   minVerticalPadding: 50,
@@ -79,8 +90,7 @@ class SettingsPage extends StatelessWidget {
                         });
                   },
                 ),
-              ),
-            ],
+              )]  
           ),
         ),
       );
