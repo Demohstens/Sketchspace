@@ -4,13 +4,13 @@ import 'package:sketchspace/classes/path.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:ui' as ui; 
 
-abstract class DrawingElement {
+abstract class SketchElement {
   late String id;
   final String layerId;
 
   Rect get boundary;
 
-  DrawingElement({
+  SketchElement({
     required this.layerId,
     String? id, 
   }) : id = id ?? Uuid().v4();
@@ -21,13 +21,13 @@ abstract class DrawingElement {
   transform(Matrix4 transform);
   translate(Offset offset);
 
-  factory DrawingElement.fromJson(Map<String, dynamic> json) {
+  factory SketchElement.fromJson(Map<String, dynamic> json) {
     // This is an abstract factory method that should be implemented by subclasses
     throw UnimplementedError('DrawingElement.fromJson must be implemented by subclasses');
   }
 }
 
-class Stroke extends DrawingElement {
+class Stroke extends SketchElement {
   SketchPath path;
   Paint paint;
 

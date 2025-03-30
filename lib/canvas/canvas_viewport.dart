@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:sketchspace/brushes/active_painter.dart';
-import 'package:sketchspace/brushes/error_painter.dart';
 import 'package:sketchspace/brushes/lazy_painter.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:provider/provider.dart';
@@ -66,9 +65,6 @@ class _CanvasViewportState extends State<CanvasViewport> {
                   builder: (context, value, child) {
                     return Stack(
                       children: context.read<DrawingContext>().canvas.layers.values.toList().map((layer) {
-                        if (layer.strokes.isEmpty) {
-                          return Container();
-                        } 
                         if (layer.visible == false) {
                           return Container();
                         }
@@ -78,7 +74,7 @@ class _CanvasViewportState extends State<CanvasViewport> {
                               willChange: false,
                               isComplex: true,
                               size: Size.infinite,
-                              painter: LazyPainter(layer.strokes.values.toList(), context.read<DrawingContext>().repaintNotifier)
+                              painter: LazyPainter(layer.elements.values.toList(), context.read<DrawingContext>().repaintNotifier)
                             )
                           )
                         );

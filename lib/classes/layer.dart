@@ -20,17 +20,22 @@ import 'package:uuid/uuid.dart';
 class Layer {
   String id;
   int index;
-  // List<Stroke> strokes;
   Map<String, Stroke> strokes = {};
+  Map<String, SketchElement> elements = {};
   bool visible = true;
   bool locked = false;
   late String name;
 
+
   Layer(this.index, {String? id, Map<String, Stroke>? strokes, this.name = "Layer", this.visible = true, this.locked = false}) 
     : id = id ?? const Uuid().v4(), strokes = strokes ?? {};
-  
+
+
+  void addElement(SketchElement element) {
+    elements[element.id] = element;
+  }
   void addStroke(Stroke stroke) {
-    strokes[stroke.id] =  stroke;
+    elements[stroke.id] =  stroke;
   }
 
   factory Layer.empty(int index) {

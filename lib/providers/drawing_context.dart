@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 
+import 'package:image_picker/image_picker.dart';
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/classes/element.dart';
+import 'package:sketchspace/classes/elements/image_el.dart';
 import 'package:sketchspace/classes/path.dart';
 import 'package:sketchspace/classes/sketch_canvas.dart';
 import 'package:sketchspace/tools/tools.dart';
@@ -79,6 +82,30 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
+  void addImported(XFile file) {
+    try {
+      ui.Image img;
+      File(file.path).readAsBytes()
+        .then((bytes) => ui.instantiateImageCodec(bytes))
+        .then((codec) => codec.getNextFrame())
+        .then((frame) => frame.image)
+        .then((image) {
+          img = image;
+          SketchElement element = ImageElement(
+            image: img,
+            layerId: activeLayer.id,
+            position: Offset(50, 200));
+            activeLayer.addElement(element);
+
+            });
+      notifyListeners();
+    }
+    catch(e)  {
+      print("File is not an image${e}");
+    }
+    notifyListeners();
+  }
+
   void newLayer() {
     // Id is equal to the length of the list as the first layer is 0
     canvas.addLayer();
@@ -109,9 +136,8 @@ class DrawingContext with ChangeNotifier {
       
       // Only add the stroke if there are enough points
       if (pointsCopy.length >= 2) {
-        canvas.activeLayer.addStroke(Stroke(paint: getPaint(), path: SketchPath(pointsCopy), layerId: activeLayer.id));
+        canvas.activeLayer.addElement(Stroke(paint: getPaint(), path: SketchPath(pointsCopy), layerId: activeLayer.id));
       }
-      
       notifyListeners();
     }
   }

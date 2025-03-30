@@ -7,13 +7,13 @@ import 'package:sketchspace/classes/stroke.dart';
 import 'package:flutter/material.dart';
 
 class LazyPainter extends CustomPainter {
-  final List<Stroke> strokes;
+  final List<SketchElement> elements;
   // RepaintListener repaintListener;
 
   // LazyPainter(this.strokes, this.repaintListener)
   //     : super(repaint: repaintListener); // : super(repaint: repaintListener);
 
-  LazyPainter(this.strokes, this.repaintNotifier)
+  LazyPainter(this.elements, this.repaintNotifier)
       : super(repaint: repaintNotifier);
 
   final ValueNotifier<bool> repaintNotifier;
@@ -21,8 +21,11 @@ class LazyPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     canvas.drawColor(Colors.transparent, BlendMode.color);
     // Thank you Philip! (https://github.com/lalondeph/flutter_performance_painter/)
-    for (Stroke stroke in strokes) {
-      stroke.draw(canvas);
+    // for (Stroke stroke in strokes) {
+    //   stroke.draw(canvas);
+    // }
+    for (SketchElement el in elements) {
+      el.draw(canvas);
     }
   }
 

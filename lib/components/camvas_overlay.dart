@@ -174,7 +174,7 @@ class DragHandle extends StatefulWidget {
   final Offset origin;
   final Offset opposite;
   final double size;
-  final DrawingElement element;
+  final SketchElement element;
 
   
   

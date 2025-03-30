@@ -1,4 +1,5 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sketchspace/components/add_imported.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class BrushMenu extends StatelessWidget {
             spacing: 10,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              AddImported(),
               MouseToolButton(),
               BrushToolButton(),
               PopupMenuButton<ColorButton>(
@@ -155,7 +157,8 @@ class ColorSelector extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return Material(child: PopupMenuButton<ColorButton>(
+    return Material(
+      child: PopupMenuButton<ColorButton>(
         constraints: BoxConstraints(maxWidth: 40),
         shape: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
