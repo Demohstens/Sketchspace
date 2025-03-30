@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/canvas/Actions.dart';
+import 'package:sketchspace/canvas/actions.dart';
 import 'package:sketchspace/canvas/drawing_context.dart';
 import 'package:sketchspace/classes/settings.dart';
 import 'package:provider/provider.dart';

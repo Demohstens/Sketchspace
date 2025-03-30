@@ -43,6 +43,9 @@ dependencies:
   share_plus: ^10.1.4
   uuid: ^4.5.1
   vector_math: ^2.1.4
+  ReTouchable:
+    git: https://github.com/Demohstens/ReTouchable.git
+    
 
 dev_dependencies:
   flutter_test:
