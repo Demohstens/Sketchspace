@@ -1,3 +1,6 @@
 [submodule "lib/canvas/zoom-widget-drawing"]
 	path = lib/canvas/zoom-widget-drawing
 	url = https://github.com/Demohstens/zoom-widget-drawing
+[submodule "lib/ReTouchable"]
+	path = lib/ReTouchable
+	url = https://github.com/Demohstens/ReTouchable
