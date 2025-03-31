@@ -76,10 +76,9 @@ class Layer {
             elementsTemp[el["id"]] = Stroke.fromJson(el);
             break;
           case "image":
-            print("Image Element");
-            ImageElement.fromJson(el).then((value) {
-              elementsTemp[value.id] = value;
-            });
+            ImageElement iElement = ImageElement.fromJson(el);
+            elementsTemp[iElement.id] = iElement;
+            iElement.load();
             break; 
         }
       } catch (e) {

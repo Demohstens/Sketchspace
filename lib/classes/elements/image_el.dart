@@ -1,15 +1,17 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'dart:ui' as ui;
 class ImageElement extends SketchElement {
-  final ui.Image image;
+  late ui.Image image;
   final String path;
   Offset position;
   double? width;
   double? height;
+  bool isLoaded = false;
   @override
   Rect get boundary {
     return Rect.fromLTWH(position.dx, position.dy, image.width.toDouble(), image.height.toDouble());
@@ -17,8 +19,8 @@ class ImageElement extends SketchElement {
 
   /// Constructor: Use this WITH an image provided
   /// Otherwise use the async factory methods below
-   ImageElement({
-    required ui.Image image, // Must provide an already loaded image
+  ImageElement({
+    required this.image, // Must provide an already loaded image
     required this.path,
     required this.position,
     double? width, // Optional: specify width, defaults to image width
@@ -26,14 +28,13 @@ class ImageElement extends SketchElement {
     required String layerId,
     String? id,
   }) : // Directly initialize final fields via initializer list
-        image = image,
+        isLoaded = true,
         width = width ?? image.width.toDouble(),
         height = height ?? image.height.toDouble(),
         super(id: id, layerId: layerId);
 
   // Private constructor: Use the async factories below to create instances
   ImageElement._internal({
-    required this.image,
     required this.path,
     required this.position,
     required this.width,
@@ -41,38 +42,38 @@ class ImageElement extends SketchElement {
     required super.layerId,
     super.id, // Handle ID generation if needed in factories
   });
-static Future<ImageElement> load({
-    required String path,
-    required Offset position,
-    double? targetWidth, // Optional desired width
-    double? targetHeight, // Optional desired height
-    required String layerId,
-    String? id, // Consider generating ID here if null: id ?? Uuid().v4()
-  }) async {
-    try {
-      final ui.Image loadedImage = await loadImage(path);
-      // Use target dimensions if provided, otherwise use image's natural size
-      final double finalWidth = targetWidth ?? loadedImage.width.toDouble();
-      final double finalHeight = targetHeight ?? loadedImage.height.toDouble();
+  // static Future<ImageElement> load({
+  //   required String path,
+  //   required Offset position,
+  //   double? targetWidth, // Optional desired width
+  //   double? targetHeight, // Optional desired height
+  //   required String layerId,
+  //   String? id, // Consider generating ID here if null: id ?? Uuid().v4()
+  // }) async {
+  //   try {
+  //     final ui.Image loadedImage = await loadImage(path);
+  //     // Use target dimensions if provided, otherwise use image's natural size
+  //     final double finalWidth = targetWidth ?? loadedImage.width.toDouble();
+  //     final double finalHeight = targetHeight ?? loadedImage.height.toDouble();
 
-      return ImageElement._internal(
-        image: loadedImage,
-        path: path,
-        position: position,
-        width: finalWidth,
-        height: finalHeight,
-        layerId: layerId,
-        id: id, // Or generate: id ?? Uuid().v4()
-      );
-    } catch (e) {
-      // Rethrow or handle more gracefully (e.g., return a placeholder element)
-      print('Error loading image element from path: $e');
-      rethrow;
-    }
-  }
+  //     return ImageElement(
+  //       image: loadedImage,
+  //       path: path,
+  //       position: position,
+  //       width: finalWidth,
+  //       height: finalHeight,
+  //       layerId: layerId,
+  //       id: id, // Or generate: id ?? Uuid().v4()
+  //     );
+  //   } catch (e) {
+  //     // Rethrow or handle more gracefully (e.g., return a placeholder element)
+  //     print('Error loading image element from path: $e');
+  //     rethrow;
+  //   }
+  // }
 
   // Async factory for creating from JSON
-  static Future<ImageElement> fromJson(Map<String, dynamic> json) async {
+  factory ImageElement.fromJson(Map<String, dynamic> json) {
     final path = json['path'] as String;
     final position = Offset(
       (json['position']['x'] as num).toDouble(),
@@ -86,18 +87,12 @@ static Future<ImageElement> load({
     final id = json['id'] as String?; // Allow null if ID is optional
 
     try {
-      final ui.Image loadedImage = await loadImage(path);
-
-      // Use JSON dimensions if they exist, otherwise default to image's natural size
-      final double finalWidth = jsonWidth ?? loadedImage.width.toDouble();
-      final double finalHeight = jsonHeight ?? loadedImage.height.toDouble();
 
       return ImageElement._internal(
-        image: loadedImage,
         path: path,
         position: position,
-        width: finalWidth, // Use the determined width
-        height: finalHeight, // Use the determined height
+        width: jsonWidth, // Use the determined width
+        height: jsonHeight, // Use the determined height
         layerId: layerId,
         id: id,
       );
@@ -108,9 +103,24 @@ static Future<ImageElement> load({
     }
   }
 
+  void load() async {
+    ui.instantiateImageCodec(File(path).readAsBytesSync()).then((v) {
+      v.getNextFrame().then((frame) {
+        print("Found image");
+        image = frame.image;
+        isLoaded = true;
+      });
+    }
+    );
+  }
+
   @override
   draw(Canvas c) {
+    if (isLoaded)
     c.drawImage(image, position, Paint()); 
+    else {
+      print("Image not loaded!");
+    }
   }
 
   @override
@@ -120,6 +130,7 @@ static Future<ImageElement> load({
 
   @override
   Map<String, dynamic> toJson() {
+    print("Savinmg img");
     return <String, dynamic>{
       'type': 'image',
       'id': id,
