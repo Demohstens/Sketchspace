@@ -1,4 +1,5 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sketchspace/components/add_imported.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
       child: MenuAnchor(
         controller: menuController,
         menuChildren: [
+          AddImported(),
           MouseToolButton(),
               BrushToolButton(),
               PopupMenuButton<ColorButton>(

@@ -29,15 +29,15 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
     return ValueListenableBuilder<Matrix4>(
       valueListenable: controller,
       builder: (context, matrix, child) {
-        final selectedStrokeId = context.watch<DrawingContext>().selectedStrokeId;
+        final selectedElementId = context.watch<DrawingContext>().selectedElementId;
         // Use read here if the overlay rebuilds primarily on matrix/selection ID change
-        final selectedStroke = context.read<DrawingContext>().canvas.getStrokeById(selectedStrokeId);
+        final selectedElement = context.read<DrawingContext>().canvas.getElementById(selectedElementId);
 
-        if (selectedStroke == null) {
+        if (selectedElement == null) {
           return const SizedBox.shrink();
         }
 
-        final Rect canvasBounds = selectedStroke.boundary;
+        final Rect canvasBounds = selectedElement.boundary;
 
         // Transform corners to SCREEN coordinates
         final Offset screenP1 = _transformPoint(matrix, canvasBounds.topLeft);
@@ -86,11 +86,11 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
                   final double currentScale = matrix.getMaxScaleOnAxis();
                   if (currentScale == 0) return;
                   final Offset canvasDelta = screenDelta / currentScale;
-                  selectedStroke.translate(canvasDelta);
+                  selectedElement.translate(canvasDelta);
                   context.read<DrawingContext>().repaint(); // Trigger visual update
                 },
                 onPanEnd: (details) {
-                  context.read<DrawingContext>().canvas.updateStroke(selectedStroke); // Persist
+                  context.read<DrawingContext>().canvas.updateElement(selectedElement); // Persist
                   context.read<DrawingContext>().repaint();
                   // context.read<DrawingContext>().repaint(); // May not be needed if updateStroke notifies
                 },
@@ -140,21 +140,22 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
                       iconSize: buttonSize * 0.7,
                       icon: const Icon(Icons.delete, color: Colors.redAccent),
                       onPressed: () {
-                          context.read<DrawingContext>().deleteStroke(selectedStroke);
+                          context.read<DrawingContext>().deleteElement(selectedElement);
                           context.read<DrawingContext>().repaint();
                       }
                     ),
+                    (selectedElement is Stroke) ?
                     ColorSelector((c) {
-                      selectedStroke.paint.color = c;
+                      selectedElement.paint.color = c;
                       context.read<DrawingContext>().repaint();
-                    })
+                    }) : const SizedBox.shrink(),
                 ],)
                 ),
             // --- Add other handles (resize, rotate) as Positioned widgets here 
-              DragHandle(origin: screenP1, opposite: screenP3, position: Position.topLeft, element: selectedStroke),
-              DragHandle(origin: screenP2, opposite: screenP4, position: Position.topRight, element: selectedStroke),
-              DragHandle(origin: screenP3, opposite: screenP1, position: Position.bottomRight, element: selectedStroke),
-              DragHandle(origin: screenP4, opposite: screenP2, position: Position.bottomLeft, element: selectedStroke),
+              DragHandle(origin: screenP1, opposite: screenP3, position: Position.topLeft, element: selectedElement),
+              DragHandle(origin: screenP2, opposite: screenP4, position: Position.topRight, element: selectedElement),
+              DragHandle(origin: screenP3, opposite: screenP1, position: Position.bottomRight, element: selectedElement),
+              DragHandle(origin: screenP4, opposite: screenP2, position: Position.bottomLeft, element: selectedElement),
            
           ],
         );

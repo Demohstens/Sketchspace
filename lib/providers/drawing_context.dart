@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/classes/element.dart';
@@ -24,7 +25,7 @@ class DrawingContext with ChangeNotifier {
   // * ATTRIBUTES * //
   List<Offset> _points = [];
   Tool _tool = Tool.mouse;
-  String? _selectedStrokeId;
+  String? _selectedElementId;
   SketchCanvas canvas;
   ValueNotifier<bool> repaintNotifier = ValueNotifier(false);
 
@@ -38,13 +39,13 @@ class DrawingContext with ChangeNotifier {
 
   // * GETTERS & SETTERS * //
   set selecedStrokeId(String? id) {
-    _selectedStrokeId = id;
+    _selectedElementId = id;
     notifyListeners();
   }
 
   // GETTERS
   Color get color => _color;
-  String? get selectedStrokeId => _selectedStrokeId;
+  String? get selectedElementId => _selectedElementId;
   Tool get tool => _tool;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
@@ -84,21 +85,21 @@ class DrawingContext with ChangeNotifier {
 
   void addImported(XFile file) {
     try {
-      ui.Image img;
       File(file.path).readAsBytes()
         .then((bytes) => ui.instantiateImageCodec(bytes))
         .then((codec) => codec.getNextFrame())
         .then((frame) => frame.image)
         .then((image) {
-          img = image;
           SketchElement element = ImageElement(
-            image: img,
+            path: file.path,
+            image: image,
             layerId: activeLayer.id,
             position: Offset(50, 200));
-            activeLayer.addElement(element);
-
-            });
-      notifyListeners();
+          print(element);  
+          activeLayer.addElement(element);
+          notifyListeners();    
+        });
+          
     }
     catch(e)  {
       print("File is not an image${e}");
@@ -270,28 +271,28 @@ class DrawingContext with ChangeNotifier {
     return;
   }
 
-  void deleteStroke(Stroke s) {
-    canvas.deleteStroke(s);
+  void deleteElement(SketchElement el) {
+    canvas.deleteElement(el);
   }
 
   // * SELECTION * //
-  void selectStroke(Offset touchPoint) {
+  void selectElement(Offset touchPoint) {
     // TODO optimize the shit out of this
     for (Layer l in canvas.layers.values.toList().reversed) {
-      for (Stroke stroke in l.strokes.values) {
-        if (stroke.hitTest(touchPoint)) {
-          _selectedStrokeId = stroke.id;
+      for (SketchElement el in l.elements.values) {
+        if (el.hitTest(touchPoint)) {
+          _selectedElementId = el.id;
           notifyListeners();
           return;
         } 
       }
     }
-    _selectedStrokeId = null;
+    _selectedElementId = null;
     notifyListeners();
   }
 
   void unSelectStroke() {
-    _selectedStrokeId = null;
+    _selectedElementId = null;
     notifyListeners();
   }
 

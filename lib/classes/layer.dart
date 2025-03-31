@@ -1,4 +1,5 @@
 import 'package:sketchspace/classes/element.dart';
+import 'package:sketchspace/classes/elements/image_el.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,34 +21,31 @@ import 'package:uuid/uuid.dart';
 class Layer {
   String id;
   int index;
-  Map<String, Stroke> strokes = {};
   Map<String, SketchElement> elements = {};
   bool visible = true;
   bool locked = false;
   late String name;
 
 
-  Layer(this.index, {String? id, Map<String, Stroke>? strokes, this.name = "Layer", this.visible = true, this.locked = false}) 
-    : id = id ?? const Uuid().v4(), strokes = strokes ?? {};
+  Layer(this.index, {String? id, Map<String, SketchElement>? elements, this.name = "Layer", this.visible = true, this.locked = false}) 
+    : id = id ?? const Uuid().v4(), elements = elements ?? {};
 
 
   void addElement(SketchElement element) {
+    print("Adding Element $element");
     elements[element.id] = element;
-  }
-  void addStroke(Stroke stroke) {
-    elements[stroke.id] =  stroke;
   }
 
   factory Layer.empty(int index) {
     return Layer(index);
   }
 
-  void updateStroke(Stroke s) {
-    strokes[s.id] = s;
+  void updateElement(SketchElement el) {
+    elements[el.id] = el;
   }
 
-  void removeStroke(Stroke stroke) {
-    strokes.remove(stroke.id);
+  void removeElement(SketchElement el) {
+    elements.remove(el.id);
   }
 
   void toggleVisibilty() {
@@ -62,7 +60,7 @@ class Layer {
     return <String, dynamic>{
       'index': index,
       'id': id,
-      'strokes': strokes.values.map((e) => e.toJson()).toList(),
+      'elements': elements.values.map((e) => e.toJson()).toList(),
       'visible': visible,
       'locked': locked,
       'name': name
@@ -70,16 +68,29 @@ class Layer {
   }
 
   factory Layer.fromJson(Map<String, dynamic> json) {
-    Map<String, Stroke> strokesTemp = {};
-    for (var el in (json['strokes'] as List)) {
-      final stroke = Stroke.fromJson(el);
-      strokesTemp[stroke.id] = stroke;
+    Map<String, SketchElement> elementsTemp = {};
+    for (var el in (json['elements'] as List)) {
+      try {
+        switch (el["type"]) {
+          case "stroke":
+            elementsTemp[el["id"]] = Stroke.fromJson(el);
+            break;
+          case "image":
+            print("Image Element");
+            ImageElement.fromJson(el).then((value) {
+              elementsTemp[value.id] = value;
+            });
+            break; 
+        }
+      } catch (e) {
+        print(e); 
+      }
     }
     
     return Layer(
       json["zIndex"] ?? 0,
       id: json['id'],
-      strokes: strokesTemp,
+      elements: elementsTemp,
       visible: json['visible'],
       locked: json['locked'],
       name: json['name']

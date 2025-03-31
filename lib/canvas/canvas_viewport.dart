@@ -39,7 +39,7 @@ class _CanvasViewportState extends State<CanvasViewport> {
               context.read<DrawingContext>().unSelectStroke();
             },
             onTapDown: (touchPoint) {
-              if (context.read<DrawingContext>().selectedStrokeId != null) {
+              if (context.read<DrawingContext>().selectedElementId != null) {
                 context.read<DrawingContext>().unSelectStroke();
               }
             },
@@ -54,7 +54,7 @@ class _CanvasViewportState extends State<CanvasViewport> {
               context.read<DrawingContext>().endDrawing();
             },
             onLongPressStart: (touchPoint) {
-              context.read<DrawingContext>().selectStroke(touchPoint);
+              context.read<DrawingContext>().selectElement(touchPoint);
             },
             onLongPressEnd: (details) {},
             child: Stack(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:uuid/uuid.dart';
@@ -127,26 +128,26 @@ class SketchCanvas {
   void setActiveLayer(Layer layer) {
     activeLayer = layer;
   }
-
-  void updateStroke(Stroke s) {
-    layers[s.layerId]?.updateStroke(s);
+  
+  void updateElement(SketchElement el) {
+    layers[el.layerId]?.updateElement(el);
   }
 
-  Stroke? getStrokeById(String? id) {
+  SketchElement? getElementById(String? id) {
     // if (id == null) {
     //   return null;
     // }
     for (Layer l in layers.values) {
-      Stroke? s = l.strokes[id];
-        if (s!=null) {
-          return s;
+      SketchElement? el = l.elements[id];
+        if (el!=null) {
+          return el;
         }
     }
     return null; 
   }
 
-  void deleteStroke(Stroke s) {
-    layers[s.layerId]?.strokes.remove(s.id);
+  void deleteElement(SketchElement el) {
+    layers[el.layerId]?.elements.remove(el.id);
   }
   // Serialization
 

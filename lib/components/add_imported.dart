@@ -13,25 +13,51 @@ class AddImported extends StatefulWidget {
 class _AddImportedState extends State<AddImported> {
   @override
   Widget build(BuildContext context) {
-    return MenuAnchor(
-      controller: widget.controller,
-      menuChildren: [
-        MenuItemButton(
-          child: Icon(Icons.image),
-          onPressed: () {
-            ImagePicker().pickImage(source: ImageSource.gallery).then((XFile? f) {
-              if (f!= null) {
-                if (context.mounted) {
-                context.read<DrawingContext>().addImported(f);
-                }
-              }
-            });
-            widget.controller.close();
+    return IconButton(
+          icon: Icon(Icons.image),
+          onPressed: () async {
+            final drawingContext = context.read<DrawingContext>();
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
+            XFile? f; // Declare f outside the try block
+          try {
+            // 4. Perform the asynchronous operation (the 'await')
+            print("Launching image picker...");
+            f = await ImagePicker().pickImage(source: ImageSource.gallery);
+            print("Image picker returned: ${f?.path ?? 'null'}");
+
+            // 5. Use the stored 'drawingContext' reference AFTER the await
+            if (f != null) {
+              print("Image selected, calling drawingContext.addImported...");
+              // Call the method on the object reference we stored earlier.
+              // We are NOT using the original 'context' variable here for this call.
+              drawingContext.addImported(f); // Await if addImported is async
+              print("addImported completed.");
+              // Show feedback using the stored scaffoldMessenger
+              scaffoldMessenger.showSnackBar(
+                SnackBar(
+                  content: Text('Image added successfully!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            } else {
+              print("Image selection cancelled.");
+              // Optionally show feedback that it was cancelled
+              // scaffoldMessenger.showSnackBar(
+              //   SnackBar(content: Text('Image selection cancelled.')),
+              // );
+            }
+          } catch (e) {
+            // Handle potential errors from ImagePicker or addImported
+            print("Error during image pick/add: $e");
+            // Show error feedback using the stored scaffoldMessenger
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text('Error adding image: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
           }, 
-        )
-      ],
-      child: IconButton(onPressed: () {
-        widget.controller.isOpen ? widget.controller.close() : widget.controller.open();
-      }, icon: Icon(Icons.add)));
+        );
   } 
 }

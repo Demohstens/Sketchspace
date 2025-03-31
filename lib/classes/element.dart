@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:sketchspace/classes/elements/image_el.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/classes/path.dart';
 import 'package:uuid/uuid.dart';
@@ -22,8 +23,7 @@ abstract class SketchElement {
   translate(Offset offset);
 
   factory SketchElement.fromJson(Map<String, dynamic> json) {
-    // This is an abstract factory method that should be implemented by subclasses
-    throw UnimplementedError('DrawingElement.fromJson must be implemented by subclasses');
+    throw Exception("Use subclass constructor");
   }
 }
 
@@ -86,6 +86,7 @@ class Stroke extends SketchElement {
   @override
   Map<String, dynamic> toJson() {
     return {
+      "type": "stroke",
       "id": id,
       "layerId": layerId,
       "path": path.toJson(),
