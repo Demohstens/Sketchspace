@@ -33,11 +33,7 @@ class _SketchColorPickerState extends State<SketchColorPicker> {
           padding: EdgeInsets.all(2),
           decoration: BoxDecoration(
             color: context.read<Settings>().background,
-            border: Border.all(
-              color: context.read<Settings>().secondaryColor,
-              width: 1,
             ),
-          ),
           child: Row(
             spacing: 4,
             children: [

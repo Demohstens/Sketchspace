@@ -1,5 +1,6 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sketchspace/components/add_imported.dart';
+import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
@@ -33,36 +34,7 @@ class BrushMenu extends StatelessWidget {
               AddImported(),
               MouseToolButton(),
               BrushToolButton(),
-              PopupMenuButton<ColorButton>(
-                constraints: BoxConstraints(maxWidth: 50),
-                shape: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(),
-                ),
-                position: PopupMenuPosition.over,
-                initialValue: ColorToColotButton(context.read<DrawingContext>().color),
-                onSelected: (ColorButton result) {
-                  context
-                      .read<DrawingContext>()
-                      .changeColor(ColorEnumToColorType(result));
-                },
-                tooltip: "Change Color",
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<ColorButton>>[
-                  PopupMenuItem(
-                      value: ColorButton.red, child: _colorButton(Colors.red)),
-                  PopupMenuItem(
-                      value: ColorButton.green, child: _colorButton(Colors.green)),
-                  PopupMenuItem(
-                      value: ColorButton.blue, child: _colorButton(Colors.blue)),
-                ],
-                child: CircleAvatar(
-                  backgroundColor: context.watch<DrawingContext>().color,
-                  radius: 15,
-                  child: null,
-                
-                ),
-              ),
-              
+              SketchColorPicker(),
               MenuAnchor(
                 controller: _menuController,
                 menuChildren: <Widget>[_widthSlider(context)],

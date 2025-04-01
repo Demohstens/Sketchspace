@@ -47,7 +47,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
             ],
             child: IconButton(onPressed: () {
               _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();
-            }, icon: Icon(Icons.color_lens)),
+            }, icon: Icon(Icons.color_lens, color: context.read<DrawingContext>().color,)),
           ),
           MenuAnchor(
                 controller: _widthMenuController,
