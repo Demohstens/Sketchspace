@@ -16,11 +16,10 @@ class CanvasViewport extends StatefulWidget {
 }
 
 class _CanvasViewportState extends State<CanvasViewport> {
-  final zoom.TransformationController controller = zoom.TransformationController();
 
   @override
   void dispose() {
-    controller.dispose(); // IMPORTANT: Dispose the controller!
+    _transformController.dispose(); // IMPORTANT: Dispose the controller!
     super.dispose();
   }
 
@@ -163,7 +162,7 @@ class _CanvasViewportState extends State<CanvasViewport> {
         //     ),
         //   ),
           CanvasOverlay(
-            controller: controller,
+            controller: _transformController,
           )
       ]),
     );

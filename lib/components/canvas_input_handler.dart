@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/canvas_overlay.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
+import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/tools/tools.dart';
 
 class CanvasView extends StatefulWidget {
@@ -22,6 +23,9 @@ class _CanvasViewState extends State<CanvasView> {
   double scaleFactor = 1.0;
   double rotation = 0.0;
 
+  /// Location of a registered LongpressDown
+  Offset longPressLocation = Offset.zero;
+
   bool isDrawing = false;
 
   @override
@@ -37,7 +41,7 @@ class _CanvasViewState extends State<CanvasView> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        color: Colors.red,
+        color: context.watch<Settings>().background,
         child: Stack(
         children: [
           ValueListenableBuilder<Matrix4>(
@@ -55,6 +59,12 @@ class _CanvasViewState extends State<CanvasView> {
               onDoubleTap: () {
                 print('Tapped');
                 _transformController.resetTransformations();
+              },
+              onLongPressDown: (details) {
+                longPressLocation = _transformController.inversePoint(details.localPosition); 
+              },
+              onLongPress: () {
+                context.read<DrawingContext>().selectElement(longPressLocation);
               },
               onScaleStart: (details) {
                 print('Scale Start');
@@ -74,8 +84,8 @@ class _CanvasViewState extends State<CanvasView> {
               onScaleUpdate: (details) {
                 if (context.read<DrawingContext>().tool == Tool.brush) {
                   if (details.pointerCount == 1 && isDrawing) {
-                    final Offset localFocalPoint = details.localFocalPoint;
-                    context.read<DrawingContext>().addPoint(localFocalPoint);
+                    final Offset transformedPoint = _transformController.inversePoint(details.localFocalPoint);
+                    context.read<DrawingContext>().addPoint(transformedPoint);
                   }
                 }
                 if (details.pointerCount >= 2) {

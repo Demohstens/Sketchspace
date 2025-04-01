@@ -28,6 +28,43 @@ class TransformController extends ValueNotifier<Matrix4>  {
     notifyListeners();
   }
 
+  Offset inversePoint(Offset p) {
+    return MatrixUtils.transformPoint(Matrix4.inverted(value), p);
+  }
+
+  Offset toLocal(Offset p) {
+    return MatrixUtils.transformPoint(value, p);
+  }
+
+  /// Transforms a rect to 
+  Rect transformRect(Rect r) {
+    // Transform all four corners of the rectangle
+    final topLeft = MatrixUtils.transformPoint(value, r.topLeft);
+    final topRight = MatrixUtils.transformPoint(value, r.topRight);
+    final bottomLeft = MatrixUtils.transformPoint(value, r.bottomLeft);
+    final bottomRight = MatrixUtils.transformPoint(value, r.bottomRight);
+
+    // Find the bounding rectangle that encompasses all transformed points
+    double left = math.min(math.min(topLeft.dx, topRight.dx), 
+                         math.min(bottomLeft.dx, bottomRight.dx));
+    double top = math.min(math.min(topLeft.dy, topRight.dy), 
+                        math.min(bottomLeft.dy, bottomRight.dy));
+    double right = math.max(math.max(topLeft.dx, topRight.dx), 
+                          math.max(bottomLeft.dx, bottomRight.dx));
+    double bottom = math.max(math.max(topLeft.dy, topRight.dy), 
+                           math.max(bottomLeft.dy, bottomRight.dy));
+
+    return Rect.fromLTRB(left, top, right, bottom);
+  }
+
+  List<Offset> transformPoints(List<Offset> points) {
+    List<Offset> res = [];
+    for (Offset p in points){
+      res.add(MatrixUtils.transformPoint(value, p));
+    }
+    return res;
+  }
+
   Matrix4 _newMatrix(Matrix4 transform) {
       value = transform.multiplied(value); // Compose transformations
       return value; // return the composed matrix
@@ -41,13 +78,13 @@ class TransformController extends ValueNotifier<Matrix4>  {
   }
 
   void panRelative(Offset pan) {
-     final Matrix4 newMatrix = Matrix4.identity()..translate(Vector3(pan.dx, pan.dy, 0.0));
-     panUpdate(newMatrix);
+    final Matrix4 newMatrix = Matrix4.identity()..translate(Vector3(pan.dx, pan.dy, 0.0));
+    panUpdate(newMatrix);
   }
 
   void rotateRelative(double rotation) {
-     final Matrix4 newMatrix = Matrix4.identity()..rotateZ(rotation);
-     rotationUpdate(newMatrix);
+    final Matrix4 newMatrix = Matrix4.identity()..rotateZ(rotation);
+    rotationUpdate(newMatrix);
   }
 
   // Direct matrix transformations that use the current matrix transform values in terms of translation, and scaling.
