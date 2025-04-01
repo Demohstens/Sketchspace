@@ -43,7 +43,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
           MenuAnchor(
             controller: _colorMenuController,
             menuChildren: [
-              SketchColorPicker()
+              SketchColorPicker(onColorChanged: (c) {context.read<DrawingContext>().changeColor(c);},),
             ],
             child: IconButton(onPressed: () {
               _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();

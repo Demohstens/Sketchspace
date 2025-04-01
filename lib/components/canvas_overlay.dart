@@ -2,6 +2,7 @@ import 'dart:math' as math; // For min/max
 import 'package:flutter/gestures.dart'; // For HitTestBehavior
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
 import 'package:sketchspace/classes/element.dart';
@@ -9,10 +10,16 @@ import 'package:sketchspace/components/brush_menu.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3, Matrix4;
 
 // The main overlay widget
-class CanvasOverlay extends StatelessWidget { // Renamed for consistency
+class CanvasOverlay extends StatefulWidget { // Renamed for consistency
   final zoom.TransformationController controller; // Controller from Zoom widget
 
   const CanvasOverlay({super.key, required this.controller});
+
+  @override
+  State<CanvasOverlay> createState() => _CanvasOverlayState();
+}
+
+class _CanvasOverlayState extends State<CanvasOverlay> {
 
   // Helper function to transform a single point from canvas to screen space
   Offset _transformPoint(Matrix4 matrix, Offset canvasPoint) {
@@ -27,7 +34,7 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Matrix4>(
-      valueListenable: controller,
+      valueListenable: widget.controller,
       builder: (context, matrix, child) {
         final selectedElementId = context.watch<DrawingContext>().selectedElementId;
         // Use read here if the overlay rebuilds primarily on matrix/selection ID change
@@ -145,10 +152,12 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
                       }
                     ),
                     (selectedElement is Stroke) ?
-                    ColorSelector((c) {
-                      selectedElement.paint.color = c;
-                      context.read<DrawingContext>().repaint();
-                    }) : const SizedBox.shrink(),
+                    SketchColorPicker(
+                      onColorChanged: (c) {
+                        selectedElement.color = c;
+                        context.read<DrawingContext>().repaint();
+                      },
+                    ) : const SizedBox.shrink(),
                 ],)
                 ),
             // --- Add other handles (resize, rotate) as Positioned widgets here 
@@ -156,7 +165,6 @@ class CanvasOverlay extends StatelessWidget { // Renamed for consistency
               DragHandle(origin: screenP2, opposite: screenP4, position: Position.topRight, element: selectedElement),
               DragHandle(origin: screenP3, opposite: screenP1, position: Position.bottomRight, element: selectedElement),
               DragHandle(origin: screenP4, opposite: screenP2, position: Position.bottomLeft, element: selectedElement),
-           
           ],
         );
       },

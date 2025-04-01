@@ -6,7 +6,7 @@ import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
 import 'package:sketchspace/providers/settings.dart';
-import 'package:sketchspace/components/camvas_overlay.dart';
+import 'package:sketchspace/components/canvas_overlay.dart';
 
 class CanvasViewport extends StatefulWidget {
   @override

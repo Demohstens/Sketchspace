@@ -5,6 +5,10 @@ import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 
 class SketchColorPicker extends StatefulWidget {
+  final Function(Color) onColorChanged;
+  final Color? initColor;
+  const SketchColorPicker({required this.onColorChanged,this.initColor, super.key});
+
   @override
   State<StatefulWidget> createState() => _SketchColorPickerState();
 
@@ -12,6 +16,12 @@ class SketchColorPicker extends StatefulWidget {
 
 class _SketchColorPickerState extends State<SketchColorPicker> {
   final MenuController _menuController = MenuController();
+  Color? selectedColor;
+  @override
+  void initState() {
+    selectedColor = widget.initColor;
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return  Material(
@@ -22,9 +32,12 @@ class _SketchColorPickerState extends State<SketchColorPicker> {
         controller: _menuController,
         menuChildren: [ 
           ColorPicker(
-            pickerColor: context.read<DrawingContext>().color,
+            pickerColor: selectedColor ?? context.watch<DrawingContext>().color,
             onColorChanged: (color) {
-              context.read<DrawingContext>().changeColor(color);
+              widget.onColorChanged(color);
+              setState(() {
+                selectedColor = color;
+              });
             },
           )
         ],
@@ -32,25 +45,30 @@ class _SketchColorPickerState extends State<SketchColorPicker> {
           // height: 30,
           padding: EdgeInsets.all(2),
           decoration: BoxDecoration(
-            color: context.read<Settings>().background,
+            color: context.watch<Settings>().background,
             ),
           child: Row(
             spacing: 4,
             children: [
-            if (context.read<DrawingContext>().colorHistory.isEmpty) 
+            if (context.watch<DrawingContext>().colorHistory.isEmpty) 
             CircleAvatar(
-              backgroundColor: context.read<DrawingContext>().color,
+              backgroundColor: context.watch<DrawingContext>().color,
               radius: 12,
               child: InkWell(
               onLongPress: () {
                 _menuController.open();
               },)),
-            ...context.read<DrawingContext>().colorHistory.map((e) =>
+            ...context.watch<DrawingContext>().colorHistory.map((e) =>
             CircleAvatar(
             radius: 15,
             backgroundColor: e,
             child: InkWell(
-              onTap: () => context.read<DrawingContext>().changeColor(e),
+              onTap: () {
+                widget.onColorChanged(e);
+                setState(() {
+                  selectedColor = e;
+                });
+              },
               onLongPress: () => _menuController.open(),
               onSecondaryTap: () => _menuController.open(),
             ),

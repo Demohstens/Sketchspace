@@ -34,7 +34,7 @@ class BrushMenu extends StatelessWidget {
               AddImported(),
               MouseToolButton(),
               BrushToolButton(),
-              SketchColorPicker(),
+              SketchColorPicker(onColorChanged: (c) {context.read<DrawingContext>().changeColor(c);},),
               MenuAnchor(
                 controller: _menuController,
                 menuChildren: <Widget>[_widthSlider(context)],
