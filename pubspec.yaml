@@ -47,6 +47,7 @@ dependencies:
     git: https://github.com/Demohstens/ReTouchable.git
   image_picker: ^1.1.2
   image: ^4.5.4
+  flutter_colorpicker: ^1.1.0
     
 
 dev_dependencies:

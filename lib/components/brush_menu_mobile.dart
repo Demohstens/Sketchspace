@@ -1,5 +1,8 @@
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sketchspace/components/add_imported.dart';
+import 'package:sketchspace/components/brush_menu.dart';
+import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,7 @@ class BrushMenuMobile extends StatefulWidget {
 
 class BrushMenuMobileState extends State<BrushMenuMobile> {
   final MenuController _widthMenuController = MenuController();
+  final MenuController _colorMenuController = MenuController();
   final MenuController menuController = MenuController();
   @override
   Widget build(BuildContext context) {
@@ -35,38 +39,17 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
         menuChildren: [
           AddImported(),
           MouseToolButton(),
-              BrushToolButton(),
-              PopupMenuButton<ColorButton>(
-                constraints: BoxConstraints(maxWidth: 50),
-                shape: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide(),
-                ),
-                position: PopupMenuPosition.over,
-                initialValue: ColorToColotButton(context.read<DrawingContext>().color),
-                onSelected: (ColorButton result) {
-                  context
-                      .read<DrawingContext>()
-                      .changeColor(ColorEnumToColorType(result));
-                },
-                tooltip: "Change Color",
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<ColorButton>>[
-                  PopupMenuItem(
-                      value: ColorButton.red, child: _colorButton(Colors.red)),
-                  PopupMenuItem(
-                      value: ColorButton.green, child: _colorButton(Colors.green)),
-                  PopupMenuItem(
-                      value: ColorButton.blue, child: _colorButton(Colors.blue)),
-                ],
-                child: CircleAvatar(
-                  backgroundColor: context.watch<DrawingContext>().color,
-                  radius: 15,
-                  child: null,
-                
-                ),
-              ),
-              
-              MenuAnchor(
+          BrushToolButton(),
+          MenuAnchor(
+            controller: _colorMenuController,
+            menuChildren: [
+              SketchColorPicker()
+            ],
+            child: IconButton(onPressed: () {
+              _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();
+            }, icon: Icon(Icons.color_lens)),
+          ),
+          MenuAnchor(
                 controller: _widthMenuController,
                 menuChildren: <Widget>[_widthSlider(context)],
                 child: GestureDetector(
@@ -166,49 +149,6 @@ ColorButton ColorToColotButton(Color color) {
     return ColorButton.blue;
   } else {
     return ColorButton.red;
-  }
-}
-
-
-class ColorSelector extends StatelessWidget {
-  void Function (Color color) changeColor;
-  ColorSelector(this.changeColor);
-  
-  Widget _colorButton(Color color) {
-    return Container(height: 30, width: 30, color: color, child: null);
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: PopupMenuButton<ColorButton>(
-        constraints: BoxConstraints(maxWidth: 40),
-        shape: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(),
-        ),
-        position: PopupMenuPosition.over,
-        initialValue: ColorToColotButton(context.read<DrawingContext>().color),
-        onSelected: (ColorButton result) {
-          changeColor(ColorEnumToColorType(result));
-        },
-        tooltip: "Change Color",
-        itemBuilder: (BuildContext context) => <PopupMenuEntry<ColorButton>>[
-          PopupMenuItem(
-              value: ColorButton.red, child: _colorButton(Colors.red)),
-          PopupMenuItem(
-              value: ColorButton.green, child: _colorButton(Colors.green)),
-          PopupMenuItem(
-              value: ColorButton.blue, child: _colorButton(Colors.blue)),
-        ],
-        child: Container(
-          height: 30,
-          width: 30,
-          decoration: BoxDecoration(
-              color: context.watch<DrawingContext>().color,
-              border: Border.all(width: 1, color: context.watch<Settings>().secondaryColor)),
-        ),
-    ));
   }
 }
 

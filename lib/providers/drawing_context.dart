@@ -24,6 +24,8 @@ enum Mode { drawing, lifted, erasing, strokeErasing, line, fill }
 class DrawingContext with ChangeNotifier {
   // * ATTRIBUTES * //
   List<Offset> _points = [];
+  // Populated with default colors
+  List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue, Colors.black];
   Tool _tool = Tool.mouse;
   String? _selectedElementId;
   SketchCanvas canvas;
@@ -134,11 +136,19 @@ class DrawingContext with ChangeNotifier {
       // Create a copy of the points before clearing
       List<Offset> pointsCopy = List.from(_points);
       _points.clear();
-      
+      var paint = getPaint();
       // Only add the stroke if there are enough points
       if (pointsCopy.length >= 2) {
-        canvas.activeLayer.addElement(Stroke(paint: getPaint(), path: SketchPath(pointsCopy), layerId: activeLayer.id));
+        canvas.activeLayer.addElement(Stroke(paint: paint, path: SketchPath(pointsCopy), layerId: activeLayer.id));
       }
+      if (!colorHistory.contains(paint.color)) {
+      // Ensure a max size of 4 in the color history
+        if (colorHistory.length >= 4) {
+          colorHistory.removeAt(0);
+        }
+        colorHistory.add(paint.color);
+      }
+      
       notifyListeners();
     }
   }

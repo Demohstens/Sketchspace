@@ -9,8 +9,14 @@ class Settings with ChangeNotifier {
 
   //* ALL SETTINGS *// 
   bool useMobile = true;
-  bool autoSave = false;
+  bool autoSave = true;
   bool darkModeEnabled = true;
+
+  set darkMode(bool value) {
+    darkModeEnabled = value;
+    brightness = darkModeEnabled? Brightness.dark : Brightness.light;
+    scheme = ColorScheme.fromSeed(seedColor: mainColor, brightness: brightness);
+  }
 
   // Theme and Color Settings
   ThemeMode themeMode = ThemeMode.system;
@@ -32,15 +38,17 @@ class Settings with ChangeNotifier {
   // Default Settings
   Settings() {
     _populate();
-    darkModeEnabled = true;
-    _background = colorScheme.surface;
-    _primaryColor = colorScheme.primary;
-    _secondaryColor = colorScheme.secondary;
-    _tertiaryColor = colorScheme.tertiary;
   }
 
   /// Populate the settings with async data
   void _populate() async {
+    brightness =
+        darkModeEnabled? Brightness.dark : Brightness.light;
+    scheme = ColorScheme.fromSeed(seedColor: mainColor, brightness: brightness);
+    _background = colorScheme.surface;
+    _primaryColor = colorScheme.primary;
+    _secondaryColor = colorScheme.secondary;
+    _tertiaryColor = colorScheme.tertiary;
     saveDirectory = await getApplicationDocumentsDirectory();
     notifyListeners();
   }
