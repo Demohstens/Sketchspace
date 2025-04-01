@@ -30,7 +30,60 @@ class _CanvasViewportState extends State<CanvasViewport> {
   Widget build(BuildContext context) {    
     return RepaintBoundary(
       child: Stack(children: [
-        CanvasView(),
+        CanvasView(
+          child: Stack(
+            children: [
+              ...context.read<DrawingContext>().canvas.layers.values.toList().map((layer) {
+                return Stack(
+                  children: [
+                  // Use ValueListenableBuilder to rebuild layers when repaintNotifier changes
+                  ValueListenableBuilder<bool>(
+                    valueListenable: context.read<DrawingContext>().repaintNotifier,
+                    builder: (context, value, child) {
+                      return Stack(
+                        children: context.read<DrawingContext>().canvas.layers.values.toList().map((layer) {
+                          if (layer.visible == false) {
+                            return Container();
+                          }
+                          return Positioned.fill(
+                            child: RepaintBoundary(
+                              child: CustomPaint(
+                                willChange: false,
+                                isComplex: true,
+                                size: Size.infinite,
+                                painter: LazyPainter(layer.elements.values.toList(), context.read<DrawingContext>().repaintNotifier)
+                              )
+                            )
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.transparent,
+                    child: CustomPaint(
+                      isComplex: true,
+                      size: Size.infinite,
+                      painter: ActivePainter(
+                          context.watch<DrawingContext>().points,
+                          context.read<DrawingContext>().getPaint())
+                          ,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  ),
+                ],
+            );
+                
+              })
+            ],
+          ),
+        ),
         // zoom.Zoom(
         //     transformationController: controller,
         //     canvasColor: context.watch<Settings>().background,

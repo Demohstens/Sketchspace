@@ -45,8 +45,7 @@ class Sketchspace extends StatelessWidget {
         OpenMenuIntent: OpenMenuAction(),
         ResetIntent: ResetAction(context.read<DrawingContext>()),
       }, 
-      child: CanvasView()),
-      //  HomePage(),)
+      child: HomePage(),)
     );
   }
 }
