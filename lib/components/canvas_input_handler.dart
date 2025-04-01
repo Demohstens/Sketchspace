@@ -1,4 +1,8 @@
+import 'dart:ui';
+
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/canvas_overlay.dart';
@@ -6,22 +10,25 @@ import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/tools/tools.dart';
 
-class CanvasView extends StatefulWidget {
+class CanvasInputHandler extends StatefulWidget {
   final Widget child;
-  const CanvasView({required this.child, super.key});
+  // final TransformController controller;
+  CanvasInputHandler({required this.child,super.key});
   @override
-  State<CanvasView> createState() => _CanvasViewState();
+  State<CanvasInputHandler> createState() => _CanvasInputHandlerState();
 }
 
-
-class _CanvasViewState extends State<CanvasView> {
-  final TransformController _transformController = TransformController();
+class _CanvasInputHandlerState extends State<CanvasInputHandler> {
+  final ScrollController _horizontalController = ScrollController();
+  final ScrollController _verticalController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
   Offset scaleStart = Offset.zero;
   double lastScaleFactor = 1.0;
   Offset scaleEnd = Offset.zero;
   double scaleFactor = 1.0;
   double rotation = 0.0;
+  bool isAltPressed = false;
 
   /// Location of a registered LongpressDown
   Offset longPressLocation = Offset.zero;
@@ -29,93 +36,166 @@ class _CanvasViewState extends State<CanvasView> {
   bool isDrawing = false;
 
   @override
+  void initState() {
+    super.initState();
+    // Add focus node to capture keyboard events
+    _focusNode.requestFocus();
+  }
+
+  @override
   void dispose() {
-    _transformController.dispose();
+    _horizontalController.dispose();
+    _verticalController.dispose();
     super.dispose();
+  }
+
+  // KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+  //   print('Key event: ${event.logicalKey}');
+  //   if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.alt) {
+  //     print('Alt pressed');
+  //     setState(() {
+  //       isAltPressed = true;
+  //     });
+  //   } else if (event is KeyUpEvent && event.logicalKey == LogicalKeyboardKey.alt) {
+  //     print('Alt released');
+  //     setState(() {
+  //       isAltPressed = false;
+  //     });
+  //   }
+  //   return KeyEventResult.handled;
+  // }
+
+  void _handleScroll(PointerScrollEvent event, BuildContext context) {
+      // Prevent default scroll behavior when Alt is pressed
+      // event.preventDefault();
+
+      // Calculate zoom factor based on scroll delta
+      final double zoomDelta = event.scrollDelta.dy > 0 ? 0.95 : 1.05;
+
+      // Get the mouse position in local coordinates
+      final RenderBox renderBox = context.findRenderObject() as RenderBox;
+      final Offset localPosition = renderBox.globalToLocal(event.position);
+
+      // Apply zoom transformation around mouse position
+      context.read<TransformController>().value = Matrix4.identity()
+        ..translate(localPosition.dx, localPosition.dy)
+        ..scale(zoomDelta)
+        ..translate(-localPosition.dx, -localPosition.dy)
+        ..multiply(context.read<TransformController>().value);
+    
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Canvas Test')),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        color: context.watch<Settings>().background,
-        child: Stack(
-        children: [
-          ValueListenableBuilder<Matrix4>(
-            valueListenable: _transformController,
-            builder: (context, matrix, child) {
-              return Transform(
-                transform: matrix,
-                child: widget.child,
-              );
-            },
-          ),
-          Positioned.fill(
-            child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onDoubleTap: () {
-                print('Tapped');
-                _transformController.resetTransformations();
-              },
-              onLongPressDown: (details) {
-                longPressLocation = _transformController.inversePoint(details.localPosition); 
-              },
-              onLongPress: () {
-                context.read<DrawingContext>().selectElement(longPressLocation);
-              },
-              onScaleStart: (details) {
-                print('Scale Start');
-                if (details.pointerCount == 1) {
-                  isDrawing = true;
-                  print('Drawing');
-                }
-                scaleStart = details.focalPoint;
-                lastScaleFactor = 1.0;
-              },
-              onScaleEnd: (details) {
-                if (isDrawing) {
-                  context.read<DrawingContext>().endDrawing();
-                  isDrawing = false;
-                }
-              },
-              onScaleUpdate: (details) {
-                if (context.read<DrawingContext>().tool == Tool.brush) {
-                  if (details.pointerCount == 1 && isDrawing) {
-                    final Offset transformedPoint = _transformController.inversePoint(details.localFocalPoint);
-                    context.read<DrawingContext>().addPoint(transformedPoint);
-                  }
-                }
-                if (details.pointerCount >= 2) {
-                  // Calculate the focal point in local coordinates
-                  final Offset localFocalPoint = details.localFocalPoint;
-                  final double delta = details.scale / lastScaleFactor;
-                  
-                  // Calculate pan delta
-                  final Offset panDelta = details.focalPoint - scaleStart;
-                  scaleStart = details.focalPoint;
-                  
-                  // Apply both zoom and pan transformations
-                  _transformController.value = Matrix4.identity()
-                    ..translate(localFocalPoint.dx, localFocalPoint.dy)
-                    ..scale(delta)
-                    ..translate(-localFocalPoint.dx, -localFocalPoint.dy)
-                    ..translate(panDelta.dx, panDelta.dy)
-                    ..multiply(_transformController.value);
-                  
-                  // Store the current scale for next update
-                  lastScaleFactor = details.scale;
-                }
-              },
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
-          ),
-        ],
-      ),
-    ));
+      body: Listener(
+          onPointerSignal: (PointerSignalEvent event) {
+            if (event is PointerScrollEvent) {
+              _handleScroll(event, context);
+            }
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: context.watch<Settings>().background,
+              child: SizedBox(
+                        width: 3000,
+                        height: 3000,
+                        child: Stack(
+                          children: [
+                            ValueListenableBuilder<Matrix4>(
+                              valueListenable: context.read<TransformController>(),
+                              builder: (context, matrix, child) {
+                                return Transform(
+                                  transform: matrix,
+                                  child: widget.child,
+                                );
+                              },
+                            ),
+                            Positioned.fill(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTapUp: (details) {
+                                  if (context.read<DrawingContext>().tool == Tool.mouse) {
+                                    final Offset transformedPoint =
+                                        context.read<TransformController>().inversePoint(
+                                            details.localPosition);
+                                    context.read<DrawingContext>().selectElement(transformedPoint);
+                                  }
+                                },
+                                
+                                onDoubleTap: () {
+                                  context.read<TransformController>().resetTransformations();
+                                },
+                                onLongPressDown: (details) {
+                                  longPressLocation = context.read<TransformController>()
+                                      .inversePoint(details.localPosition);
+                                },
+                                onLongPress: () {
+                                  context
+                                      .read<DrawingContext>()
+                                      .selectElement(longPressLocation);
+                                },
+                                onScaleStart: (details) {
+                                  if (details.pointerCount == 1) {
+                                    isDrawing = true;
+                                  }
+                                  scaleStart = details.focalPoint;
+                                  lastScaleFactor = 1.0;
+                                },
+                                onScaleEnd: (details) {
+                                  if (isDrawing) {
+                                    context.read<DrawingContext>().endDrawing();
+                                    isDrawing = false;
+                                  }
+                                },
+                                onScaleUpdate: (details) {
+                                  if (context.read<DrawingContext>().tool ==
+                                      Tool.brush) {
+                                    if (details.pointerCount == 1 && isDrawing) {
+                                      final Offset transformedPoint =
+                                          context.read<TransformController>().inversePoint(
+                                              details.localFocalPoint);
+                                      context
+                                          .read<DrawingContext>()
+                                          .addPoint(transformedPoint);
+                                    }
+                                  }
+                                  if (details.pointerCount >= 2 || context.read<DrawingContext>().tool == Tool.mouse) {
+                                    final Offset localFocalPoint =
+                                        details.localFocalPoint;
+                                    final double delta =
+                                        details.scale / lastScaleFactor;
+
+                                    final Offset panDelta =
+                                        details.focalPoint - scaleStart;
+                                    scaleStart = details.focalPoint;
+
+                                    context.read<TransformController>().value = Matrix4.identity()
+                                      ..translate(
+                                          localFocalPoint.dx, localFocalPoint.dy)
+                                      ..scale(delta)
+                                      ..translate(
+                                          -localFocalPoint.dx, -localFocalPoint.dy)
+                                      ..translate(panDelta.dx, panDelta.dy)
+                                      ..multiply(context.read<TransformController>().value);
+
+                                    lastScaleFactor = details.scale;
+                                  }
+                                },
+                                child: Container(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+            
+    );
   }
 }

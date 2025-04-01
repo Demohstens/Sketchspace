@@ -21,8 +21,8 @@ class DrawingContext with ChangeNotifier {
   // * ATTRIBUTES * //
   List<Offset> _points = [];
   // Populated with default colors
-  List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue, Colors.black];
-  Tool _tool = Tool.mouse;
+  List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue, Colors.grey];
+  Tool _tool = Tool.brush;
   String? _selectedElementId;
   SketchCanvas canvas;
   ValueNotifier<bool> repaintNotifier = ValueNotifier(false);

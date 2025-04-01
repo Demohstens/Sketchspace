@@ -11,25 +11,23 @@ import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/components/canvas_overlay.dart';
 
 class CanvasViewport extends StatefulWidget {
+
+  CanvasViewport({super.key});
+
+  
   @override
   State<CanvasViewport> createState() => _CanvasViewportState();
+
 }
 
 class _CanvasViewportState extends State<CanvasViewport> {
 
   @override
-  void dispose() {
-    _transformController.dispose(); // IMPORTANT: Dispose the controller!
-    super.dispose();
-  }
+  Widget build(BuildContext context) {      
 
-  final TransformController _transformController = TransformController();
-
-  @override
-  Widget build(BuildContext context) {    
     return RepaintBoundary(
       child: Stack(children: [
-        CanvasView(
+        CanvasInputHandler(
           child: Stack(
             children: [
               ...context.read<DrawingContext>().canvas.layers.values.toList().map((layer) {
@@ -83,7 +81,14 @@ class _CanvasViewportState extends State<CanvasViewport> {
             ],
           ),
         ),
-        // zoom.Zoom(
+      
+          CanvasOverlay()
+      ]),
+    );
+  }
+}
+
+  // zoom.Zoom(
         //     transformationController: controller,
         //     canvasColor: context.watch<Settings>().background,
         //     doubleTapZoom: false,
@@ -161,11 +166,3 @@ class _CanvasViewportState extends State<CanvasViewport> {
         //       ],
         //     ),
         //   ),
-          CanvasOverlay(
-            controller: _transformController,
-          )
-      ]),
-    );
-  }
-}
-

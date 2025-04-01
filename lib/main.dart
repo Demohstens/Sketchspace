@@ -1,5 +1,6 @@
 import 'package:sketchspace/actions/menu_actions.dart';
 import 'package:sketchspace/canvas/actions.dart';
+import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/canvas_input_handler.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
@@ -16,6 +17,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => Settings()),
         ChangeNotifierProvider(create: (_) => DrawingContext()),
+        ChangeNotifierProvider(create: (_) => TransformController()),
       ],
       child: const Sketchspace(),
     ),

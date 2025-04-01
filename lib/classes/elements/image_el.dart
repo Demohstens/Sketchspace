@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -143,6 +144,11 @@ class ImageElement extends SketchElement {
       'width': image.width,
       'height': image.height,
     };
+  }
+
+  @override
+  scale(Vector2 scale) async {
+    throw UnimplementedError('ImageElement does not support scaling.');
   }
 
   @override

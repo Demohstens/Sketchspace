@@ -1,20 +1,17 @@
 import 'dart:math' as math; // For min/max
-import 'package:flutter/gestures.dart'; // For HitTestBehavior
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
-import 'package:sketchspace/canvas/zoom-widget-drawing/lib/zoom_widget.dart' as zoom;
 import 'package:sketchspace/classes/element.dart';
-import 'package:sketchspace/components/brush_menu.dart';
-import 'package:vector_math/vector_math_64.dart' show Vector3, Matrix4;
+import 'package:vector_math/vector_math_64.dart' as math;
 
-// The main overlay widget
+
 class CanvasOverlay extends StatefulWidget {
-  final TransformController controller;
+  
 
-  const CanvasOverlay({super.key, required this.controller});
+  const CanvasOverlay({super.key});
 
   @override
   State<CanvasOverlay> createState() => _CanvasOverlayState();
@@ -24,7 +21,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Matrix4>(
-      valueListenable: widget.controller,
+      valueListenable: context.read<TransformController>(),
       builder: (context, matrix, child) {
         final selectedElementId = context.watch<DrawingContext>().selectedElementId;
         final selectedElement = context.read<DrawingContext>().canvas.getElementById(selectedElementId);
@@ -33,8 +30,8 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
           return const SizedBox.shrink();
         }
 
-        final screenBounds = widget.controller.transformRect(selectedElement.boundary);
-        final screenPoints = widget.controller.transformPoints([
+        final screenBounds = context.read<TransformController>().transformRect(selectedElement.boundary);
+        final screenPoints =  context.read<TransformController>().transformPoints([
           selectedElement.boundary.topLeft,
           selectedElement.boundary.topRight,
           selectedElement.boundary.bottomRight,
@@ -44,6 +41,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
         final screenTopCenter = (screenPoints[0] + screenPoints[1]) / 2.0;
         const double buttonSize = 50.0;
         const double buttonPadding = 5.0;
+        
 
         return Stack(
           children: [
@@ -53,8 +51,17 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onPanUpdate: (details) {
-                  final canvasDelta = widget.controller.inversePoint(details.delta);
-                  selectedElement.translate(canvasDelta);
+                  // Convert the global position to canvas coordinates
+                  final globalPosition = details.globalPosition;
+                  final localPosition = context.read<TransformController>().inversePoint(globalPosition);
+
+                  // Calculate the delta relative to the element's current position
+                  final delta = localPosition - selectedElement.boundary.center;
+
+                  // Translate the selected element by the delta
+                  selectedElement.translate(delta);
+
+                  // Repaint the canvas
                   context.read<DrawingContext>().repaint();
                 },
                 onPanEnd: (details) {
@@ -71,18 +78,15 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
               ),
             ),
 
-            // Boundary Outline
-            Positioned.fromRect(
-              rect: screenBounds,
-              child: IgnorePointer(
-                child: CustomPaint(
-                  size: screenBounds.size,
-                  painter: BoundaryPainter(
-                    points: screenPoints.map((p) => p - screenBounds.topLeft).toList(),
-                  ),
-                ),
+            // Corner Handles
+            for (var i = 0; i < 4; i++)
+              DragHandle(
+                position: Position.values[i],
+                origin: screenPoints[i],
+                opposite: screenPoints[(i + 2) % 4],
+                element: selectedElement,
+                controller:  context.read<TransformController>(),
               ),
-            ),
 
             // Controls
             Positioned(
@@ -109,22 +113,13 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                 ],
               ),
             ),
-
-            // Corner Handles
-            for (var i = 0; i < 4; i++)
-              DragHandle(
-                position: Position.values[i],
-                origin: screenPoints[i],
-                opposite: screenPoints[(i + 2) % 4],
-                element: selectedElement,
-                controller: widget.controller,
-              ),
           ],
         );
       },
     );
   }
 }
+
 
 enum Position {
   topLeft,
@@ -154,7 +149,6 @@ class DragHandle extends StatefulWidget {
   @override
   State<DragHandle> createState() => _DragHandleState();
 }
-
 class _DragHandleState extends State<DragHandle> {
   @override
   Widget build(BuildContext context) {
@@ -165,21 +159,25 @@ class _DragHandleState extends State<DragHandle> {
       top: widget.origin.dy - (widget.size / 2),
       child: GestureDetector(
         onPanUpdate: (details) {
-          final delta = widget.controller.toLocal(details.delta);
-          final center = widget.element.boundary.center;
-          
-          final scaleX = 1.0 + delta.dx * 0.003;
-          final scaleY = 1.0 + delta.dy * 0.003;
-          
-          final transform = Matrix4.identity()
-            ..translate(center.dx, center.dy)
-            ..scale(
-              widget.position.index.isEven ? 2.0 - scaleX : scaleX,
-              widget.position.index < 2 ? 2.0 - scaleY : scaleY
-            )
-            ..translate(-center.dx, -center.dy);
-          
-          widget.element.transform(transform);
+          final globalPosition = details.globalPosition;
+          final localPosition = widget.controller.inversePoint(globalPosition);
+
+          // Calculate the vector from opposite corner to current position
+          final currentVector = localPosition - widget.opposite;
+          final originalVector = widget.origin - widget.opposite;
+
+          // Calculate scaling factors maintaining aspect ratio
+          double scaleX = currentVector.dx / originalVector.dx;
+          double scaleY = currentVector.dy / originalVector.dy;
+
+          // Ensure minimum scale
+          scaleX = scaleX.sign * math.max(0.1, scaleX.abs());
+          scaleY = scaleY.sign * math.max(0.1, scaleY.abs());
+
+          // Apply the scaling matrix to the element
+          widget.element.scale(math.Vector2(scaleX, scaleY));
+
+          // Repaint the canvas
           context.read<DrawingContext>().repaint();
         },
         child: Container(
@@ -203,7 +201,6 @@ class _DragHandleState extends State<DragHandle> {
     );
   }
 }
-
 class BoundaryPainter extends CustomPainter {
   final List<Offset> points;
 

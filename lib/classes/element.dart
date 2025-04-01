@@ -3,7 +3,9 @@ import 'package:sketchspace/classes/elements/image_el.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/classes/path.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:ui' as ui; 
+import 'dart:ui' as ui;
+
+import 'package:vector_math/vector_math_64.dart'; 
 
 abstract class SketchElement {
   late String id;
@@ -20,6 +22,7 @@ abstract class SketchElement {
   Map<String, dynamic> toJson();
   draw(Canvas c);
   transform(Matrix4 transform);
+  scale(Vector2 scale);
   translate(Offset offset);
 
   factory SketchElement.fromJson(Map<String, dynamic> json) {
@@ -110,6 +113,11 @@ class Stroke extends SketchElement {
   @override
   void transform(Matrix4 transform) {
     path.transform(transform);
+  }
+
+  @override
+  void scale(Vector2 scale) {
+    path.scale(scale);
   }
 
   @override
