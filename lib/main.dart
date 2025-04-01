@@ -1,5 +1,6 @@
 import 'package:sketchspace/actions/menu_actions.dart';
 import 'package:sketchspace/canvas/actions.dart';
+import 'package:sketchspace/components/canvas_input_handler.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/pages/homepage.dart';
@@ -44,7 +45,8 @@ class Sketchspace extends StatelessWidget {
         OpenMenuIntent: OpenMenuAction(),
         ResetIntent: ResetAction(context.read<DrawingContext>()),
       }, 
-      child: HomePage(),)
+      child: CanvasView()),
+      //  HomePage(),)
     );
   }
 }

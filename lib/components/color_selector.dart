@@ -59,20 +59,20 @@ class _SketchColorPickerState extends State<SketchColorPicker> {
                 _menuController.open();
               },)),
             ...context.watch<DrawingContext>().colorHistory.map((e) =>
-            CircleAvatar(
-            radius: 15,
-            backgroundColor: e,
-            child: InkWell(
-              onTap: () {
-                widget.onColorChanged(e);
-                setState(() {
-                  selectedColor = e;
-                });
-              },
-              onLongPress: () => _menuController.open(),
-              onSecondaryTap: () => _menuController.open(),
-            ),
-          ))
+              CircleAvatar(
+              radius: 15,
+              backgroundColor: e,
+              child: InkWell(
+                onTap: () {
+                  widget.onColorChanged(e);
+                  setState(() {
+                    selectedColor = e;
+                  });
+                },
+                onLongPress: () => _menuController.open(),
+                onSecondaryTap: () => _menuController.open(),
+              ),
+            ))
       ])          
     ))));
   }

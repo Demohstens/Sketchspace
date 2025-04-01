@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
-import 'package:sketchspace/brushes/selected_stroke_painter.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/elements/image_el.dart';
 import 'package:sketchspace/classes/path.dart';
@@ -12,8 +10,6 @@ import 'package:sketchspace/classes/sketch_canvas.dart';
 import 'package:sketchspace/tools/tools.dart';
 import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
-import 'package:sketchspace/classes/stroke.dart';
-import 'package:sketchspace/components/brush_menu.dart';
 import 'package:sketchspace/components/file_save_dialogs.dart';
 import 'package:flutter/material.dart';
 

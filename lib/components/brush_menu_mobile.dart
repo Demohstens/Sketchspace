@@ -1,7 +1,4 @@
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sketchspace/components/add_imported.dart';
-import 'package:sketchspace/components/brush_menu.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
