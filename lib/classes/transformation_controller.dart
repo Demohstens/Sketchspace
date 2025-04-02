@@ -38,6 +38,12 @@ class TransformController extends ValueNotifier<Matrix4>  {
     return MatrixUtils.transformPoint(Matrix4.inverted(value), p);
   }
 
+  Offset inverseVector(Offset v) {
+    final inverseMatrix = value.clone()..invert();
+    final transformedVector = inverseMatrix.transform3(Vector3(v.dx, v.dy, 0));
+    return Offset(transformedVector.x, transformedVector.y);
+  }
+
   Offset toLocal(Offset p) {
     return MatrixUtils.transformPoint(value, p);
   }
@@ -48,21 +54,9 @@ class TransformController extends ValueNotifier<Matrix4>  {
     final Matrix4 currentMatrix = value;
 
     final topLeft = MatrixUtils.transformPoint(currentMatrix, r.topLeft);
-    final topRight = MatrixUtils.transformPoint(currentMatrix, r.topRight);
-    final bottomLeft = MatrixUtils.transformPoint(currentMatrix, r.bottomLeft);
     final bottomRight = MatrixUtils.transformPoint(currentMatrix, r.bottomRight);
-
-    // Find the bounding rectangle that encompasses all transformed points
-    final double left = math.min(math.min(topLeft.dx, topRight.dx), 
-                                 math.min(bottomLeft.dx, bottomRight.dx));
-    final double top = math.min(math.min(topLeft.dy, topRight.dy), 
-                                math.min(bottomLeft.dy, bottomRight.dy));
-    final double right = math.max(math.max(topLeft.dx, topRight.dx), 
-                                  math.max(bottomLeft.dx, bottomRight.dx));
-    final double bottom = math.max(math.max(topLeft.dy, topRight.dy), 
-                                   math.max(bottomLeft.dy, bottomRight.dy));
-
-    return Rect.fromLTRB(left, top, right, bottom);
+    
+    return Rect.fromPoints(topLeft, bottomRight);
   }
 
   List<Offset> transformPoints(List<Offset> points) {

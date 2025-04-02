@@ -31,12 +31,12 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
         }
 
         final screenBounds = context.read<TransformController>().transformRect(selectedElement.boundary);
-        final screenPoints =  context.read<TransformController>().transformPoints([
-          selectedElement.boundary.topLeft,
-          selectedElement.boundary.topRight,
-          selectedElement.boundary.bottomRight,
-          selectedElement.boundary.bottomLeft,
-        ]);
+        List<Offset> screenPoints = [
+          screenBounds.topLeft,
+          screenBounds.topRight,
+          screenBounds.bottomRight,
+          screenBounds.bottomLeft,
+        ];
 
         final screenTopCenter = (screenPoints[0] + screenPoints[1]) / 2.0;
         const double buttonSize = 50.0;
@@ -201,33 +201,6 @@ class _DragHandleState extends State<DragHandle> {
     );
   }
 }
-class BoundaryPainter extends CustomPainter {
-  final List<Offset> points;
-
-  BoundaryPainter({required this.points});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-      
-    final path = Path()..moveTo(points[0].dx, points[0].dy);
-    for (var i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
-    }
-    path.close();
-    
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant BoundaryPainter oldDelegate) {
-    return !List.generate(4, (i) => points[i] == oldDelegate.points[i]).contains(false);
-  }
-}
-
 class HitTestPainter extends CustomPainter {
   final List<Offset> points;
 

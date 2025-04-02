@@ -25,6 +25,7 @@ class _SketchColorPickerState extends State<SketchColorPicker> {
   @override
   Widget build(BuildContext context) {
     return  Material(
+      color: Colors.transparent,
       child: 
     Container(
       padding: EdgeInsets.all(8),
