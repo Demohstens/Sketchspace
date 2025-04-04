@@ -1,4 +1,5 @@
 import 'package:perfect_freehand/perfect_freehand.dart';
+import 'package:sketchspace/classes/elements/stroke_element.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:flutter/material.dart';
 import 'package:sketchspace/classes/element.dart';

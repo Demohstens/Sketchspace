@@ -1,5 +1,6 @@
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/elements/image_el.dart';
+import 'package:sketchspace/classes/elements/stroke_element.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:uuid/uuid.dart';
 

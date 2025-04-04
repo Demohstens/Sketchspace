@@ -5,6 +5,8 @@ import 'dart:ui' as ui;
 import 'package:image_picker/image_picker.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/elements/image_el.dart';
+import 'package:sketchspace/classes/elements/stroke_element.dart';
+import 'package:sketchspace/classes/elements/text_element.dart';
 import 'package:sketchspace/classes/path.dart';
 import 'package:sketchspace/classes/sketch_canvas.dart';
 import 'package:sketchspace/tools/tools.dart';
@@ -78,6 +80,12 @@ class DrawingContext with ChangeNotifier {
 
   void addPoint(Offset p) {
     _points.add(p);
+    notifyListeners();
+  }
+
+  void insertText(Offset p) {
+    final text= TextElement(text: "YIPPEE", fontSize: 12, position: p, layerId: activeLayer.id);
+    activeLayer.addElement(text);
     notifyListeners();
   }
 

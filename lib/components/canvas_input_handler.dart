@@ -121,6 +121,12 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                                             details.localPosition);
                                     context.read<DrawingContext>().selectElement(transformedPoint);
                                   }
+                                  if (context.read<DrawingContext>().tool ==
+                                      Tool.text) {
+                                    final pos = context.read<TransformController>()
+                                      .inversePoint(details.localPosition);
+                                    context.read<DrawingContext>().insertText(pos);
+                                  }
                                 },
                                 
                                 onDoubleTap: () {

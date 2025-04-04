@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/tools/brush.dart';
 import 'package:sketchspace/tools/mouse.dart';
+import 'package:sketchspace/tools/text.dart';
 
 // possible to use menu anchor instead?
 // https://api.flutter.dev/flutter/material/PopupMenuButton-class.html
@@ -34,6 +35,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
       child: MenuAnchor(
         controller: menuController,
         menuChildren: [
+          TextToolButton(),
           AddImported(),
           MouseToolButton(),
           BrushToolButton(),

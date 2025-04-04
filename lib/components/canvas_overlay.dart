@@ -1,6 +1,7 @@
 import 'dart:math' as math; // For min/max
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sketchspace/classes/elements/stroke_element.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
