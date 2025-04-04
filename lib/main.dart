@@ -1,23 +1,26 @@
 import 'package:sketchspace/actions/menu_actions.dart';
 import 'package:sketchspace/canvas/actions.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
-import 'package:sketchspace/components/canvas_input_handler.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/pages/homepage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:sketchspace/providers/sketch_canvas.dart';
 
 void main() {
   runApp(
-    /// Providers are above [MyApp] instead of inside it, so that tests
-    /// can use [MyApp] while mocking the providers
     MultiProvider(
       providers: [
+        ChangeNotifierProvider<SketchCanvas>(create: (_) => SketchCanvas()),
         ChangeNotifierProvider(create: (_) => Settings()),
-        ChangeNotifierProvider(create: (_) => DrawingContext()),
         ChangeNotifierProvider(create: (_) => TransformController()),
+        ChangeNotifierProxyProvider<SketchCanvas, DrawingContext>(
+      create: (_) => DrawingContext(),
+      update: (_, canvasContext, drawingContext) =>
+          drawingContext!..updateCanvasContext(canvasContext),
+    ),
       ],
       child: const Sketchspace(),
     ),

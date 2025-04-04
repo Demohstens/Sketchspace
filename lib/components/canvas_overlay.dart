@@ -6,6 +6,7 @@ import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/classes/element.dart';
+import 'package:sketchspace/providers/sketch_canvas.dart';
 import 'package:vector_math/vector_math_64.dart' as math;
 
 
@@ -24,14 +25,16 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
     return ValueListenableBuilder<Matrix4>(
       valueListenable: context.read<TransformController>(),
       builder: (context, matrix, child) {
-        final selectedElementId = context.watch<DrawingContext>().selectedElementId;
-        final selectedElement = context.read<DrawingContext>().canvas.getElementById(selectedElementId);
+        Set<String> selectedIds = context.watch<DrawingContext>().selectedElementIds;
+        final selectedElements = context.read<SketchCanvas>().getElementsByIds(selectedIds);
 
-        if (selectedElement == null) {
+        if (selectedElements.isEmpty) {
           return const SizedBox.shrink();
         }
-
-        final screenBounds = context.read<TransformController>().transformRect(selectedElement.boundary);
+        Rect combinedBounds = selectedElements
+          .map((e) => e.boundary)
+          .reduce((a, b) => a.expandToInclude(b));
+        final screenBounds = context.read<TransformController>().transformRect(combinedBounds);
         List<Offset> screenPoints = [
           screenBounds.topLeft,
           screenBounds.topRight,
@@ -57,19 +60,21 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                   final localPosition = context.read<TransformController>().inversePoint(globalPosition);
 
                   // Calculate the delta relative to the element's current position
-                  final delta = localPosition - selectedElement.boundary.center;
+                  final delta = localPosition - selectedElements.first.boundary.center;
 
                   // Translate the selected element by the delta
-                  selectedElement.translate(delta);
+                  for (var element in selectedElements) {
+                    element.translate(delta);
+                  }
 
                   // Repaint the canvas
                   context.read<DrawingContext>().repaint();
                 },
                 onPanEnd: (details) {
-                  context.read<DrawingContext>().canvas.updateElement(selectedElement);
+                  // context.read<DrawingContext>().canvas.updateElement(selectedElements.first);
                   context.read<DrawingContext>().repaint();
                 },
-                onLongPress: () => context.read<DrawingContext>().unSelectStroke(),
+                onLongPress: () => context.read<DrawingContext>().unselectAll(),
                 child: CustomPaint(
                   size: screenBounds.size,
                   painter: HitTestPainter(
@@ -85,7 +90,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                 position: Position.values[i],
                 origin: screenPoints[i],
                 opposite: screenPoints[(i + 2) % 4],
-                element: selectedElement,
+                element: selectedElements.first,
                 controller:  context.read<TransformController>(),
               ),
 
@@ -100,14 +105,17 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                     iconSize: buttonSize * 0.7,
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () {
-                      context.read<DrawingContext>().deleteElement(selectedElement);
+                      context.read<SketchCanvas>().removeElements(selectedElements);
+                      context.read<DrawingContext>().unselectAll();
                       context.read<DrawingContext>().repaint();
                     }
                   ),
-                  if (selectedElement is Stroke) 
+                  if (true) 
                     SketchColorPicker(
                       onColorChanged: (c) {
-                        selectedElement.color = c;
+                        for (var el in selectedElements) {
+                          (el as Stroke).color = c; 
+                        }
                         context.read<DrawingContext>().repaint();
                       },
                     ),

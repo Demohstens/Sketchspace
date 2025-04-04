@@ -5,6 +5,7 @@ import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/tools/brush.dart';
+import 'package:sketchspace/tools/eraser.dart';
 import 'package:sketchspace/tools/mouse.dart';
 import 'package:sketchspace/tools/text.dart';
 

@@ -1,11 +1,7 @@
-import 'dart:ui';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
-import 'package:sketchspace/components/canvas_overlay.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/tools/tools.dart';
@@ -50,9 +46,20 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
     super.dispose();
   }
 
+  void startDrawing() {
+    // context.read<DrawingContext>().startDrawing();
+    context.read<DrawingContext>().unselectAll();
+    isDrawing = true;
+  }
+
   void endDrawing() {
     context.read<DrawingContext>().endDrawing();
     isDrawing = false; 
+  }
+
+  void endErasing() {
+    context.read<DrawingContext>().endErasing();
+    isDrawing = false;
   }
 
   void startScaling() {
@@ -142,9 +149,10 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                                       .selectElement(longPressLocation);
                                 },
                                 onScaleStart: (details) {
-                                  if (details.pointerCount == 1 && canDraw) {
+                                  Tool selectedTool =  context.read<DrawingContext>().tool;
+                                  if (details.pointerCount == 1 && canDraw && selectedTool == Tool.strokeEraser || selectedTool == Tool.brush) {
                                     // Start drawing
-                                    isDrawing = true;
+                                    startDrawing();
                                   } else {
                                     startScaling();
                                   }
@@ -154,7 +162,13 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                                 },
                                 onScaleEnd: (details) {
                                   if (isDrawing) {
-                                    endDrawing();
+                                    Tool selectedTool =  context.read<DrawingContext>().tool;
+
+                                    if (selectedTool == Tool.brush) {
+                                      endDrawing();
+                                    } else if (selectedTool == Tool.strokeEraser) {
+                                      endErasing();
+                                    }
                                   } else {
                                     endScaling();
                                   }

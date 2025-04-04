@@ -20,7 +20,7 @@ import 'package:uuid/uuid.dart';
 /// The canvas maintains a list of [Layer] objects and tracks which layer
 /// is currently active for drawing operations.
 
-class SketchCanvas {
+class SketchCanvas extends ChangeNotifier {
   // Canvas properties
   String id; // UUID - used for actual management of the canvas and data storage
   String? fileName; // Name of the file - used for displaying in the UI
@@ -83,6 +83,50 @@ class SketchCanvas {
     isDirty = false;
   }
 
+  void reinitialize({SketchCanvas? canvas, double? width, double? height, List<Layer>? layers, String? id, String? fileName, String? filePath}) {
+    if (canvas != null) {
+      this.width = canvas.width;
+      this.height = canvas.height;
+      _layers = canvas.layers;
+      _activeLayer = canvas.activeLayer;
+      this.id = canvas.id;
+      this.fileName = canvas.fileName;
+      this.filePath = canvas.filePath;
+      isDirty = canvas.isDirty;
+      notifyListeners();
+    }
+    this.width = width??  1080;
+    this.height = height?? 1920;
+
+    // Intialize layers
+    _layers = {};
+    if (layers!= null) {
+      _activeLayer = layers[0];
+      for (var e in layers) {
+        _layers[e.id] = e;
+      } 
+    }
+    else {
+      Layer newLayer = Layer.empty(0);
+      _layers[newLayer.id] = newLayer;
+      _activeLayer = newLayer; 
+    }
+
+    this.id = id?? const Uuid().v4();
+    this.fileName = fileName?? "";
+    this.filePath = filePath?? "";
+    isDirty = false;
+
+    print("REINITIALIZED");
+    notifyListeners();
+  }
+
+  void removeElements(Set<SketchElement> elements) {
+    for (var el in elements) {
+      deleteElement(el);
+    }
+  }
+
   bool validate() {
     // Validate canvas has required properties
     if (width <= 0 || height <= 0) {
@@ -133,6 +177,19 @@ class SketchCanvas {
     layers[el.layerId]?.updateElement(el);
   }
 
+  Set<SketchElement> getElementsByIds(Set<String> ids) {
+    Set<SketchElement> elements = {};
+    for (String id in ids) {
+      SketchElement? el = getElementById(id);
+      if (el!=null) {
+        elements.add(el);
+      }
+    }    
+    return elements;
+  }
+
+
+
   SketchElement? getElementById(String? id) {
     // if (id == null) {
     //   return null;
@@ -159,6 +216,18 @@ class SketchCanvas {
       "id": id,
       "Layers": layers.values.map((layer) => layer.toJson()).toList(),
     };
+  }
+
+  void reinitializeFromFile(File file) {
+    SketchCanvas newCanvas = getCanvasFromFile(file);
+    reinitialize(
+      width: newCanvas.width,
+      height: newCanvas.height,
+      layers: newCanvas.layers.values.toList(),
+      id: newCanvas.id,
+      fileName: newCanvas.fileName,
+      filePath: newCanvas.filePath,
+    );
   }
 }
 

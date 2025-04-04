@@ -8,7 +8,7 @@ import 'package:sketchspace/classes/elements/image_el.dart';
 import 'package:sketchspace/classes/elements/stroke_element.dart';
 import 'package:sketchspace/classes/elements/text_element.dart';
 import 'package:sketchspace/classes/path.dart';
-import 'package:sketchspace/classes/sketch_canvas.dart';
+import 'package:sketchspace/providers/sketch_canvas.dart';
 import 'package:sketchspace/tools/tools.dart';
 import 'package:sketchspace/utils/draw_file.dart';
 import 'package:sketchspace/classes/layer.dart';
@@ -25,11 +25,16 @@ class DrawingContext with ChangeNotifier {
   // Populated with default colors
   List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue, Colors.grey];
   Tool _tool = Tool.brush;
-  String? _selectedElementId;
-  SketchCanvas canvas;
+  Set<String> _selectedElementIds = {};
+  late SketchCanvas _canvas;
   ValueNotifier<bool> repaintNotifier = ValueNotifier(false);
 
-  DrawingContext() : canvas = SketchCanvas();
+  DrawingContext();
+
+  void updateCanvasContext(SketchCanvas canvas) {
+    _canvas = canvas;
+    notifyListeners();
+  }
 
   // * Paint Attributes * //
   Color _color = Colors.orange;
@@ -38,19 +43,22 @@ class DrawingContext with ChangeNotifier {
   bool ui_enabled = true;
 
   // * GETTERS & SETTERS * //
-  set selecedStrokeId(String? id) {
-    _selectedElementId = id;
+  set selectedElementIds(Set<String> ids) {
+    _selectedElementIds = ids;
     notifyListeners();
   }
-
+  set canvas(SketchCanvas canvas) {
+    throw Exception("Don't set canvas manually. Call canvas.reinitialize instead");
+  }
   // GETTERS
+  SketchCanvas get canvas => _canvas;
   Color get color => _color;
-  String? get selectedElementId => _selectedElementId;
+  Set<String> get selectedElementIds => _selectedElementIds;
   Tool get tool => _tool;
   List<Offset> get points => _points;
   double get strokeWidth => _width;
   // * LAYERS * //
-  Layer get activeLayer => canvas.activeLayer;
+  Layer get activeLayer => _canvas.activeLayer;
   
   @override
   void notifyListeners() {
@@ -115,27 +123,34 @@ class DrawingContext with ChangeNotifier {
 
   void newLayer() {
     // Id is equal to the length of the list as the first layer is 0
-    canvas.addLayer();
+    _canvas.addLayer();
     notifyListeners();
   }
 
   void changeActiveLayer(Layer layer) {
     print("Changed active layer to ${layer.id}");
-    canvas.activeLayer = canvas.layers[layer.id] ?? layer;
+    _canvas.activeLayer = _canvas.layers[layer.id] ?? layer;
     notifyListeners();
   }
 
   void deleteLayer(Layer layer) {
-    canvas.layers.remove(layer);
+    _canvas.layers.remove(layer);
     notifyListeners();
   }
 
   void pushCanvas(SketchCanvas canvas) {
-    this.canvas = canvas;
+    _canvas.reinitialize(canvas: canvas);
     notifyListeners();
   }
 
+  void endErasing() {
+    // TODO
+  }
+
   void endDrawing() {
+    if (tool != Tool.brush) {
+      throw Exception("NOT DRAWING");
+    }
     if (_points.isNotEmpty) {
       // Create a copy of the points before clearing
       List<Offset> pointsCopy = List.from(_points);
@@ -143,7 +158,7 @@ class DrawingContext with ChangeNotifier {
       var paint = getPaint();
       // Only add the stroke if there are enough points
       if (pointsCopy.length >= 2) {
-        canvas.activeLayer.addElement(Stroke(paint: paint, path: SketchPath(pointsCopy), layerId: activeLayer.id));
+        _canvas.activeLayer.addElement(Stroke(paint: paint, path: SketchPath(pointsCopy), layerId: activeLayer.id));
       }
       if (!colorHistory.contains(paint.color)) {
       // Ensure a max size of 4 in the color history
@@ -158,13 +173,18 @@ class DrawingContext with ChangeNotifier {
   }
 
   void resetDrawing() {
-    unSelectStroke();
+    unselectElement();
     _points.clear();
+    notifyListeners();
+  } 
+
+  void unselectAll() {
+    _selectedElementIds = {};
     notifyListeners();
   }
 
   void resetAll() {
-    unSelectStroke();
+    unselectElement();
     _points.clear();
     notifyListeners();
   }
@@ -195,14 +215,14 @@ class DrawingContext with ChangeNotifier {
   /// Attempts to save the current canvas to the given path
   /// Returns true if the file was saved successfully 
   Future<bool> saveFile(BuildContext context) async {
-    String _name = canvas.fileName ?? "";
+    String _name = _canvas.fileName ?? "";
     bool saveSuccess = false;
     
     print("SAVING FILE: $_name");
     if (_name == "" || _name == "Untitled") {
       String? fileName = await showFileNameDialog(context);
       if (fileName != null && fileName != "") {
-        canvas.fileName = fileName;
+        _canvas.fileName = fileName;
       } else {
         return saveSuccess;
       }
@@ -210,17 +230,17 @@ class DrawingContext with ChangeNotifier {
     
     try {
       // First validate the canvas data
-      bool isValid = canvas.validate();
+      bool isValid = _canvas.validate();
       if (!isValid) {
         throw Exception("Canvas contains invalid data (NaN values)");
       }
 
       // Convert strokes to JSON list
-      Map<String, dynamic> jsonData = canvas.toJson();
+      Map<String, dynamic> jsonData = _canvas.toJson();
       final String jsonString = jsonEncode(jsonData);
 
       final Directory appDir = await getAppDirectory();
-      String filePath = '${appDir.path}/${canvas.fileName}.json';
+      String filePath = '${appDir.path}/${_canvas.fileName}.json';
       
       File file = File(filePath);
       await file.writeAsString(jsonString);
@@ -248,7 +268,7 @@ class DrawingContext with ChangeNotifier {
 
   void loadFileContext(File file) {
     resetAll(); // TODO check if this is necessary
-    canvas = SketchCanvas.fromFile(file);
+    canvas.reinitializeFromFile(file);
     ui_enabled = true;
     notifyListeners();
   }
@@ -286,27 +306,27 @@ class DrawingContext with ChangeNotifier {
   }
 
   void deleteElement(SketchElement el) {
-    canvas.deleteElement(el);
+    _canvas.deleteElement(el);
   }
 
   // * SELECTION * //
   void selectElement(Offset touchPoint) {
     // TODO optimize the shit out of this
-    for (Layer l in canvas.layers.values.toList().reversed) {
+    for (Layer l in _canvas.layers.values.toList().reversed) {
       for (SketchElement el in l.elements.values) {
         if (el.hitTest(touchPoint)) {
-          _selectedElementId = el.id;
+          _selectedElementIds.add(el.id);
           notifyListeners();
           return;
         } 
       }
-    }
-    _selectedElementId = null;
+    } 
+    _selectedElementIds = {};
     notifyListeners();
   }
 
-  void unSelectStroke() {
-    _selectedElementId = null;
+  void unselectElement() {
+    _selectedElementIds = {};
     notifyListeners();
   }
 
