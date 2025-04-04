@@ -39,7 +39,7 @@ class Sketchspace extends StatelessWidget {
                 TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
               })),
       darkTheme: ThemeData.dark(),
-      themeMode: context.watch<Settings>().darkModeEnabled
+      themeMode: context.watch<Settings>().useDarkMode
           ? ThemeMode.dark
           : ThemeMode.light,
       home: Actions(actions: 

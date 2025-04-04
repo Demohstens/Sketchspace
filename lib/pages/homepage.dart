@@ -84,7 +84,8 @@ class DrawFileButton extends StatefulWidget {
   final File file;
   final Function setFiles;
   @override
-  DrawFileButton(this.file, this.setFiles);
+  const DrawFileButton(this.file, this.setFiles, {super.key});
+  @override
   _DrawFileButtonState createState() => _DrawFileButtonState(file);
 }
 

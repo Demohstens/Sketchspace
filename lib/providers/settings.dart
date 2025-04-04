@@ -8,14 +8,23 @@ class Settings with ChangeNotifier {
   static const Color mainColor = Color(0xffbb86fc);
 
   //* ALL SETTINGS *// 
-  bool useMobile = true;
+  bool _useMobile = true;
   bool autoSave = true;
-  bool darkModeEnabled = true;
+  bool _useDarkMode = true;
+
+  bool get useMobile => _useMobile;
+  bool get useDarkMode => _useDarkMode;
 
   set darkMode(bool value) {
-    darkModeEnabled = value;
-    brightness = darkModeEnabled? Brightness.dark : Brightness.light;
+    _useDarkMode = value;
+    brightness = _useDarkMode ? Brightness.dark : Brightness.light;
     scheme = ColorScheme.fromSeed(seedColor: mainColor, brightness: brightness);
+    notifyListeners();
+  }
+
+  set useMobile(bool value) {
+    _useMobile = value;
+    notifyListeners(); 
   }
 
   // Theme and Color Settings
@@ -43,7 +52,7 @@ class Settings with ChangeNotifier {
   /// Populate the settings with async data
   void _populate() async {
     brightness =
-        darkModeEnabled? Brightness.dark : Brightness.light;
+        _useDarkMode? Brightness.dark : Brightness.light;
     scheme = ColorScheme.fromSeed(seedColor: mainColor, brightness: brightness);
     _background = colorScheme.surface;
     _primaryColor = colorScheme.primary;
@@ -60,9 +69,9 @@ class Settings with ChangeNotifier {
   Color get tertiaryColor => _tertiaryColor;
 
   void toggleDarkMode() {
-    darkModeEnabled = !darkModeEnabled;
+    _useDarkMode = !_useDarkMode;
     brightness =
-        darkModeEnabled ? Brightness.dark : Brightness.light;
+        _useDarkMode ? Brightness.dark : Brightness.light;
     scheme = ColorScheme.fromSeed(seedColor: mainColor, brightness: brightness);
 
     switch (themeMode) {
@@ -84,7 +93,7 @@ class Settings with ChangeNotifier {
   }
 
   void toggleMobile() {
-    useMobile = !useMobile;
+    _useMobile = !_useMobile;
     notifyListeners();
   }
 

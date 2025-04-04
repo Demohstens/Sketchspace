@@ -15,8 +15,8 @@ enum MenuEntry { width }
 class BrushMenuMobile extends StatefulWidget {
 
   const BrushMenuMobile({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<BrushMenuMobile> createState() => BrushMenuMobileState();
@@ -76,6 +76,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
         child:CircleAvatar( 
           backgroundColor: Colors.transparent, 
           child: IconButton(
+            iconSize: 40,
           tooltip: "Brush Menu",
           color: context.read<Settings>().secondaryColor,
           onPressed: () {

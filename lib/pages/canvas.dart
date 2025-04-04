@@ -1,8 +1,6 @@
-import 'package:flutter/services.dart';
-import 'package:sketchspace/actions/menu_actions.dart';
-import 'package:sketchspace/canvas/actions.dart';
 import 'package:sketchspace/canvas/canvas_mobile_ui.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
+import 'package:sketchspace/components/sketch_drawer.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/canvas/canvas_desktop_ui.dart';
 import 'package:flutter/material.dart';
@@ -16,37 +14,36 @@ class CanvasPage extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
-    final drawingContext = context.read<DrawingContext>();
 
     // context.read<Worldspace>().loadFile([]);
-    return Shortcuts(
-      shortcuts: {
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyZ): const UndoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyY): const RedoIntent(),
-          LogicalKeySet(LogicalKeyboardKey.escape): OpenMenuIntent(context),
-          },
-        child: Actions(
-          actions: {
-            RedoIntent: RedoAction(drawingContext),
-            UndoIntent: UndoAction(drawingContext),
-            OpenMenuIntent: OpenMenuAction(),
-            ResetIntent: ResetAction(drawingContext),
-          },
-            child: GestureDetector(child:  Focus(
-            autofocus: true,
-            focusNode: _focusNode,
-            child: Stack(
+    return  Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: () {
+              context.read<DrawingContext>().saveFile(context);
+            },
+          ),
+        ],
+        title: Text(context.watch<DrawingContext>().activeLayer.name),
+      ),
+      // floatingActionButton: FloatingActionButton(onPressed: (){}),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+      drawer: SketchDrawer(),
+      body: Stack(
               children: [
                 Positioned.fill(
                   child: CanvasViewport(),
                 ),
                 Visibility(
-                  visible: context.watch<DrawingContext>().ui_enabled,
+                  visible: true, // context.watch<DrawingContext>().ui_enabled,
                   child: context.watch<Settings>().useMobile == true
                       ? CanvasUIMobile()
                       : CanvasUIDesktop(),
                 ),
               ],
-            )))));
+    ));
   }
 }

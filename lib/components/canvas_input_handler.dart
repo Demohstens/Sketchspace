@@ -29,6 +29,7 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   double scaleFactor = 1.0;
   double rotation = 0.0;
   bool isAltPressed = false;
+  bool canDraw = true;
 
   /// Location of a registered LongpressDown
   Offset longPressLocation = Offset.zero;
@@ -49,21 +50,20 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
     super.dispose();
   }
 
-  // KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
-  //   print('Key event: ${event.logicalKey}');
-  //   if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.alt) {
-  //     print('Alt pressed');
-  //     setState(() {
-  //       isAltPressed = true;
-  //     });
-  //   } else if (event is KeyUpEvent && event.logicalKey == LogicalKeyboardKey.alt) {
-  //     print('Alt released');
-  //     setState(() {
-  //       isAltPressed = false;
-  //     });
-  //   }
-  //   return KeyEventResult.handled;
-  // }
+  void endDrawing() {
+    context.read<DrawingContext>().endDrawing();
+    isDrawing = false; 
+  }
+
+  void startScaling() {
+    canDraw = false;
+  }
+
+  void endScaling() {
+    Future.delayed(Duration(milliseconds: context.read<Settings>().drawCooldown), () {
+      canDraw = true;
+    });
+  }
 
   void _handleScroll(PointerScrollEvent event, BuildContext context) {
       // Prevent default scroll behavior when Alt is pressed
@@ -87,9 +87,7 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Canvas Test')),
-      body: Listener(
+    return Listener(
           onPointerSignal: (PointerSignalEvent event) {
             if (event is PointerScrollEvent) {
               _handleScroll(event, context);
@@ -138,16 +136,21 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                                       .selectElement(longPressLocation);
                                 },
                                 onScaleStart: (details) {
-                                  if (details.pointerCount == 1) {
+                                  if (details.pointerCount == 1 && canDraw) {
+                                    // Start drawing
                                     isDrawing = true;
+                                  } else {
+                                    startScaling();
                                   }
                                   scaleStart = details.focalPoint;
                                   lastScaleFactor = 1.0;
+                                  
                                 },
                                 onScaleEnd: (details) {
                                   if (isDrawing) {
-                                    context.read<DrawingContext>().endDrawing();
-                                    isDrawing = false;
+                                    endDrawing();
+                                  } else {
+                                    endScaling();
                                   }
                                 },
                                 onScaleUpdate: (details) {
@@ -193,9 +196,6 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                         ),
                       ),
                     ),
-                  ),
-
-            
-    );
+                  );
   }
 }
