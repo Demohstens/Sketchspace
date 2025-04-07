@@ -1,3 +1,4 @@
+import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/canvas/canvas_mobile_ui.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
 import 'package:sketchspace/components/sketch_drawer.dart';
@@ -32,7 +33,9 @@ class CanvasPage extends StatelessWidget {
       // floatingActionButton: FloatingActionButton(onPressed: (){}),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       drawer: SketchDrawer(),
-      body: Stack(
+      body: PieCanvas(child:  
+      
+      Stack(
               children: [
                 Positioned.fill(
                   child: CanvasViewport(),
@@ -44,6 +47,6 @@ class CanvasPage extends StatelessWidget {
                       : CanvasUIDesktop(),
                 ),
               ],
-    ));
+    )));
   }
 }

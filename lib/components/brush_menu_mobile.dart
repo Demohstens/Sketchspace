@@ -1,3 +1,4 @@
+import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/components/add_imported.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
@@ -8,6 +9,7 @@ import 'package:sketchspace/tools/brush.dart';
 import 'package:sketchspace/tools/eraser.dart';
 import 'package:sketchspace/tools/mouse.dart';
 import 'package:sketchspace/tools/text.dart';
+import 'package:sketchspace/tools/tools.dart';
 
 // possible to use menu anchor instead?
 // https://api.flutter.dev/flutter/material/PopupMenuButton-class.html
@@ -27,105 +29,130 @@ class BrushMenuMobile extends StatefulWidget {
 class BrushMenuMobileState extends State<BrushMenuMobile> {
   final MenuController _widthMenuController = MenuController();
   final MenuController _colorMenuController = MenuController();
-  final MenuController menuController = MenuController();
+  final PieMenuController menuController = PieMenuController();
   @override
   Widget build(BuildContext context) {
     Color secondary = context.watch<Settings>().secondaryColor;
-    return Material(
-      color: Colors.transparent,
-      child: MenuAnchor(
-        controller: menuController,
-        menuChildren: [
-          TextToolButton(),
-          AddImported(),
-          MouseToolButton(),
-          BrushToolButton(),
-          MenuAnchor(
-            controller: _colorMenuController,
-            menuChildren: [
-              SketchColorPicker(onColorChanged: (c) {context.read<DrawingContext>().changeColor(c);},),
-            ],
-            child: IconButton(onPressed: () {
-              _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();
-            }, icon: Icon(Icons.color_lens, color: context.read<DrawingContext>().color,)),
-          ),
-          MenuAnchor(
-                controller: _widthMenuController,
-                menuChildren: <Widget>[_widthSlider(context)],
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque, // Ensures the entire area is clickable
-                  onTap: () {
-                    switch (_widthMenuController.isOpen) {
-                      case true:
-                        _widthMenuController.close();
-                        break;
-                      case false:
-                        _widthMenuController.open();
-                        break;
-                    }
-                  },
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    child: Icon(
-                      Icons.circle,
-                      size: context.read<DrawingContext>().strokeWidth,
-                      color: secondary,
-                    ),
-                  ),
-                ),
-        )
+    return PieMenu(
+      controller: menuController,
+      actions: [
+        PieAction(
+          child: Icon(Icons.brush, color: secondary, size: 15),
+          onSelect: () {
+            context.read<DrawingContext>().setTool(Tool.brush);
+          },
+          tooltip: Text("Brush"),
+        ),
       ],
-        child:CircleAvatar( 
+      child:
+      CircleAvatar( 
           backgroundColor: Colors.transparent, 
           child: IconButton(
             iconSize: 40,
           tooltip: "Brush Menu",
           color: context.read<Settings>().secondaryColor,
           onPressed: () {
-          switch (menuController.isOpen) {
-            case true: 
-              {
-                setState(() {
-                  menuController.close();
-
-                });
-              }
-              break;
-            case false:
-              {
-                setState(() {
-                  menuController.open();
-
-                });
-              }
-              break;
+            menuController.toggleMenu();
             
-          }
-        }, icon: menuController.isOpen ? Icon(Icons.close) : Icon(Icons.menu)),
-    )));
-  }
+          }, icon: Icon(Icons.menu)), 
+    ) 
+    ); }
+    
+  //   Material(
+  //     color: Colors.transparent,
+  //     child: MenuAnchor(
+  //       controller: menuController,
+  //       menuChildren: [
+  //         TextToolButton(),
+  //         AddImported(),
+  //         MouseToolButton(),
+  //         BrushToolButton(),
+  //         MenuAnchor(
+  //           controller: _colorMenuController,
+  //           menuChildren: [
+  //             SketchColorPicker(onColorChanged: (c) {context.read<DrawingContext>().changeColor(c);},),
+  //           ],
+  //           child: IconButton(onPressed: () {
+  //             _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();
+  //           }, icon: Icon(Icons.color_lens, color: context.read<DrawingContext>().color,)),
+  //         ),
+  //         MenuAnchor(
+  //               controller: _widthMenuController,
+  //               menuChildren: <Widget>[_widthSlider(context)],
+  //               child: GestureDetector(
+  //                 behavior: HitTestBehavior.opaque, // Ensures the entire area is clickable
+  //                 onTap: () {
+  //                   switch (_widthMenuController.isOpen) {
+  //                     case true:
+  //                       _widthMenuController.close();
+  //                       break;
+  //                     case false:
+  //                       _widthMenuController.open();
+  //                       break;
+  //                   }
+  //                 },
+  //                 child: Container(
+  //                   height: 40,
+  //                   width: 40,
+  //                   child: Icon(
+  //                     Icons.circle,
+  //                     size: context.read<DrawingContext>().strokeWidth,
+  //                     color: secondary,
+  //                   ),
+  //                 ),
+  //               ),
+  //       )
+  //     ],
+  //       child:CircleAvatar( 
+  //         backgroundColor: Colors.transparent, 
+  //         child: IconButton(
+  //           iconSize: 40,
+  //         tooltip: "Brush Menu",
+  //         color: context.read<Settings>().secondaryColor,
+  //         onPressed: () {
+  //         switch (menuController.isOpen) {
+  //           case true: 
+  //             {
+  //               setState(() {
+  //                 menuController.close();
 
-  Widget _colorButton(Color color) {
-    return CircleAvatar(
-      backgroundColor: color,
-      radius: 15,
-      child: null,
-    );
-  }
+  //               });
+  //             }
+  //             break;
+  //           case false:
+  //             {
+  //               setState(() {
+  //                 menuController.open();
 
-  Widget _widthSlider(BuildContext context) {
-    return Slider(
-      value: context.read<DrawingContext>().strokeWidth,
-      min: 1,
-      max: 20,
-      divisions: 19,
-      label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
-      onChanged: (double value) {
-        context.read<DrawingContext>().changeWidth(value);
-      },
-    );
-  }
+  //               });
+  //             }
+  //             break;
+            
+  //         }
+  //       }, icon: menuController.isOpen ? Icon(Icons.close) : Icon(Icons.menu)),
+  //   )));
+  // }
+
+  // Widget _colorButton(Color color) {
+  //   return CircleAvatar(
+  //     backgroundColor: color,
+  //     radius: 15,
+  //     child: null,
+  //   );
+  // }
+
+  // Widget _widthSlider(BuildContext context) {
+  //   return Slider(
+  //     value: context.read<DrawingContext>().strokeWidth,
+  //     min: 1,
+  //     max: 20,
+  //     divisions: 19,
+  //     label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
+  //     onChanged: (double value) {
+  //       context.read<DrawingContext>().changeWidth(value);
+  //     },
+  //   );
+  // }
 }
 
 enum ColorButton { red, green, blue }
