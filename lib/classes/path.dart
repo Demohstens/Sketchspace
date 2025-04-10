@@ -17,8 +17,12 @@ class SketchPath {
     _originalPoints = List.from(points); // Save original points
     
     if (points.isNotEmpty) {
+      List<Offset> processedPoints = [];
       // Process points with perfect_freehand only for display, not storage
-      final processedPoints = getStroke(
+      if (points.length <= 3) {
+        processedPoints = points;
+      } else {
+        processedPoints = getStroke(
         points.map((e) => PointVector(e.dx, e.dy)).toList(), 
         options: StrokeOptions(
           size: 1, 
@@ -28,6 +32,8 @@ class SketchPath {
         )
       );
       
+      }
+    
       // Create path from processed points
       if (processedPoints.isNotEmpty) {
         _path.moveTo(processedPoints.first.dx, processedPoints.first.dy);

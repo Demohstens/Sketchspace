@@ -1,6 +1,7 @@
 import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/canvas/canvas_mobile_ui.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
+import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/sketch_drawer.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/canvas/canvas_desktop_ui.dart';
@@ -10,6 +11,7 @@ import 'package:sketchspace/providers/settings.dart';
 
 class CanvasPage extends StatelessWidget {
   final _focusNode = FocusNode();
+  
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {

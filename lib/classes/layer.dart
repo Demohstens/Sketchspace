@@ -34,7 +34,6 @@ class Layer {
 
 
   void addElement(SketchElement element) {
-    print("Adding Element $element");
     elements[element.id] = element;
   }
 

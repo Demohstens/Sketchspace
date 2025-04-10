@@ -1,5 +1,6 @@
 import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/components/add_imported.dart';
+import 'package:sketchspace/components/brush_menu.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
@@ -17,23 +18,27 @@ import 'package:sketchspace/tools/tools.dart';
 enum MenuEntry { width }
 
 class BrushMenuMobile extends StatefulWidget {
-
-  const BrushMenuMobile({
-    super.key,
-  });
+  const BrushMenuMobile({super.key});
 
   @override
   State<BrushMenuMobile> createState() => BrushMenuMobileState();
 }
 
 class BrushMenuMobileState extends State<BrushMenuMobile> {
-  final MenuController _widthMenuController = MenuController();
   final MenuController _colorMenuController = MenuController();
   final PieMenuController menuController = PieMenuController();
   @override
   Widget build(BuildContext context) {
     Color secondary = context.watch<Settings>().secondaryColor;
     return PieMenu(
+      theme: PieTheme(
+        overlayColor: Colors.transparent,
+        radius: 80,
+        iconSize: 20,
+        childBounceEnabled: false,
+        delayDuration: Duration.zero,
+        spacing: 0,
+      ),
       controller: menuController,
       actions: [
         PieAction(
@@ -43,21 +48,33 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
           },
           tooltip: Text("Brush"),
         ),
+        PieAction(
+          child: Icon(Icons.mouse, color: secondary, size: 30),
+          onSelect: () {
+            context.read<DrawingContext>().setTool(Tool.mouse);
+          },
+          tooltip: Text("Mouse"),
+        ),
+        PieAction(
+          child: Icon(Icons.text_fields, color: secondary, size: 15),
+          onSelect: () {
+            context.read<DrawingContext>().setTool(Tool.text);
+          },
+          tooltip: Text("Text"),
+        ),
       ],
-      child:
-      CircleAvatar( 
-          backgroundColor: Colors.transparent, 
-          child: IconButton(
-            iconSize: 40,
-          tooltip: "Brush Menu",
-          color: context.read<Settings>().secondaryColor,
-          onPressed: () {
-            menuController.toggleMenu();
-            
-          }, icon: Icon(Icons.menu)), 
-    ) 
-    ); }
-    
+      child: IconButton(
+            onPressed: () {
+              _colorMenuController.isOpen
+                  ? _colorMenuController.close()
+                  : _colorMenuController.open();
+              menuController.toggleMenu();
+            },
+            icon: Icon(Icons.menu, color: secondary, size: 40),
+          ),
+    );
+  }
+
   //   Material(
   //     color: Colors.transparent,
   //     child: MenuAnchor(
@@ -103,15 +120,15 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
   //               ),
   //       )
   //     ],
-  //       child:CircleAvatar( 
-  //         backgroundColor: Colors.transparent, 
+  //       child:CircleAvatar(
+  //         backgroundColor: Colors.transparent,
   //         child: IconButton(
   //           iconSize: 40,
   //         tooltip: "Brush Menu",
   //         color: context.read<Settings>().secondaryColor,
   //         onPressed: () {
   //         switch (menuController.isOpen) {
-  //           case true: 
+  //           case true:
   //             {
   //               setState(() {
   //                 menuController.close();
@@ -127,7 +144,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
   //               });
   //             }
   //             break;
-            
+
   //         }
   //       }, icon: menuController.isOpen ? Icon(Icons.close) : Icon(Icons.menu)),
   //   )));
@@ -195,22 +212,32 @@ class WidthSelector extends StatelessWidget {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
-          controller: _menuController,
-          menuChildren: <Widget>[_widthSlider(context)],
-          child: GestureDetector(
-              onTap: () {
-                _menuController.open();
-              },
-              child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: context.watch<Settings>().secondaryColor)),
-                  child: Icon(Icons.circle,
-                      size: context.read<DrawingContext>().strokeWidth,
-                      color: context.watch<Settings>().secondaryColor))));
+      controller: _menuController,
+      menuChildren: <Widget>[_widthSlider(context)],
+      child: GestureDetector(
+        onTap: () {
+          _menuController.open();
+        },
+        child: Container(
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: context.watch<Settings>().secondaryColor,
+            ),
+          ),
+          child: Icon(
+            Icons.circle,
+            size: context.read<DrawingContext>().strokeWidth,
+            color: context.watch<Settings>().secondaryColor,
+          ),
+        ),
+      ),
+    );
   }
 }

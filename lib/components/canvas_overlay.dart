@@ -26,7 +26,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
       valueListenable: context.read<TransformController>(),
       builder: (context, matrix, child) {
         Set<String> selectedIds = context.watch<DrawingContext>().selectedElementIds;
-        final selectedElements = context.read<SketchCanvas>().getElementsByIds(selectedIds);
+        final selectedElements = context.read<DrawingContext>().canvas.getElementsByIds(selectedIds);
 
         if (selectedElements.isEmpty) {
           return const SizedBox.shrink();
@@ -105,7 +105,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                     iconSize: buttonSize * 0.7,
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () {
-                      context.read<SketchCanvas>().removeElements(selectedElements);
+                      context.read<DrawingContext>().canvas.removeElements(selectedElements);
                       context.read<DrawingContext>().unselectAll();
                       context.read<DrawingContext>().repaint();
                     }

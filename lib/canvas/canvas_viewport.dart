@@ -1,3 +1,4 @@
+import 'package:awesome_extensions/awesome_extensions_flutter.dart';
 import 'package:flutter/material.dart';
 
 import 'package:sketchspace/brushes/active_painter.dart';
@@ -19,21 +20,27 @@ class CanvasViewport extends StatefulWidget {
 
 class _CanvasViewportState extends State<CanvasViewport> {
 
+  
+
   @override
   Widget build(BuildContext context) {   
     setState(() {
-      
     });   
+
+    final cWidth = context.watch<DrawingContext>().canvas.width;
+    final cHeight = context.watch<DrawingContext>().canvas.height;
 
     return RepaintBoundary(
       child: Stack(children: [
         CanvasInputHandler(
+          canvasWidth: cWidth,
+          canvasHeight: cHeight,
           child: Stack(
             children: [
-              ...context.read<DrawingContext>().canvas.layers.values.toList().map((layer) {
-                return Stack(
-                  children: [
-                  // Use ValueListenableBuilder to rebuild layers when repaintNotifier changes
+                  CustomPaint(
+                    size: Size(cWidth, cHeight),
+                    painter: BackGroundPainter(size: Size(cWidth, cHeight)),
+                  ),
                   ValueListenableBuilder<bool>(
                     valueListenable: context.read<DrawingContext>().repaintNotifier,
                     builder: (context, value, child) {
@@ -47,7 +54,7 @@ class _CanvasViewportState extends State<CanvasViewport> {
                               child: CustomPaint(
                                 willChange: false,
                                 isComplex: true,
-                                size: Size.infinite,
+                                size: Size(context.watch<DrawingContext>().canvas.width, context.watch<DrawingContext>().canvas.height),
                                 painter: LazyPainter(layer.elements.values.toList(), context.read<DrawingContext>().repaintNotifier)
                               )
                             )
@@ -56,29 +63,14 @@ class _CanvasViewportState extends State<CanvasViewport> {
                       );
                     },
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    color: Colors.transparent,
-                    child: CustomPaint(
-                      isComplex: true,
-                      size: Size.infinite,
-                      painter: ActivePainter(
-                          context.watch<DrawingContext>().points,
-                          context.read<DrawingContext>().getPaint())
-                          ,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        color: Colors.transparent,
-                      ),
-                    ),
+                  CustomPaint(
+                    isComplex: true,
+                    size: Size(context.watch<DrawingContext>().canvas.width, context.watch<DrawingContext>().canvas.height),
+                    painter: ActivePainter(
+                        context.watch<DrawingContext>().points,
+                        context.read<DrawingContext>().getPaint())
                   ),
                 ],
-            );
-                
-              })
-            ],
           ),
         ),
       
@@ -86,4 +78,24 @@ class _CanvasViewportState extends State<CanvasViewport> {
       ]),
     );
   }
+}
+
+class BackGroundPainter extends CustomPainter {
+  final Size size;
+
+  BackGroundPainter({required this.size});
+  
+  @override
+  void paint(Canvas canvas, Size _) {
+    final paint = Paint()
+      ..color = Colors.grey
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRect(Offset.zero & size, paint);
+  }
+  
+  @override
+  bool shouldRepaint(covariant BackGroundPainter oldDelegate) {
+    return false;
+  } 
 }

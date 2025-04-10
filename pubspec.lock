@@ -26,6 +26,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.12.0"
+  awesome_extensions:
+    dependency: "direct main"
+    description:
+      name: awesome_extensions
+      sha256: "9b1693e986e4045141add298fa2d7f9aa6cdd3c125b951e2cde739a5058ed879"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.21"
   boolean_selector:
     dependency: transitive
     description:
@@ -42,6 +50,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.0"
+  circular_menu:
+    dependency: "direct main"
+    description:
+      name: circular_menu
+      sha256: "2969127a4fcad1a1366e667925b4492f6dda94702b426ee2c15ab1a3f1fb060e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
   clock:
     dependency: transitive
     description:
@@ -146,6 +162,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  fluent_ui:
+    dependency: "direct main"
+    description:
+      name: fluent_ui
+      sha256: "569f61002931665b9613ed12008a368d60ae66baab78b6270c4dc8b44f24d1df"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.11.3"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -167,6 +191,11 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.0.0"
+  flutter_localizations:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -281,6 +310,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.1+1"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.19.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -322,13 +359,21 @@ packages:
     source: hosted
     version: "0.12.17"
   material_color_utilities:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: material_color_utilities
       sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
       url: "https://pub.dev"
     source: hosted
     version: "0.11.1"
+  math_expressions:
+    dependency: transitive
+    description:
+      name: math_expressions
+      sha256: "218dc65bed4726562bb31c53d8daa3cc824664b26fb72d77bc592757edf74ba0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.0"
   meta:
     dependency: transitive
     description:
@@ -465,6 +510,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.4"
+  recase:
+    dependency: transitive
+    description:
+      name: recase
+      sha256: e4eb4ec2dcdee52dcf99cb4ceabaffc631d7424ee55e56f280bc039737f89213
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
+  scroll_pos:
+    dependency: transitive
+    description:
+      name: scroll_pos
+      sha256: cebf602b2dd939de6832bb902ffefb574608d1b84f420b82b381a4007d3c1e1b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   share_plus:
     dependency: "direct main"
     description:

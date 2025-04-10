@@ -26,15 +26,10 @@ class DrawingContext with ChangeNotifier {
   List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue, Colors.grey];
   Tool _tool = Tool.brush;
   Set<String> _selectedElementIds = {};
-  late SketchCanvas _canvas;
+  SketchCanvas _canvas = SketchCanvas.empty();
   ValueNotifier<bool> repaintNotifier = ValueNotifier(false);
 
   DrawingContext();
-
-  void updateCanvasContext(SketchCanvas canvas) {
-    _canvas = canvas;
-    notifyListeners();
-  }
 
   // * Paint Attributes * //
   Color _color = Colors.orange;
@@ -47,11 +42,10 @@ class DrawingContext with ChangeNotifier {
     _selectedElementIds = ids;
     notifyListeners();
   }
-  set canvas(SketchCanvas canvas) {
-    throw Exception("Don't set canvas manually. Call canvas.reinitialize instead");
-  }
   // GETTERS
-  SketchCanvas get canvas => _canvas;
+  SketchCanvas get canvas {
+    return _canvas;
+  }
   Color get color => _color;
   Set<String> get selectedElementIds => _selectedElementIds;
   Tool get tool => _tool;
@@ -139,12 +133,29 @@ class DrawingContext with ChangeNotifier {
   }
 
   void pushCanvas(SketchCanvas canvas) {
-    _canvas.reinitialize(canvas: canvas);
+    _points.clear();
+    _canvas = canvas;
+    print(_canvas.width);
+
     notifyListeners();
   }
 
   void endErasing() {
     // TODO
+  }
+
+  void drawPoint(Offset p) {
+    if (tool!= Tool.brush) {
+      throw Exception("NOT DRAWING");
+    }
+    _canvas.activeLayer.addElement(Stroke(paint: getPaint(), path: SketchPath([p]), layerId: activeLayer.id));
+    notifyListeners();
+  }
+
+  void cancelDrawing() {
+    _points.clear();
+
+    notifyListeners();
   }
 
   void endDrawing() {
@@ -156,10 +167,8 @@ class DrawingContext with ChangeNotifier {
       List<Offset> pointsCopy = List.from(_points);
       _points.clear();
       var paint = getPaint();
-      // Only add the stroke if there are enough points
-      if (pointsCopy.length >= 2) {
-        _canvas.activeLayer.addElement(Stroke(paint: paint, path: SketchPath(pointsCopy), layerId: activeLayer.id));
-      }
+      // Create a stroke even for single points
+      _canvas.activeLayer.addElement(Stroke(paint: paint, path: SketchPath(pointsCopy), layerId: activeLayer.id));
       if (!colorHistory.contains(paint.color)) {
       // Ensure a max size of 4 in the color history
         if (colorHistory.length >= 4) {
@@ -206,11 +215,6 @@ class DrawingContext with ChangeNotifier {
 
   }
 
-  // File logic
-  void newFile() {
-    canvas = SketchCanvas();
-    notifyListeners();
-  }
 
   /// Attempts to save the current canvas to the given path
   /// Returns true if the file was saved successfully 
@@ -267,8 +271,12 @@ class DrawingContext with ChangeNotifier {
   }
 
   void loadFileContext(File file) {
-    resetAll(); // TODO check if this is necessary
-    canvas.reinitializeFromFile(file);
+    resetAll();
+    final newCanvas = SketchCanvas.fromFile(file);
+    if (newCanvas.width <= 0 || newCanvas.height <= 0) {
+      throw Exception("Invalid canvas dimensions in file");
+    }
+    pushCanvas(newCanvas);
     ui_enabled = true;
     notifyListeners();
   }

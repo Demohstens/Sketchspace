@@ -49,6 +49,10 @@ dependencies:
   image: ^4.5.4
   flutter_colorpicker: ^1.1.0
   pie_menu: ^3.2.7
+  circular_menu: ^4.0.0
+  awesome_extensions: ^2.0.21
+  material_color_utilities: ^0.11.1
+  fluent_ui: ^4.11.3
     
 
 dev_dependencies:

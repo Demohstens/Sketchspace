@@ -13,14 +13,9 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<SketchCanvas>(create: (_) => SketchCanvas()),
         ChangeNotifierProvider(create: (_) => Settings()),
         ChangeNotifierProvider(create: (_) => TransformController()),
-        ChangeNotifierProxyProvider<SketchCanvas, DrawingContext>(
-      create: (_) => DrawingContext(),
-      update: (_, canvasContext, drawingContext) =>
-          drawingContext!..updateCanvasContext(canvasContext),
-    ),
+        ChangeNotifierProvider(create: (_) => DrawingContext()),
       ],
       child: const Sketchspace(),
     ),

@@ -45,8 +45,8 @@ class SketchCanvas extends ChangeNotifier {
   // Constructor
   SketchCanvas({
     this.isDirty = false,
-    double? width,
-    double? height,
+    required this.width,
+    required this.height,
     List<Layer>? layers, 
     String? id,
     String? fileName,
@@ -54,8 +54,6 @@ class SketchCanvas extends ChangeNotifier {
   }) :
       id = id?? const Uuid().v4(),
       fileName = fileName?? "",
-      width = width ??  1080,
-      height = height?? 1920,
       _layers = {}
       {
         if (layers != null) {
@@ -71,7 +69,10 @@ class SketchCanvas extends ChangeNotifier {
       }
   
   factory SketchCanvas.empty(){
-    return SketchCanvas();
+    return SketchCanvas(
+      width: 1080,
+      height: 1920,
+    );
   }
 
   factory SketchCanvas.fromFile(File f) {
@@ -94,29 +95,29 @@ class SketchCanvas extends ChangeNotifier {
       this.filePath = canvas.filePath;
       isDirty = canvas.isDirty;
       notifyListeners();
-    }
-    this.width = width??  1080;
-    this.height = height?? 1920;
+    } else {
+      // Create new canvas with given properties or defaul
+      this.width = width??  1080;
+      this.height = height?? 1920; 
+      // Intialize layers
+      _layers = {};
+      if (layers!= null) {
+        _activeLayer = layers[0];
+        for (var e in layers) {
+          _layers[e.id] = e;
+        } 
+      }
+      else {
+        Layer newLayer = Layer.empty(0);
+        _layers[newLayer.id] = newLayer;
+        _activeLayer = newLayer; 
+      }
 
-    // Intialize layers
-    _layers = {};
-    if (layers!= null) {
-      _activeLayer = layers[0];
-      for (var e in layers) {
-        _layers[e.id] = e;
-      } 
+      this.id = id?? const Uuid().v4();
+      this.fileName = fileName?? "";
+      this.filePath = filePath?? "";
+      isDirty = false;
     }
-    else {
-      Layer newLayer = Layer.empty(0);
-      _layers[newLayer.id] = newLayer;
-      _activeLayer = newLayer; 
-    }
-
-    this.id = id?? const Uuid().v4();
-    this.fileName = fileName?? "";
-    this.filePath = filePath?? "";
-    isDirty = false;
-
     print("REINITIALIZED");
     notifyListeners();
   }
