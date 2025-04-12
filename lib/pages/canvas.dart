@@ -46,7 +46,7 @@ class CanvasPage extends StatelessWidget {
                 ),
                 Positioned(
                   left: 10,
-                  top: 10,
+                  top: 20,
                   child: IconButton(
                     icon: Icon(Icons.menu, color: Colors.black.withAlpha(200),),
                     onPressed: () {

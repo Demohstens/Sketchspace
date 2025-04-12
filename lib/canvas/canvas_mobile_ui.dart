@@ -36,7 +36,7 @@ class _CanvasUIState extends State<CanvasUIMobile> {
         children: [
           Positioned(
             right: 10,
-            top: 10,
+            top: 20,
             child: Column(
               children: [
                 IconButton(
