@@ -23,7 +23,7 @@ class DrawingContext with ChangeNotifier {
   // * ATTRIBUTES * //
   List<Offset> _points = [];
   // Populated with default colors
-  List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue, Colors.grey];
+  List<Color> colorHistory = [Colors.red, Colors.green, Colors.blue];
   Tool _tool = Tool.brush;
   Set<String> _selectedElementIds = {};
   SketchCanvas _canvas = SketchCanvas.empty();
@@ -73,6 +73,11 @@ class DrawingContext with ChangeNotifier {
 
   void updateDrawing(Offset p) {
     _points.add(p);
+    notifyListeners();
+  }
+
+  void removeLayer(String layerId) {
+    _canvas.removeLayerById(layerId);
     notifyListeners();
   }
 
@@ -171,7 +176,7 @@ class DrawingContext with ChangeNotifier {
       _canvas.activeLayer.addElement(Stroke(paint: paint, path: SketchPath(pointsCopy), layerId: activeLayer.id));
       if (!colorHistory.contains(paint.color)) {
       // Ensure a max size of 4 in the color history
-        if (colorHistory.length >= 4) {
+        if (colorHistory.length >= 3) {
           colorHistory.removeAt(0);
         }
         colorHistory.add(paint.color);

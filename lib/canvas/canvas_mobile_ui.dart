@@ -4,6 +4,7 @@ import 'package:sketchspace/components/add_imported.dart';
 import 'package:sketchspace/components/brush_menu_mobile.dart';
 import 'package:sketchspace/components/collapsed_layer_button.dart';
 import 'package:sketchspace/components/color_selector.dart';
+import 'package:sketchspace/components/width_menu.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:provider/provider.dart';
 
@@ -20,12 +21,11 @@ class _CanvasUIState extends State<CanvasUIMobile> {
   }
 
   final double iconSize = 20;
-
+  final Color iconColor = Colors.black.withAlpha(200);
   @override
   Widget build(BuildContext context) {
     final drawingContext = context.read<DrawingContext>();
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+
 
     return Actions(
       actions: <Type, Action<Intent>>{
@@ -35,20 +35,6 @@ class _CanvasUIState extends State<CanvasUIMobile> {
       child: Stack(
         children: [
           Positioned(
-            bottom: 10,
-            left: 10,
-            child: Row(
-              children: [
-                AddImported(),
-                SketchColorPicker(
-                  onColorChanged: (c) {
-                    context.read<DrawingContext>().changeColor(c);
-                  },
-                ),
-              ],
-            ),
-          ),
-          Positioned(
             right: 10,
             top: 10,
             child: Column(
@@ -57,27 +43,50 @@ class _CanvasUIState extends State<CanvasUIMobile> {
                   onPressed: () {
                     importImage(drawingContext, context);
                   },
-                  icon: Icon(Icons.add, color: Colors.white, size: iconSize),
+                  icon: Icon(Icons.add, color: iconColor, size: iconSize),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Not implemented")),
+                    );
+                  },
                   icon: Icon(
-                    Icons.import_contacts,
-                    color: Colors.white,
+                    Icons.import_export,
+                    color: iconColor,
                     size: iconSize,
                   ),
                 ),
-                CollapsedLayerButton(
-                    iconSize: iconSize,
-                  ),
+                CollapsedLayerButton(iconSize: iconSize, iconColor: iconColor),
               ],
             ),
           ),
-          Positioned(bottom: 10, right: 10, child: WidthSelector()),
+
           Positioned(
             bottom: 10,
-            left: screenWidth * 0.5 - 30,
-            child: BrushMenuMobile(),
+            left: 10,
+            right: 10,
+            child: SizedBox(
+              height: 60,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: SketchColorPicker(
+                      onColorChanged: (c) {
+                        drawingContext.changeColor(c);
+                      },
+                    ),
+                  ),
+                  Align(alignment: Alignment.center, child: BrushMenuMobile()),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: WidthSelector(),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

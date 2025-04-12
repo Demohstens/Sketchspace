@@ -7,7 +7,6 @@ import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/classes/element.dart';
-import 'package:sketchspace/providers/sketch_canvas.dart';
 import 'package:vector_math/vector_math_64.dart' as math;
 
 class CanvasOverlay extends StatefulWidget {
@@ -102,9 +101,9 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                 );
               },
             ),
-            // // Controls
+            // Controls
             Positioned(
-              left: screenTopCenter.dx - (buttonSize / 2),
+              left: screenTopCenter.dx - 2 * buttonSize,
               top: screenPoints[0].dy - buttonSize - buttonPadding,
               child: Row(
                 children: [

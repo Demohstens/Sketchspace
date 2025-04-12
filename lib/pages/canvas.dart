@@ -12,7 +12,7 @@ import 'package:sketchspace/providers/settings.dart';
 
 class CanvasPage extends StatelessWidget {
   final _focusNode = FocusNode();
-  
+
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -20,41 +20,45 @@ class CanvasPage extends StatelessWidget {
     });
 
     // context.read<Worldspace>().loadFile([]);
-    return  Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () {
-              context.read<DrawingContext>().saveFile(context);
-            },
-          ),
-        ],
-        title: Text(context.watch<DrawingContext>().activeLayer.name),
-      ),
+    return Scaffold(
       // floatingActionButton: FloatingActionButton(onPressed: (){}),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       drawer: SketchDrawer(),
-      body: PieCanvas(child:  
-      
-      Stack(
+      body: Builder(
+        builder: (context) {
+          return PieCanvas(
+            child: Stack(
               children: [
                 Positioned.fill(
-                    child: CustomPaint(
-                      painter: BackGroundPainter(size: Size(context.width, context.height)),
-                    )
+                  child: CustomPaint(
+                    painter: BackGroundPainter(
+                      size: Size(context.width, context.height),
+                    ),
                   ),
-                Positioned.fill(
-                  child: CanvasViewport(),
                 ),
+                Positioned.fill(child: CanvasViewport()),
                 Visibility(
                   visible: true, // context.watch<DrawingContext>().ui_enabled,
-                  child: context.watch<Settings>().useMobile == true
-                      ? CanvasUIMobile()
-                      : CanvasUIDesktop(),
+                  child:
+                      context.watch<Settings>().useMobile == true
+                          ? CanvasUIMobile()
+                          : CanvasUIDesktop(),
+                ),
+                Positioned(
+                  left: 10,
+                  top: 10,
+                  child: IconButton(
+                    icon: Icon(Icons.menu, color: Colors.black.withAlpha(200),),
+                    onPressed: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                  ),
                 ),
               ],
-    )));
+            ),
+          );
+        },
+      ),
+    );
   }
 }

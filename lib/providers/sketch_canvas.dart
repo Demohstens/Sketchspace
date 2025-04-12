@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/layer.dart';
 import 'package:uuid/uuid.dart';
@@ -20,7 +19,7 @@ import 'package:uuid/uuid.dart';
 /// The canvas maintains a list of [Layer] objects and tracks which layer
 /// is currently active for drawing operations.
 
-class SketchCanvas extends ChangeNotifier {
+class SketchCanvas  {
   // Canvas properties
   String id; // UUID - used for actual management of the canvas and data storage
   String? fileName; // Name of the file - used for displaying in the UI
@@ -94,7 +93,6 @@ class SketchCanvas extends ChangeNotifier {
       this.fileName = canvas.fileName;
       this.filePath = canvas.filePath;
       isDirty = canvas.isDirty;
-      notifyListeners();
     } else {
       // Create new canvas with given properties or defaul
       this.width = width??  1080;
@@ -119,7 +117,6 @@ class SketchCanvas extends ChangeNotifier {
       isDirty = false;
     }
     print("REINITIALIZED");
-    notifyListeners();
   }
 
   void removeElements(Set<SketchElement> elements) {
@@ -166,8 +163,9 @@ class SketchCanvas extends ChangeNotifier {
     return newLayer;
   }
 
-  void removeLayer(Layer layer) {
-    layers.remove(layer.id);
+  void removeLayerById(String layerId) {
+    print("Removing layer with id $layerId");
+    layers.remove(id);
   }
 
   void setActiveLayer(Layer layer) {

@@ -20,16 +20,25 @@ class SketchContextMenu extends StatelessWidget {
           left: controller.position.dx,
           top: controller.position.dy - 20,
           child: Container(
-            color: Colors.black.withAlpha(200),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.black.withAlpha(200),
+            ),
             child: Column(
               children: [
                 TextButton(
                   onPressed: () {
-                    DrawingContext drawingContext = context.read<DrawingContext>();
-                    Offset transformedPosition = context.read<TransformController>().inversePoint(controller.position);
+                    DrawingContext drawingContext =
+                        context.read<DrawingContext>();
+                    Offset transformedPosition = context
+                        .read<TransformController>()
+                        .inversePoint(controller.position);
                     Clipboard.getData('text/plain').then((value) {
                       if (value != null) {
-                        drawingContext.insertText(transformedPosition, value.text!);
+                        drawingContext.insertText(
+                          transformedPosition,
+                          value.text!,
+                        );
                       }
                     });
                     controller.hide();
@@ -59,7 +68,12 @@ class SketchContextMenu extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("This is not Implemented yet :("), duration: Duration(milliseconds: 500),));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("This is not Implemented yet :("),
+                        duration: Duration(milliseconds: 500),
+                      ),
+                    );
                     controller.hide();
                   },
                   child: Row(
@@ -80,4 +94,3 @@ class SketchContextMenu extends StatelessWidget {
     );
   }
 }
-

@@ -1,12 +1,17 @@
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sketchspace/components/context_menu/stroke_context.dart';
+import 'package:sketchspace/providers/drawing_context.dart';
 
 class LayerContextMenu extends StatelessWidget {
   final PositionedContextController controller;
   final Widget child;
-  const LayerContextMenu(this.controller, this.child, {Key? key} ) : super(key: key);
-
+  final String layerId;
+  const LayerContextMenu(this.controller, this.child, this.layerId, {super.key});
+  final style =  const TextStyle(
+    color: Colors.white,
+    fontSize: 16,
+  );
   @override
   Widget build(BuildContext context) {
     return OverlayPortal(
@@ -19,28 +24,27 @@ class LayerContextMenu extends StatelessWidget {
             color: Colors.grey,
             child: Column(
               children: [
-                TextButton(onPressed: () {
-                  controller.hide();
-                }, child: const Text("Delete")),
-                TextButton(onPressed: () {
-                  controller.hide();
-                }, child: const Text("Merge")),
-                TextButton(onPressed: () {
-                  controller.hide();
-                }, child: const Text("Duplicate")),
-                TextButton(onPressed: () {
-                  controller.hide();
-                }, child: const Text("Move Up")), 
-                TextButton(onPressed: () {
-                  controller.hide();
-                }, child: const Text("Move Down")),
+                TextButton(
+                  onPressed: () {
+                    print("Deleting Layer");
+                    context.read<DrawingContext>().removeLayer(
+                      layerId,
+                    );
+                  },
+                  child:  Text("Delete", style: style,),
+                ),
+                TextButton(
+                  onPressed: () {
+                    controller.hide();
+                  },
+                  child: Text("Merge", style: style),
+                ),
               ],
             ),
-          
-        ));
-        },
+          ),
+        );
+      },
       child: child,
-      );
+    );
   }
-
 }
