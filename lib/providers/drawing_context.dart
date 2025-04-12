@@ -85,8 +85,8 @@ class DrawingContext with ChangeNotifier {
     notifyListeners();
   }
 
-  void insertText(Offset p) {
-    final text= TextElement(text: "YIPPEE", fontSize: 12, position: p, layerId: activeLayer.id);
+  void insertText(Offset p, String src) {
+    final text = TextElement(text: src, fontSize: 12, position: p, layerId: activeLayer.id);
     activeLayer.addElement(text);
     notifyListeners();
   }

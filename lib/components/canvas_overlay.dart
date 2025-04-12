@@ -10,10 +10,7 @@ import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/providers/sketch_canvas.dart';
 import 'package:vector_math/vector_math_64.dart' as math;
 
-
 class CanvasOverlay extends StatefulWidget {
-  
-
   const CanvasOverlay({super.key});
 
   @override
@@ -21,22 +18,27 @@ class CanvasOverlay extends StatefulWidget {
 }
 
 class _CanvasOverlayState extends State<CanvasOverlay> {
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Matrix4>(
       valueListenable: context.read<TransformController>(),
       builder: (context, matrix, child) {
-        Set<String> selectedIds = context.watch<DrawingContext>().selectedElementIds;
-        final selectedElements = context.read<DrawingContext>().canvas.getElementsByIds(selectedIds);
+        Set<String> selectedIds =
+            context.watch<DrawingContext>().selectedElementIds;
+        final selectedElements = context
+            .read<DrawingContext>()
+            .canvas
+            .getElementsByIds(selectedIds);
 
         if (selectedElements.isEmpty) {
           return const SizedBox.shrink();
         }
         Rect combinedBounds = selectedElements
-          .map((e) => e.boundary)
-          .reduce((a, b) => a.expandToInclude(b));
-        final screenBounds = context.read<TransformController>().transformRect(combinedBounds);
+            .map((e) => e.boundary)
+            .reduce((a, b) => a.expandToInclude(b));
+        final screenBounds = context.read<TransformController>().transformRect(
+          combinedBounds,
+        );
         List<Offset> screenPoints = [
           screenBounds.topLeft,
           screenBounds.topRight,
@@ -47,29 +49,23 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
         final screenTopCenter = (screenPoints[0] + screenPoints[1]) / 2.0;
         const double buttonSize = 50.0;
         const double buttonPadding = 5.0;
-        
+
         Offset dragStartPosition = Offset.zero;
 
         return Stack(
           children: [
             TransformableBox(
-              resizable: false, //TODO reimplement scaling.
+              resizable: true, //TODO reimplement scaling.
               rect: screenBounds,
               onResizeUpdate: (result, event) {
-                final globalPosition = event.globalPosition;
-                final localPosition = context.read<TransformController>().inversePoint(globalPosition);
-
-                // Apply the scaling matrix to the element
-                selectedElements.map((e) {
-                  for (var element in selectedElements) {
-                    element.transform(
-                      Matrix4.identity()
-                        ..scale(result.delta.dx, result.delta.dy)
-                        ..translate(result.delta.dx, result.delta.dy)
-                    );
-                  }
-                  
-                  });
+                final transformedPosition = context
+                    .read<TransformController>()
+                    .inversePoint(result.delta);
+                
+                for (SketchElement element in selectedElements) {
+                  // Apply the scaling matrix to the element
+                  element.scale(math.Vector2(transformedPosition.dx, transformedPosition.dy));
+                }
 
                 // Repaint the canvas
                 context.read<DrawingContext>().repaint();
@@ -79,19 +75,22 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
               },
               onDragUpdate: (result, event) {
                 //  Convert the global position to canvas coordinates
-                  final globalPosition = event.globalPosition;
-                  final transformedPos = context.read<TransformController>().inversePoint(globalPosition);
+                final globalPosition = event.globalPosition;
+                final transformedPos = context
+                    .read<TransformController>()
+                    .inversePoint(globalPosition);
 
-                  // Calculate the delta relative to the element's current position
-                  final delta = transformedPos - selectedElements.first.boundary.center;
+                // Calculate the delta relative to the element's current position
+                final delta =
+                    transformedPos - selectedElements.first.boundary.center;
 
-                  // Translate the selected element by the delta
-                  for (var element in selectedElements) {
-                    element.translate(delta);
-                  }
+                // Translate the selected element by the delta
+                for (var element in selectedElements) {
+                  element.translate(delta);
+                }
 
-                  // Repaint the canvas
-                  context.read<DrawingContext>().repaint();
+                // Repaint the canvas
+                context.read<DrawingContext>().repaint();
               },
               contentBuilder: (context, rect, flip) {
                 return Container(
@@ -99,9 +98,10 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                     color: Colors.black.withAlpha(20),
                     border: Border.all(color: Colors.black, width: 1.5),
                     borderRadius: BorderRadius.circular(5),
-                  ), 
+                  ),
                 );
-              }  ),
+              },
+            ),
             // // Controls
             Positioned(
               left: screenTopCenter.dx - (buttonSize / 2),
@@ -113,16 +113,18 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
                     iconSize: buttonSize * 0.7,
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () {
-                      context.read<DrawingContext>().canvas.removeElements(selectedElements);
+                      context.read<DrawingContext>().canvas.removeElements(
+                        selectedElements,
+                      );
                       context.read<DrawingContext>().unselectAll();
                       context.read<DrawingContext>().repaint();
-                    }
+                    },
                   ),
-                  if (true) 
+                  if (true)
                     SketchColorPicker(
                       onColorChanged: (c) {
                         for (var el in selectedElements) {
-                          (el as Stroke).color = c; 
+                          (el as Stroke).color = c;
                         }
                         context.read<DrawingContext>().repaint();
                       },
@@ -137,13 +139,7 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
   }
 }
 
-
-enum Position {
-  topLeft,
-  topRight,
-  bottomRight,
-  bottomLeft,
-}
+enum Position { topLeft, topRight, bottomRight, bottomLeft }
 
 class DragHandle extends StatefulWidget {
   final Position position;
@@ -166,11 +162,12 @@ class DragHandle extends StatefulWidget {
   @override
   State<DragHandle> createState() => _DragHandleState();
 }
+
 class _DragHandleState extends State<DragHandle> {
   @override
   Widget build(BuildContext context) {
     final rotationAngle = (widget.position.index * 90 - 45) * (math.pi / 180);
-    
+
     return Positioned(
       left: widget.origin.dx - (widget.size / 2),
       top: widget.origin.dy - (widget.size / 2),

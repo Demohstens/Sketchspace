@@ -1,15 +1,17 @@
 import 'dart:math';
 
 import 'package:awesome_extensions/awesome_extensions.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
+import 'package:sketchspace/components/context_menu/context_menu.dart';
+import 'package:sketchspace/components/context_menu/stroke_context.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:sketchspace/tools/tools.dart';
-import 'package:vector_math/vector_math_64.dart';
 
 class CanvasInputHandler extends StatefulWidget {
   final Widget? child;
@@ -31,6 +33,7 @@ class CanvasInputHandler extends StatefulWidget {
 class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   final ScrollController _horizontalController = ScrollController();
   final ScrollController _verticalController = ScrollController();
+  final contextMenuController = PositionedContextController();
   final FocusNode _focusNode = FocusNode();
 
   Offset scaleStart = Offset.zero;
@@ -80,7 +83,6 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   }
 
   void cancelDrawing() {
-    print("cancelled drawing");
     context.read<DrawingContext>().cancelDrawing();
     isDrawing = false;
   }
@@ -108,6 +110,7 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   void onLongPress(DrawingContext c, Offset transformedPosition) {
     canDraw = false;
     potentialLongPress = false;
+    c.cancelDrawing();
     c.selectElement(transformedPosition);
   }
 
@@ -140,6 +143,7 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
       Duration(milliseconds: context.read<Settings>().drawCooldown),
       () {
         canDraw = true;
+        inputEvents.clear();
       },
     );
   }
@@ -208,38 +212,67 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               onDoubleTap(context);
             }
 
-            // Two fingers down starts the scaling function:
-            if (inputEvents.length == 2) {
-              isScaling = true;
-              final point1 = inputEvents[0].position;
-              final point2 = inputEvents[1].position;
-              scaleStartDistance = (point1 - point2).distance;
-              scaleStartMidpoint = Offset(
-                (point1.dx + point2.dx) / 2,
-                (point1.dy + point2.dy) / 2,
-              );
-              scaleStartMatrix = context.read<TransformController>().value;
-            }
-
             final transformedPoint = context
                 .read<TransformController>()
                 .inversePoint(event.localPosition);
-            // Single finger/pointer function:
-            if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
-              if (isShiftPressed || tool == Tool.mouse) {
-                startPanning(event.localPosition);
-                context.read<DrawingContext>().selectElement(transformedPoint);
-              } else if (canDraw && tool == Tool.brush) {
-                startDrawing();
-                context.read<DrawingContext>().addPoint(transformedPoint);
-              } else if (tool == Tool.text) {
-                context.read<DrawingContext>().insertText(transformedPoint);
-              }
-            } else if (inputEvents.length == 2 &&
-                event.buttons == kTouchContact) {
-              cancelDrawing();
-              startScaling(event.localPosition);
-              lastScaleFactor = 1.0;
+
+            switch (event.buttons) {
+              case kPrimaryButton:
+                {
+                  switch (inputEvents.length) {
+                    case 1:
+                      {
+                        if (isShiftPressed || tool == Tool.mouse) {
+                          startPanning(event.localPosition);
+                          context.read<DrawingContext>().selectElement(
+                            transformedPoint,
+                          );
+                        } else if (canDraw && tool == Tool.brush) {
+                          startDrawing();
+                          context.read<DrawingContext>().addPoint(
+                            transformedPoint,
+                          );
+                        } else if (tool == Tool.text) {
+                          context.read<DrawingContext>().insertText(
+                            transformedPoint,
+                            "MEGA"
+                          );
+                        }
+                      }
+                    // Two fingers down starts the scaling function:
+                    case 2:
+                      {
+                        if (inputEvents.length == 2 &&
+                            event.buttons == kTouchContact) {
+                          isScaling = true;
+                          final point1 = inputEvents[0].position;
+                          final point2 = inputEvents[1].position;
+                          scaleStartDistance = (point1 - point2).distance;
+                          scaleStartMidpoint = Offset(
+                            (point1.dx + point2.dx) / 2,
+                            (point1.dy + point2.dy) / 2,
+                          );
+                          scaleStartMatrix =
+                              context.read<TransformController>().value;
+
+                          cancelDrawing();
+                          startScaling(event.localPosition);
+                          lastScaleFactor = 1.0;
+                        }
+                      }
+                  }
+                  break;
+                }
+              case kSecondaryButton:
+                {
+                  contextMenuController.setPosition(event.localPosition);
+                  contextMenuController.show();
+                }
+              case kTertiaryButton:
+                {
+                  startPanning(event.localPosition);
+                  break;
+                }
             }
 
             timeOfLastDown = DateTime.now();
@@ -279,7 +312,8 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               }
             }
 
-            if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
+            if (event.buttons == kPrimaryButton && inputEvents.length == 1 ||
+                event.buttons == kTertiaryButton) {
               if (isPanning) {
                 final delta = event.localPosition - panStart;
                 final controller = context.read<TransformController>();
@@ -290,10 +324,16 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                 controller.value = matrix;
                 panStart = event.localPosition;
               } else if (isDrawing) {
-                final transformedPoint = context
-                    .read<TransformController>()
-                    .inversePoint(event.localPosition);
-                context.read<DrawingContext>().addPoint(transformedPoint);
+                if (!canDraw) {
+                  isDrawing = false;
+                  context.read<DrawingContext>().cancelDrawing();
+                } else {
+                  potentialLongPress = false;
+                  final transformedPoint = context
+                      .read<TransformController>()
+                      .inversePoint(event.localPosition);
+                  context.read<DrawingContext>().addPoint(transformedPoint);
+                }
               }
             }
 
@@ -325,17 +365,19 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               _handleScroll(event, context);
             }
           },
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ValueListenableBuilder<Matrix4>(
-                valueListenable: context.read<TransformController>(),
-                builder: (context, matrix, child) {
-                  return Transform(transform: matrix, child: widget.child);
-                },
-              ),
-            ],
-          ),
+          child: SketchContextMenu(
+            contextMenuController,
+            Stack(
+              fit: StackFit.expand,
+              children: [
+                ValueListenableBuilder<Matrix4>(
+                  valueListenable: context.read<TransformController>(),
+                  builder: (context, matrix, child) {
+                    return Transform(transform: matrix, child: widget.child);
+                  },
+                ),
+              ],
+          )),
         ),
       ),
     );

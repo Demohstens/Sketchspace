@@ -1,5 +1,6 @@
 
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 import 'package:sketchspace/classes/element.dart';
@@ -86,6 +87,11 @@ class Stroke extends SketchElement {
 
   @override
   void draw(Canvas c) {
+    if (path.points.isEmpty) return; // No points to draw
+    if (path.points.length < 5) {
+      c.drawOval(Rect.fromCenter(center: path.points[0], width: paint.strokeWidth, height: paint.strokeWidth), paint..style = PaintingStyle.fill);
+      return;
+    }
     c.drawPath(path.path, paint);
   }
 

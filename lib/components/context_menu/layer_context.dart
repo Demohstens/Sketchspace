@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:sketchspace/components/context_menu/stroke_context.dart';
 
 class LayerContextMenu extends StatelessWidget {
   final PositionedContextController controller;
@@ -43,12 +44,3 @@ class LayerContextMenu extends StatelessWidget {
   }
 
 }
-
-class PositionedContextController extends OverlayPortalController {
-  Offset position = const Offset(0, 0);
-  
-  void setPosition(Offset position) {
-    this.position = position;
-  }
-
-} 
