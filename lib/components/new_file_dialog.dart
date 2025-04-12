@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
-import 'package:sketchspace/classes/sketch_canvas.dart';
+import 'package:sketchspace/providers/sketch_canvas.dart';
 import 'package:sketchspace/main.dart';
 import 'package:sketchspace/pages/canvas.dart';
 
@@ -42,9 +42,10 @@ class NewFileDialog extends StatelessWidget {
                   double width = double.tryParse(widthController.text) ?? 0;
                   double height = double.tryParse(heightController.text) ?? 0;
                   SketchCanvas canvas = SketchCanvas(
-                  fileName: name,
-                  width: width,
-                  height: height);
+                    fileName: name,
+                    width: width,
+                    height: height
+                  );
                   context.read<DrawingContext>().pushCanvas(canvas);
                   Navigator.pop(context);
                   Navigator.push(

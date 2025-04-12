@@ -1,5 +1,7 @@
 import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/elements/image_el.dart';
+import 'package:sketchspace/classes/elements/stroke_element.dart';
+import 'package:sketchspace/classes/elements/text_element.dart';
 import 'package:sketchspace/classes/stroke.dart';
 import 'package:uuid/uuid.dart';
 
@@ -32,7 +34,6 @@ class Layer {
 
 
   void addElement(SketchElement element) {
-    print("Adding Element $element");
     elements[element.id] = element;
   }
 
@@ -80,6 +81,9 @@ class Layer {
             elementsTemp[iElement.id] = iElement;
             iElement.load();
             break; 
+          case "text":
+            elementsTemp[el["id"]] = TextElement.fromJson(el);
+            break;
         }
       } catch (e) {
         print(e); 

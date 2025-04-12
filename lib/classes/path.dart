@@ -17,8 +17,12 @@ class SketchPath {
     _originalPoints = List.from(points); // Save original points
     
     if (points.isNotEmpty) {
+      List<Offset> processedPoints = [];
       // Process points with perfect_freehand only for display, not storage
-      final processedPoints = getStroke(
+      if (points.length <= 3) {
+        processedPoints = points;
+      } else {
+        processedPoints = getStroke(
         points.map((e) => PointVector(e.dx, e.dy)).toList(), 
         options: StrokeOptions(
           size: 1, 
@@ -28,6 +32,8 @@ class SketchPath {
         )
       );
       
+      }
+    
       // Create path from processed points
       if (processedPoints.isNotEmpty) {
         _path.moveTo(processedPoints.first.dx, processedPoints.first.dy);
@@ -71,20 +77,40 @@ class SketchPath {
         }
       }
   }
+
+  void scale(Vector2 scale) {
+    // Scale original points first since they are the source of truth
+    for (int i = 0; i < _originalPoints.length; i++) {
+      _originalPoints[i] = Offset(
+        _originalPoints[i].dx * scale.x,
+        _originalPoints[i].dy * scale.y,
+      );
+    }
+    // Recalculate the path with the scaled points
+    recalculatePath();
+  }
+
   void transform(Matrix4 transform) {
     // Transform original points first since they are the source of truth
     for (int i = 0; i < _originalPoints.length; i++) {
       // Create a Vector3 instead of Vector4 to avoid perspective issues
-      final Vector3 point3 = Vector3(_originalPoints[i].dx, _originalPoints[i].dy, 0);
+      final Vector3 point3 = Vector3(
+        _originalPoints[i].dx,
+        _originalPoints[i].dy,
+        0,
+      );
+
       // Apply the transformation directly to the Vector3
-      transform.transform3(point3);
+      // This correctly applies rotation, scaling, AND translation from the matrix
+      transform.transform3(point3); // <--- Correct standard application
+
       // Update the original point with the transformed coordinates
       _originalPoints[i] = Offset(point3.x, point3.y);
     }
     // Recalculate the path with the transformed points
     recalculatePath();
-    // _path = _path.transform(transform.storage);
   }
+
 
   Map<String, dynamic> toJson() {
     // Store original points, not processed ones

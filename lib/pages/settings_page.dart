@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:sketchspace/providers/settings.dart';
 
 class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, Settings settings, child) {
@@ -27,7 +29,7 @@ class SettingsPage extends StatelessWidget {
                   child: SwitchListTile(
                       title: const Text("Dark Mode"),
                       subtitle: const Text("Toggle dark mode."),
-                      value: context.watch<Settings>().darkModeEnabled,
+                      value: context.watch<Settings>().useDarkMode,
                       onChanged: (bool newValue) {
                         context.read<Settings>().toggleDarkMode();
               })),

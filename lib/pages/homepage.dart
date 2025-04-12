@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/components/new_file_dialog.dart';
 import 'package:sketchspace/utils/draw_file.dart';
@@ -61,6 +62,7 @@ class _FileGridState extends State<FileGrid> {
 
   @override
   Widget build(BuildContext context) {
+
     getFiles().then((value) {
       setState(() {
         files = value;
@@ -84,7 +86,8 @@ class DrawFileButton extends StatefulWidget {
   final File file;
   final Function setFiles;
   @override
-  DrawFileButton(this.file, this.setFiles);
+  const DrawFileButton(this.file, this.setFiles, {super.key});
+  @override
   _DrawFileButtonState createState() => _DrawFileButtonState(file);
 }
 

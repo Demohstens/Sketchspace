@@ -1,14 +1,10 @@
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/components/add_imported.dart';
-import 'package:sketchspace/components/brush_menu.dart';
-import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/tools/brush.dart';
-import 'package:sketchspace/tools/mouse.dart';
+import 'package:sketchspace/tools/tools.dart';
 
 // possible to use menu anchor instead?
 // https://api.flutter.dev/flutter/material/PopupMenuButton-class.html
@@ -16,115 +12,160 @@ import 'package:sketchspace/tools/mouse.dart';
 enum MenuEntry { width }
 
 class BrushMenuMobile extends StatefulWidget {
-
-  const BrushMenuMobile({
-    Key? key,
-  }) : super(key: key);
+  const BrushMenuMobile({super.key});
 
   @override
   State<BrushMenuMobile> createState() => BrushMenuMobileState();
 }
 
 class BrushMenuMobileState extends State<BrushMenuMobile> {
-  final MenuController _widthMenuController = MenuController();
   final MenuController _colorMenuController = MenuController();
-  final MenuController menuController = MenuController();
+  final PieMenuController menuController = PieMenuController();
   @override
   Widget build(BuildContext context) {
     Color secondary = context.watch<Settings>().secondaryColor;
-    return Material(
-      color: Colors.transparent,
-      child: MenuAnchor(
-        controller: menuController,
-        menuChildren: [
-          AddImported(),
-          MouseToolButton(),
-          BrushToolButton(),
-          MenuAnchor(
-            controller: _colorMenuController,
-            menuChildren: [
-              SketchColorPicker(onColorChanged: (c) {context.read<DrawingContext>().changeColor(c);},),
-            ],
-            child: IconButton(onPressed: () {
-              _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();
-            }, icon: Icon(Icons.color_lens, color: context.read<DrawingContext>().color,)),
-          ),
-          MenuAnchor(
-                controller: _widthMenuController,
-                menuChildren: <Widget>[_widthSlider(context)],
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque, // Ensures the entire area is clickable
-                  onTap: () {
-                    switch (_widthMenuController.isOpen) {
-                      case true:
-                        _widthMenuController.close();
-                        break;
-                      case false:
-                        _widthMenuController.open();
-                        break;
-                    }
-                  },
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    child: Icon(
-                      Icons.circle,
-                      size: context.read<DrawingContext>().strokeWidth,
-                      color: secondary,
-                    ),
-                  ),
-                ),
-        )
+    return PieMenu(
+      theme: PieTheme(
+        overlayColor: Colors.transparent,
+        radius: 80,
+        iconSize: 20,
+        childBounceEnabled: false,
+        delayDuration: Duration.zero,
+        spacing: 0,
+      ),
+      controller: menuController,
+      actions: [
+
+        PieAction(
+          child: Icon(Icons.brush, color: secondary, size: 15),
+          onSelect: () {
+            context.read<DrawingContext>().setTool(Tool.brush);
+          },
+          tooltip: Text("Brush"),
+        ),
+        PieAction(
+          child: Icon(Icons.mouse, color: secondary, size: 30),
+          onSelect: () {
+            context.read<DrawingContext>().setTool(Tool.mouse);
+          },
+          tooltip: Text("Mouse"),
+        ),
+        // PieAction(
+        //   child: Icon(Icons.text_fields, color: secondary, size: 15),
+        //   onSelect: () {
+        //     context.read<DrawingContext>().setTool(Tool.text);
+        //   },
+        //   tooltip: Text("Text"),
+        // ), TODO add text again
+        
       ],
-        child:CircleAvatar( 
-          backgroundColor: Colors.transparent, 
-          child: IconButton(
-          tooltip: "Brush Menu",
-          color: context.read<Settings>().secondaryColor,
-          onPressed: () {
-          switch (menuController.isOpen) {
-            case true: 
-              {
-                setState(() {
-                  menuController.close();
-
-                });
-              }
-              break;
-            case false:
-              {
-                setState(() {
-                  menuController.open();
-
-                });
-              }
-              break;
-            
-          }
-        }, icon: menuController.isOpen ? Icon(Icons.close) : Icon(Icons.menu)),
-    )));
-  }
-
-  Widget _colorButton(Color color) {
-    return CircleAvatar(
-      backgroundColor: color,
-      radius: 15,
-      child: null,
+      child: IconButton(
+        onPressed: () {
+          _colorMenuController.isOpen
+              ? _colorMenuController.close()
+              : _colorMenuController.open();
+          menuController.toggleMenu();
+        },
+        icon: Icon(Icons.menu, color: secondary, size: 40),
+      ),
     );
   }
 
-  Widget _widthSlider(BuildContext context) {
-    return Slider(
-      value: context.read<DrawingContext>().strokeWidth,
-      min: 1,
-      max: 20,
-      divisions: 19,
-      label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
-      onChanged: (double value) {
-        context.read<DrawingContext>().changeWidth(value);
-      },
-    );
-  }
+  //   Material(
+  //     color: Colors.transparent,
+  //     child: MenuAnchor(
+  //       controller: menuController,
+  //       menuChildren: [
+  //         TextToolButton(),
+  //         AddImported(),
+  //         MouseToolButton(),
+  //         BrushToolButton(),
+  //         MenuAnchor(
+  //           controller: _colorMenuController,
+  //           menuChildren: [
+  //             SketchColorPicker(onColorChanged: (c) {context.read<DrawingContext>().changeColor(c);},),
+  //           ],
+  //           child: IconButton(onPressed: () {
+  //             _colorMenuController.isOpen ? _colorMenuController.close() : _colorMenuController.open();
+  //           }, icon: Icon(Icons.color_lens, color: context.read<DrawingContext>().color,)),
+  //         ),
+  //         MenuAnchor(
+  //               controller: _widthMenuController,
+  //               menuChildren: <Widget>[_widthSlider(context)],
+  //               child: GestureDetector(
+  //                 behavior: HitTestBehavior.opaque, // Ensures the entire area is clickable
+  //                 onTap: () {
+  //                   switch (_widthMenuController.isOpen) {
+  //                     case true:
+  //                       _widthMenuController.close();
+  //                       break;
+  //                     case false:
+  //                       _widthMenuController.open();
+  //                       break;
+  //                   }
+  //                 },
+  //                 child: Container(
+  //                   height: 40,
+  //                   width: 40,
+  //                   child: Icon(
+  //                     Icons.circle,
+  //                     size: context.read<DrawingContext>().strokeWidth,
+  //                     color: secondary,
+  //                   ),
+  //                 ),
+  //               ),
+  //       )
+  //     ],
+  //       child:CircleAvatar(
+  //         backgroundColor: Colors.transparent,
+  //         child: IconButton(
+  //           iconSize: 40,
+  //         tooltip: "Brush Menu",
+  //         color: context.read<Settings>().secondaryColor,
+  //         onPressed: () {
+  //         switch (menuController.isOpen) {
+  //           case true:
+  //             {
+  //               setState(() {
+  //                 menuController.close();
+
+  //               });
+  //             }
+  //             break;
+  //           case false:
+  //             {
+  //               setState(() {
+  //                 menuController.open();
+
+  //               });
+  //             }
+  //             break;
+
+  //         }
+  //       }, icon: menuController.isOpen ? Icon(Icons.close) : Icon(Icons.menu)),
+  //   )));
+  // }
+
+  // Widget _colorButton(Color color) {
+  //   return CircleAvatar(
+  //     backgroundColor: color,
+  //     radius: 15,
+  //     child: null,
+  //   );
+  // }
+
+  // Widget _widthSlider(BuildContext context) {
+  //   return Slider(
+  //     value: context.read<DrawingContext>().strokeWidth,
+  //     min: 1,
+  //     max: 20,
+  //     divisions: 19,
+  //     label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
+  //     onChanged: (double value) {
+  //       context.read<DrawingContext>().changeWidth(value);
+  //     },
+  //   );
+  // }
 }
 
 enum ColorButton { red, green, blue }
@@ -154,35 +195,46 @@ ColorButton ColorToColotButton(Color color) {
 
 class WidthSelector extends StatelessWidget {
   final MenuController _menuController = MenuController();
+  final bool isVertical;
 
-  Widget _widthSlider(BuildContext context) {
-    return Slider(
-      value: context.read<DrawingContext>().strokeWidth,
-      min: 1,
-      max: 20,
-      divisions: 19,
-      label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
-      onChanged: (double value) {
-        context.read<DrawingContext>().changeWidth(value);
-      },
-    );
-  }
+  WidthSelector({super.key, this.isVertical = false});
+
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
-          controller: _menuController,
-          menuChildren: <Widget>[_widthSlider(context)],
-          child: GestureDetector(
-              onTap: () {
-                _menuController.open();
-              },
-              child: Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: context.watch<Settings>().secondaryColor)),
-                  child: Icon(Icons.circle,
-                      size: context.read<DrawingContext>().strokeWidth,
-                      color: context.watch<Settings>().secondaryColor))));
+      controller: _menuController,
+      menuChildren: <Widget>[
+        Slider.adaptive(
+          value: context.read<DrawingContext>().strokeWidth,
+          min: 1,
+          max: 50,
+          divisions: 49,
+          label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
+          onChanged: (double value) {
+            context.read<DrawingContext>().changeWidth(value);
+          },
+        ),
+      ],
+      child: GestureDetector(
+        onTap: () {
+          _menuController.open();
+        },
+        child: Container(
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: context.watch<Settings>().secondaryColor,
+            ),
+          ),
+          child: Icon(
+            Icons.circle,
+            size: context.read<DrawingContext>().strokeWidth,
+            color: context.watch<Settings>().secondaryColor,
+          ),
+        ),
+      ),
+    );
   }
 }
