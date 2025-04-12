@@ -191,6 +191,7 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
         child: Listener(
           behavior: HitTestBehavior.opaque,
           onPointerDown: (event) {
+            // Creates and adds the event to the list of events being tracke
             inputEvents.add(
               SketchPointerEvent(
                 pointer: event.pointer,
@@ -200,13 +201,16 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               ),
             );
 
+            // Starts the Long press timer
             startPotentialLongPress(context, event.localPosition);
             
+            // checks for double taps.
             final timeDif = timeOfLastDown.difference(DateTime.now()).abs();
             if (timeDif < Duration(milliseconds: 200) && inputEvents.length == 1) {
               onDoubleTap(context);
             }
-
+            
+            // Two fingers down starts the scaling function:
             if (inputEvents.length == 2) {
               isScaling = true;
               final point1 = inputEvents[0].position;
@@ -219,12 +223,17 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               scaleStartMatrix = context.read<TransformController>().value;
             }
 
+            final transformedPoint = context
+              .read<TransformController>()
+              .inversePoint(event.localPosition);
+            // Single finger/pointer function:
             if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
+              
               if (isShiftPressed || tool == Tool.mouse) {
                 startPanning(event.localPosition);
+                context.read<DrawingContext>().selectElement(transformedPoint);
               } else if (canDraw && tool == Tool.brush) {
                 startDrawing();
-                final transformedPoint = context.read<TransformController>().inversePoint(event.localPosition);
                 context.read<DrawingContext>().addPoint(transformedPoint);
               }
             } else if (inputEvents.length == 2 && event.buttons == kTouchContact) {
@@ -250,7 +259,10 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
             canDraw = true;
           },
           onPointerMove: (event) {
-            potentialLongPress = false;
+            if ((inputEvents.last.position - event.localPosition).distance > 10) {
+              potentialLongPress = false;
+              context.read<DrawingContext>().unselectAll();
+            }
             
             for (int i = 0; i < inputEvents.length; i++) {
               if (inputEvents[i].pointer == event.pointer) {
