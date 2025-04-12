@@ -14,11 +14,8 @@
     ✔ Show delete button @done(24-08-11 15:09)
     ✔ Display grid dynamically @done(24-08-11 17:24)
 ☐ Thumbnails
-✔ settings menu @done(24-08-11 18:45)
 ☐ Share 
 https://pub.dev/packages/share_pluss
-☐ Interface
-    ☐ Custom Context Menu @done(24-08-11 18:45)
 ☐ toasts 
 ☐ Button to hot switch between the last two brushes
 ☐ Custom Color palette
@@ -27,16 +24,10 @@ https://pub.dev/packages/share_pluss
 ☐ Layers (Moveable, hideable, etc) using caching 
     ✔ Layer selection @done(25-03-25 21:45)
     ✔ Layer visibility @done(25-03-25 21:45)
-    ☐ Layer reordering
-    ☐ Layer merging
+    ☐ Layer reordering / merging
     ☐ Layer CRUD
-    ☐ Layer locking
-    ☐ Layer opacity
-    ☐ Layer blending modes
-    ☐ Layer masks
-    ☐ Layer Moving
-☐ Images
-☐ Text
+    ☐ Layer locking / opacity / blending modes/ masks / moving
+✔ Images @done(25-04-13 01:17)
 ☐ Shapes (Arcs, squares, circles, etc)
 ✔ haptic feedback on android @done(24-08-11 14:48) alpha v.0.0.2
 ✔ undo/redo @done(24-08-11 01:50)
@@ -61,7 +52,7 @@ https://pub.dev/packages/share_pluss
     - file picker
     - color picker
     - share
-    - floating draggable wudget 
+    - floating draggable widget 
     - flutter_svg: ^2.0.10+1
     - shared_preferences
     - syncfusion_flutter_sliders: ^26.2.9
@@ -73,35 +64,10 @@ https://pub.dev/packages/share_pluss
 
 
 ✔ fix selecting strokes  | CANCELLED FOR NOW @done(24-08-15 00:32)
-☐ fix and make remove stroke more performant
+✔ fix and make remove stroke more performant @done(25-04-13 01:15)
 
 
 ---
 - Moveable, modular Interface
 - Tablet mode
 - hotkeys
-
-# Selection logic:
-1. detect a tap & hold gesture on the GestureDetecter 
-2. Pass that coordinate to the DrawingContext's selectStroke method
-3.1. Check each strokes boundary box for a match and return a list of possible matches
-3.2. narrow down the matches by checking each individual point (Possibly stop once one is "close enough")
-4. Create a temporary layer for the stroke that is drawn above the canvas allowing for free movement
-5. Once let go, readd the stroke to the list of strokes in the buffer and transform it's coordinates
-6. (Maybe also show highlight points to transform? Such as ends of a line. Also allow for scaling?)
-
-# Pan and Zoom
-Option 1:
-    Use a common CustomPaint object and paint a static lazy image of the canvas on it. 
-    Then use a Transform widget to move and scale the canvas then restore and draw the current 
-    strokes on top of it before merging it with the static image.
-Option 2:
-    Use a CustomPaint object for the canvas and a separate CustomPaint object for the strokes. 
-    Then use a Transform widget to move and scale the canvas and strokes separately. 
-    This would require a lot of extra logic to keep the strokes in sync with the canvas.
-Option 3: 
-    Use a main global canvsa to lazypaint on, then use a Transform widget to move and scale the canvas. 
-    Then use a Active Painter to draw acoording to the TransFormationController.
-
-Option 4: 
-    Subtract the size difference of the two canvases, 
