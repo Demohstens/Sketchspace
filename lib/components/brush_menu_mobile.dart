@@ -50,13 +50,13 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
           },
           tooltip: Text("Mouse"),
         ),
-        // PieAction(
-        //   child: Icon(Icons.text_fields, color: secondary, size: 15),
-        //   onSelect: () {
-        //     context.read<DrawingContext>().setTool(Tool.text);
-        //   },
-        //   tooltip: Text("Text"),
-        // ), TODO add text again
+        PieAction(
+          child: Icon(Icons.text_fields, color: secondary, size: 15),
+          onSelect: () {
+            context.read<DrawingContext>().setTool(Tool.text);
+          },
+          tooltip: Text("Text"),
+        ), 
         
       ],
       child: IconButton(

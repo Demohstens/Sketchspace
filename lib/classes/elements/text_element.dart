@@ -7,34 +7,35 @@ class TextElement extends SketchElement {
   final double fontSize;
   final Offset position;
 
+  Rect _rect = Rect.zero;
+
   TextElement({
     required this.text,
     required this.fontSize,
-    required this.position, 
+    required this.position,
     required super.layerId,
     super.id,
-  }); 
+  });
 
   @override
-  Rect get boundary => Rect.zero;
+  Rect get boundary => _rect;
 
   @override
   void draw(Canvas canvas) {
     final parbuilder = ParagraphBuilder(
-      ParagraphStyle(
-      fontSize: fontSize,
-      textAlign: TextAlign.left, 
-      
-    ));
+      ParagraphStyle(fontSize: fontSize, textAlign: TextAlign.left),
+    );
     parbuilder.addText(text);
     final par = parbuilder.build();
     par.layout(ParagraphConstraints(width: 100));
+
+    _rect = Rect.fromLTWH(position.dx, position.dy, par.maxIntrinsicWidth, par.height);
     canvas.drawParagraph(par, position);
   }
 
   @override
   bool hitTest(Offset point) {
-    return false;
+    return _rect.contains(point);
   }
 
   @override
@@ -59,13 +60,10 @@ class TextElement extends SketchElement {
       'type': 'text',
       'text': text,
       'fontSize': fontSize,
-      'position': {
-        'x': position.dx,
-        'y': position.dy,
-      },
+      'position': {'x': position.dx, 'y': position.dy},
     };
   }
-  
+
   factory TextElement.fromJson(Map<String, dynamic> json) {
     return TextElement(
       text: json['text'],
@@ -73,6 +71,6 @@ class TextElement extends SketchElement {
       position: Offset(json['position']['x'], json['position']['y']),
       layerId: json['layerId'],
       id: json['id'],
-    ); 
+    );
   }
 }

@@ -115,14 +115,11 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
     var transformedPoint = c.read<TransformController>().inversePoint(position);
     var dc = context.read<DrawingContext>();
     potentialLongPress = true;
-    Future.delayed(
-      Duration(milliseconds: 500),
-      () {
-        if (potentialLongPress) {
-          onLongPress(dc, transformedPoint);
-        }
-      },
-    );
+    Future.delayed(Duration(milliseconds: 500), () {
+      if (potentialLongPress) {
+        onLongPress(dc, transformedPoint);
+      }
+    });
   }
 
   void startScaling(Offset screenPos) {
@@ -203,13 +200,14 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
 
             // Starts the Long press timer
             startPotentialLongPress(context, event.localPosition);
-            
+
             // checks for double taps.
             final timeDif = timeOfLastDown.difference(DateTime.now()).abs();
-            if (timeDif < Duration(milliseconds: 200) && inputEvents.length == 1) {
+            if (timeDif < Duration(milliseconds: 200) &&
+                inputEvents.length == 1) {
               onDoubleTap(context);
             }
-            
+
             // Two fingers down starts the scaling function:
             if (inputEvents.length == 2) {
               isScaling = true;
@@ -224,27 +222,31 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
             }
 
             final transformedPoint = context
-              .read<TransformController>()
-              .inversePoint(event.localPosition);
+                .read<TransformController>()
+                .inversePoint(event.localPosition);
             // Single finger/pointer function:
             if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
-              
               if (isShiftPressed || tool == Tool.mouse) {
                 startPanning(event.localPosition);
                 context.read<DrawingContext>().selectElement(transformedPoint);
               } else if (canDraw && tool == Tool.brush) {
                 startDrawing();
                 context.read<DrawingContext>().addPoint(transformedPoint);
+              } else if (tool == Tool.text) {
+                context.read<DrawingContext>().insertText(transformedPoint);
               }
-            } else if (inputEvents.length == 2 && event.buttons == kTouchContact) {
+            } else if (inputEvents.length == 2 &&
+                event.buttons == kTouchContact) {
               cancelDrawing();
               startScaling(event.localPosition);
               lastScaleFactor = 1.0;
             }
-            
+
             timeOfLastDown = DateTime.now();
           },
           onPointerUp: (event) {
+            potentialLongPress = false;
+
             inputEvents.removeWhere((ev) => ev.pointer == event.pointer);
 
             if (isDrawing) {
@@ -259,11 +261,12 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
             canDraw = true;
           },
           onPointerMove: (event) {
-            if ((inputEvents.last.position - event.localPosition).distance > 10) {
+            if ((inputEvents.first.position - event.localPosition).distance >
+                10) {
               potentialLongPress = false;
-              context.read<DrawingContext>().unselectAll();
             }
-            
+            context.read<DrawingContext>().unselectAll();
+
             for (int i = 0; i < inputEvents.length; i++) {
               if (inputEvents[i].pointer == event.pointer) {
                 inputEvents[i] = SketchPointerEvent(
@@ -280,9 +283,10 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               if (isPanning) {
                 final delta = event.localPosition - panStart;
                 final controller = context.read<TransformController>();
-                final matrix = Matrix4.identity()
-                  ..translate(delta.dx, delta.dy)
-                  ..multiply(controller.value);
+                final matrix =
+                    Matrix4.identity()
+                      ..translate(delta.dx, delta.dy)
+                      ..multiply(controller.value);
                 controller.value = matrix;
                 panStart = event.localPosition;
               } else if (isDrawing) {
@@ -306,11 +310,12 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               final scale = currentDistance / scaleStartDistance;
 
               final controller = context.read<TransformController>();
-              final matrix = Matrix4.identity()
-                ..translate(currentMidpoint.dx, currentMidpoint.dy)
-                ..scale(scale)
-                ..translate(-scaleStartMidpoint.dx, -scaleStartMidpoint.dy)
-                ..multiply(scaleStartMatrix);
+              final matrix =
+                  Matrix4.identity()
+                    ..translate(currentMidpoint.dx, currentMidpoint.dy)
+                    ..scale(scale)
+                    ..translate(-scaleStartMidpoint.dx, -scaleStartMidpoint.dy)
+                    ..multiply(scaleStartMatrix);
 
               controller.value = matrix;
             }
