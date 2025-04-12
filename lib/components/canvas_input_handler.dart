@@ -112,9 +112,11 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
     potentialLongPress = false;
     c.cancelDrawing();
     c.selectElement(transformedPosition);
+    print("Long press at $transformedPosition");
   }
 
   void startPotentialLongPress(BuildContext c, Offset position) {
+    print("Starting long press timer");
     var transformedPoint = c.read<TransformController>().inversePoint(position);
     var dc = context.read<DrawingContext>();
     potentialLongPress = true;
@@ -123,6 +125,11 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
         onLongPress(dc, transformedPoint);
       }
     });
+  }
+
+  void cancelLongPress({String? reason}) {
+    print("Cancelling long press timer: $reason");
+    potentialLongPress = false;
   }
 
   void startScaling(Offset screenPos) {
@@ -202,9 +209,6 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
               ),
             );
 
-            // Starts the Long press timer
-            startPotentialLongPress(context, event.localPosition);
-
             // checks for double taps.
             final timeDif = timeOfLastDown.difference(DateTime.now()).abs();
             if (timeDif < Duration(milliseconds: 200) &&
@@ -222,6 +226,8 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                   switch (inputEvents.length) {
                     case 1:
                       {
+                        startPotentialLongPress(context, event.localPosition);
+
                         if (isShiftPressed || tool == Tool.mouse) {
                           startPanning(event.localPosition);
                           context.read<DrawingContext>().selectElement(
@@ -229,13 +235,14 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                           );
                         } else if (canDraw && tool == Tool.brush) {
                           startDrawing();
+                          // Starts the Long press timer
                           context.read<DrawingContext>().addPoint(
                             transformedPoint,
                           );
                         } else if (tool == Tool.text) {
                           context.read<DrawingContext>().insertText(
                             transformedPoint,
-                            "MEGA"
+                            "MEGA",
                           );
                         }
                       }
@@ -278,7 +285,7 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
             timeOfLastDown = DateTime.now();
           },
           onPointerUp: (event) {
-            potentialLongPress = false;
+            cancelLongPress(reason: "Pointer up");
 
             inputEvents.removeWhere((ev) => ev.pointer == event.pointer);
 
@@ -294,11 +301,12 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
             canDraw = true;
           },
           onPointerMove: (event) {
-            if ((inputEvents.first.position - event.localPosition).distance >
-                10) {
-              potentialLongPress = false;
+            if ((inputEvents.first.position - event.localPosition)
+                    .distanceSquared >
+                1) {
+              cancelLongPress(reason: "Pointer moved");
+              context.read<DrawingContext>().unselectAll();
             }
-            context.read<DrawingContext>().unselectAll();
 
             for (int i = 0; i < inputEvents.length; i++) {
               if (inputEvents[i].pointer == event.pointer) {
@@ -328,7 +336,6 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                   isDrawing = false;
                   context.read<DrawingContext>().cancelDrawing();
                 } else {
-                  potentialLongPress = false;
                   final transformedPoint = context
                       .read<TransformController>()
                       .inversePoint(event.localPosition);
@@ -377,7 +384,8 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
                   },
                 ),
               ],
-          )),
+            ),
+          ),
         ),
       ),
     );

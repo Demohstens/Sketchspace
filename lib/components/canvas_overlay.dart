@@ -17,8 +17,12 @@ class CanvasOverlay extends StatefulWidget {
 }
 
 class _CanvasOverlayState extends State<CanvasOverlay> {
+  Rect oldRect = Rect.zero; // Rect before scaling started
+  Offset pivot = Offset.zero; // Pivot point for scaling
+
   @override
   Widget build(BuildContext context) {
+    final transformController = context.read<TransformController>();
     return ValueListenableBuilder<Matrix4>(
       valueListenable: context.read<TransformController>(),
       builder: (context, matrix, child) {
@@ -56,19 +60,120 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
             TransformableBox(
               resizable: true, //TODO reimplement scaling.
               rect: screenBounds,
+
+              onResizeStart: (handle, details) {
+                // flutter_box_transform >= 0.6.0 uses ResizeResult
+                selectedElements.first.startScaling(handle);
+              },
               onResizeUpdate: (result, event) {
-                final transformedPosition = context
-                    .read<TransformController>()
-                    .inversePoint(result.delta);
-                
-                for (SketchElement element in selectedElements) {
-                  // Apply the scaling matrix to the element
-                  element.scale(math.Vector2(transformedPosition.dx, transformedPosition.dy));
+                // 1. Get Initial State (from the element itself)
+                Rect initialCanvasBounds =
+                    selectedElements.first.initialBoundsOnScaleStart;
+                HandlePosition? handle = result.handle;
+
+                // Basic check for valid initial bounds
+                if (initialCanvasBounds.width <= 1e-9 ||
+                    initialCanvasBounds.height <= 1e-9) {
+                  return; // Cannot scale from zero size
                 }
 
-                // Repaint the canvas
+                // 2. Determine Target Canvas Bounds
+                // Transform the *new* screen rectangle corners back to canvas coordinates
+                Rect newScreenRect = result.rect;
+                Offset targetTopLeft = transformController.inversePoint(
+                  newScreenRect.topLeft,
+                );
+                Offset targetBottomLeft = transformController.inversePoint(
+                  newScreenRect.bottomLeft,
+                );
+                Offset targetTopRight = transformController.inversePoint(
+                  newScreenRect.topRight,
+                );
+                Offset targetBottomRight = transformController.inversePoint(
+                  newScreenRect.bottomRight,
+                );
+
+                // Reconstruct the target bounds in canvas space (assumes no rotation/skew)
+                double minX = math.min(targetTopLeft.dx, targetBottomLeft.dx);
+                double maxX = math.max(targetTopRight.dx, targetBottomRight.dx);
+                double minY = math.min(targetTopLeft.dy, targetTopRight.dy);
+                double maxY = math.max(
+                  targetBottomLeft.dy,
+                  targetBottomRight.dy,
+                );
+                // Ensure non-zero dimensions for calculation
+                double targetWidth = math.max(1e-9, maxX - minX);
+                double targetHeight = math.max(1e-9, maxY - minY);
+                Rect targetCanvasBounds = Rect.fromLTWH(
+                  minX,
+                  minY,
+                  targetWidth,
+                  targetHeight,
+                );
+
+                // 3. Calculate Scale Factors
+                double scaleFactorX =
+                    targetCanvasBounds.width / initialCanvasBounds.width;
+                double scaleFactorY =
+                    targetCanvasBounds.height / initialCanvasBounds.height;
+
+                // 4. Determine Pivot Point (in CANVAS coordinates) based on handle
+                Offset pivot;
+                switch (handle) {
+                  case HandlePosition.topLeft:
+                    pivot = initialCanvasBounds.bottomRight;
+                    break;
+                  case HandlePosition.topRight:
+                    pivot = initialCanvasBounds.bottomLeft;
+                    break;
+                  case HandlePosition.bottomLeft:
+                    pivot = initialCanvasBounds.topRight;
+                    break;
+                  case HandlePosition.bottomRight:
+                    pivot = initialCanvasBounds.topLeft;
+                    break;
+                  // Add cases for middle handles if needed (adjust scale factors too)
+                  case HandlePosition.top:
+                    pivot = initialCanvasBounds.bottomCenter;
+                    scaleFactorX = 1.0; // Only scale Y
+                    break;
+                  case HandlePosition.bottom:
+                    pivot = initialCanvasBounds.topCenter;
+                    scaleFactorX = 1.0; // Only scale Y
+                    break;
+                  case HandlePosition.left:
+                    pivot = initialCanvasBounds.centerRight;
+                    scaleFactorY = 1.0; // Only scale X
+                    break;
+                  case HandlePosition.right:
+                    pivot = initialCanvasBounds.centerLeft;
+                    scaleFactorY = 1.0; // Only scale X
+                    break;
+                  default: // Should not happen during resize
+                    print("  Warning: Unexpected handle position: $handle");
+                    pivot = initialCanvasBounds.center;
+                    scaleFactorX = 1.0;
+                    scaleFactorY = 1.0;
+                    break;
+                }
+
+                // 5. Apply the scaling to the element
+                selectedElements.first.scale(
+                  math.Vector2(scaleFactorX, scaleFactorY),
+                  pivot,
+                );
+
                 context.read<DrawingContext>().repaint();
               },
+
+              // 6. Repaint the main canvas
+              onResizeEnd: (handle, details) {
+                selectedElements.first.endScaling();
+                // Repaint needed to potentially hide handles or finalize appearance
+                context.read<DrawingContext>().repaint();
+                context.read<DrawingContext>().repaint();
+              },
+
               onDragStart: (event) {
                 dragStartPosition = event.globalPosition;
               },
@@ -136,81 +241,69 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
       },
     );
   }
-}
 
-enum Position { topLeft, topRight, bottomRight, bottomLeft }
+  void getPivot(
+    DragStartDetails details,
+    SketchElement element,
+    HandlePosition draggedHandleType,
+  ) {
+    oldRect = element.boundary; // Store the initial rect before resizing
 
-class DragHandle extends StatefulWidget {
-  final Position position;
-  final Offset origin;
-  final Offset opposite;
-  final double size;
-  final SketchElement element;
-  final TransformController controller;
-
-  const DragHandle({
-    required this.position,
-    required this.origin,
-    required this.opposite,
-    required this.element,
-    required this.controller,
-    this.size = 20,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<DragHandle> createState() => _DragHandleState();
-}
-
-class _DragHandleState extends State<DragHandle> {
-  @override
-  Widget build(BuildContext context) {
-    final rotationAngle = (widget.position.index * 90 - 45) * (math.pi / 180);
-
-    return Positioned(
-      left: widget.origin.dx - (widget.size / 2),
-      top: widget.origin.dy - (widget.size / 2),
-      child: GestureDetector(
-        onPanUpdate: (details) {
-          final globalPosition = details.globalPosition;
-          final localPosition = widget.controller.inversePoint(globalPosition);
-
-          // Calculate the vector from opposite corner to current position
-          final currentVector = localPosition - widget.opposite;
-          final originalVector = widget.origin - widget.opposite;
-
-          // Calculate scaling factors maintaining aspect ratio
-          double scaleX = currentVector.dx / originalVector.dx;
-          double scaleY = currentVector.dy / originalVector.dy;
-
-          // Ensure minimum scale
-          scaleX = scaleX.sign * math.max(0.1, scaleX.abs());
-          scaleY = scaleY.sign * math.max(0.1, scaleY.abs());
-
-          // Apply the scaling matrix to the element
-          widget.element.scale(math.Vector2(scaleX, scaleY));
-
-          // Repaint the canvas
-          context.read<DrawingContext>().repaint();
-        },
-        child: Container(
-          width: widget.size + 10,
-          height: widget.size + 10,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey, width: 1.5),
-            borderRadius: BorderRadius.circular((widget.size + 10) / 2),
-          ),
-          child: Transform.rotate(
-            angle: rotationAngle,
-            child: Icon(
-              Icons.drag_indicator,
-              size: widget.size + 5,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-      ),
-    );
+    switch (draggedHandleType) {
+      case HandlePosition.topLeft:
+        pivot = oldRect.bottomRight;
+        break;
+      case HandlePosition.topRight:
+        pivot = oldRect.bottomLeft;
+        break;
+      case HandlePosition.bottomLeft:
+        pivot = oldRect.topRight;
+        break;
+      case HandlePosition.bottomRight:
+        pivot = oldRect.topLeft;
+        break;
+      default:
+        pivot = oldRect.center; // Fallback to center if no handle is dragged
+    }
   }
+}
+
+math.Vector2 calculateSizeChange(
+  HandlePosition draggedHandleType,
+  Offset delta,
+  Rect initialBounds,
+) {
+  math.Vector2 totalHandleDelta = math.Vector2(delta.dx, delta.dy); // Or global
+
+  math.Vector2 totalSizeChange;
+
+  // --- Determine Pivot and Adjust Delta ---
+  switch (draggedHandleType) {
+    case HandlePosition.topLeft:
+      // Dragging left (negative dx) increases width
+      // Dragging up (negative dy) increases height
+      totalSizeChange = math.Vector2(-totalHandleDelta.x, -totalHandleDelta.y);
+      break;
+    case HandlePosition.topRight:
+      // Dragging right (positive dx) increases width
+      // Dragging up (negative dy) increases height
+      totalSizeChange = math.Vector2(totalHandleDelta.x, -totalHandleDelta.y);
+      break;
+    case HandlePosition.bottomLeft:
+      // Dragging left (negative dx) increases width
+      // Dragging down (positive dy) increases height
+      totalSizeChange = math.Vector2(-totalHandleDelta.x, totalHandleDelta.y);
+      break;
+    case HandlePosition.bottomRight:
+
+      // Dragging right (positive dx) increases width
+      // Dragging down (positive dy) increases height
+      totalSizeChange = math.Vector2(totalHandleDelta.x, totalHandleDelta.y);
+      break;
+    default:
+      totalSizeChange =
+          math.Vector2.zero(); // No size change if no handle is dragged
+      break;
+  }
+  return totalSizeChange;
 }

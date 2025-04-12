@@ -20,7 +20,7 @@ class _CanvasUIState extends State<CanvasUIMobile> {
     setState(() {});
   }
 
-  final double iconSize = 20;
+  final double iconSize = 25;
   final Color iconColor = Colors.black.withAlpha(200);
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class _CanvasUIState extends State<CanvasUIMobile> {
         children: [
           Positioned(
             right: 10,
-            top: 20,
+            top: 50,
             child: Column(
               children: [
                 IconButton(

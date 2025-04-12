@@ -1,9 +1,10 @@
-## Core Features
-☐ Layers 
+## 0.4 Core Features
 ☐ Text editing
-☐ Radial Brush menu
+☐ (Radial) Brush menu
 ☐ shapes
 ☐ area selection
+☐ Make use of the topmost canvas for frequest updates before pushing it back to the main canvas
+☐ Undo/Redo
 
 ### Archive
 ✔ Loadfiles @done(24-08-10 00:48)
@@ -43,24 +44,6 @@ https://pub.dev/packages/share_pluss
 ----
 # Bugs 
 ☐ Fix Renaming (file name used as name but canvas uses JSON property)
-✔ Loading files broke again - FIXED @done(24-08-10 00:48)
-✔ saving files might be broken? see above. - FIXED @done(24-08-10 00:48)
-✔ able to save empty file names - FIXED but introduced: @done(24-08-10 00:48)
-✔ Cancelling saving will leave the filename empty instead -> Will name "unknown" @done(24-08-10 19:34)
-✔ will exit canvas instead of cancelling saving @done(24-08-10 19:34)
-✔ Doesn't check for invalid file names properly :SOB: maybe use prebuilt solution @done(24-08-10 19:34)
-✔ saving an untitled file will save it as "Untitled" @done(24-08-10 19:34)
-✔ Selecting lines/polygones doesn't work, because detetion is based solely on the points and not the area between them. @done(24-08-15 00:32)
-    ✔ Unfortunately this might require a full rewrite of the selection logic. Otherwise performance might become an issue @done(24-08-15 00:32)
-✔ cannot exit without saving, due to the way the file is saved. @done(24-08-11 15:08)
-✔ FileSaveDialog too... tall? Odd. @done(24-08-11 20:20)
-✔ Selection color hardcoded. Darkmode makes it invisible. @done(25-03-27 20:51)
-✔ Android doesn't work: @done(25-03-27 20:51)
-    ✔ Scaling is off @done(24-08-11 17:53) ?? 
-    ✔ touch support is inconsistant @done(24-08-15 00:32)
-    ✔ can't access options (need to push them down by the nozle thingy) @done(24-08-11 01:15)
-✔ Rewrite RepaintListener to allow for unloading of Listeners. @done(24-08-13 14:21) replaced with ValueNotifier
-
 
 
 # For alpha 1:
@@ -70,7 +53,7 @@ https://pub.dev/packages/share_pluss
 ✔ fix reset @started(24-08-13 10:28) @done(24-08-13 12:59) @lasted(2h31m39s)
 ✔ Remove reload button on home screen @done(24-08-13 12:59)
 ☐ add welcome pop-up?
-☐ update readme
+✔ update readme @done(25-04-12 22:17)
 ☐ share feature
 ✔ rename file feature @started(24-08-13 15:20) @done(24-08-13 16:15) @lasted(55m26s)
 ☐ check out packages & impl?

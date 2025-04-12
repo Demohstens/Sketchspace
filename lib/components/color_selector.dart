@@ -37,6 +37,7 @@ class _SketchColorPickerState extends State<SketchColorPicker> {
           controller: _menuController,
           menuChildren: [
             ColorPicker(
+              paletteType: PaletteType.hsv,
               pickerColor:
                   selectedColor ?? context.watch<DrawingContext>().color,
               onColorChanged: (color) {

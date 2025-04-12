@@ -3,9 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_box_transform/flutter_box_transform.dart';
 import 'package:sketchspace/classes/element.dart';
 import 'package:vector_math/vector_math_64.dart';
 import 'dart:ui' as ui;
+
 class ImageElement extends SketchElement {
   late ui.Image image;
   final String path;
@@ -15,7 +17,12 @@ class ImageElement extends SketchElement {
   bool isLoaded = false;
   @override
   Rect get boundary {
-    return Rect.fromLTWH(position.dx, position.dy, image.width.toDouble(), image.height.toDouble());
+    return Rect.fromLTWH(
+      position.dx,
+      position.dy,
+      image.width.toDouble(),
+      image.height.toDouble(),
+    );
   }
 
   /// Constructor: Use this WITH an image provided
@@ -29,10 +36,10 @@ class ImageElement extends SketchElement {
     required String layerId,
     String? id,
   }) : // Directly initialize final fields via initializer list
-        isLoaded = true,
-        width = width ?? image.width.toDouble(),
-        height = height ?? image.height.toDouble(),
-        super(id: id, layerId: layerId);
+       isLoaded = true,
+       width = width ?? image.width.toDouble(),
+       height = height ?? image.height.toDouble(),
+       super(id: id, layerId: layerId);
 
   // Private constructor: Use the async factories below to create instances
   ImageElement._internal({
@@ -88,7 +95,6 @@ class ImageElement extends SketchElement {
     final id = json['id'] as String?; // Allow null if ID is optional
 
     try {
-
       return ImageElement._internal(
         path: path,
         position: position,
@@ -111,14 +117,13 @@ class ImageElement extends SketchElement {
         image = frame.image;
         isLoaded = true;
       });
-    }
-    );
+    });
   }
 
   @override
   draw(Canvas c) {
     if (isLoaded)
-    c.drawImage(image, position, Paint()); 
+      c.drawImage(image, position, Paint());
     else {
       print("Image not loaded!");
     }
@@ -137,17 +142,21 @@ class ImageElement extends SketchElement {
       'id': id,
       'layerId': layerId,
       'path': path,
-      'position': {
-        'x': position.dx,
-        'y': position.dy,
-      }, 
+      'position': {'x': position.dx, 'y': position.dy},
       'width': image.width,
       'height': image.height,
     };
   }
-
   @override
-  scale(Vector2 scale) async {
+  endScaling() {
+    // No-op for ImageElement
+  }
+  @override 
+  startScaling(HandlePosition handle) {
+    // No-op for ImageElement
+  }
+  @override
+  scale(Vector2 delta, Offset pivot) async {
     throw UnimplementedError('ImageElement does not support scaling.');
   }
 
@@ -157,35 +166,38 @@ class ImageElement extends SketchElement {
     // Assuming the transformation matrix is a 4x4 matrix, we can apply it to the width and height
 
     // Create a vector to store the original dimensions
-    Vector3 dimensions = Vector3(width ?? image.width.toDouble(), 
-                                height ?? image.height.toDouble(), 
-                                0);
-    
+    Vector3 dimensions = Vector3(
+      width ?? image.width.toDouble(),
+      height ?? image.height.toDouble(),
+      0,
+    );
+
     // Apply the transformation matrix to the dimensions vector
     dimensions = transform.perspectiveTransform(dimensions);
-    
+
     // Update the width and he    // Update width and height with the transformed values
     // Take absolute values to handle negative scaling
-  } 
+  }
 
-  @override 
+  @override
   translate(Offset offset) {
     position += offset;
   }
 }
+
 // loadImage remains largely the same, but ensure it handles errors
 Future<ui.Image> loadImage(String path) async {
   final file = File(path);
   if (!await file.exists()) {
     throw Exception('Image file not found at path: $path');
   }
-  
+
   final bytes = await file.readAsBytes();
   // Add check for empty bytes as instantiateImageCodec can fail
   if (bytes.isEmpty) {
     throw Exception('Image file is empty: $path');
   }
-  
+
   try {
     final codec = await ui.instantiateImageCodec(bytes);
     final frame = await codec.getNextFrame();
@@ -195,5 +207,5 @@ Future<ui.Image> loadImage(String path) async {
     print('Failed to load image from $path: $e');
     // Rethrow to be caught by the calling factory constructor
     rethrow;
-  } 
+  }
 }

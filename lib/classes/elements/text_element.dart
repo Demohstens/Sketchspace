@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:flutter_box_transform/flutter_box_transform.dart';
 import 'package:sketchspace/classes/element.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 class TextElement extends SketchElement {
   final String text;
@@ -29,7 +31,12 @@ class TextElement extends SketchElement {
     final par = parbuilder.build();
     par.layout(ParagraphConstraints(width: 100));
 
-    _rect = Rect.fromLTWH(position.dx, position.dy, par.maxIntrinsicWidth, par.height);
+    _rect = Rect.fromLTWH(
+      position.dx,
+      position.dy,
+      par.maxIntrinsicWidth,
+      par.height,
+    );
     canvas.drawParagraph(par, position);
   }
 
@@ -39,7 +46,17 @@ class TextElement extends SketchElement {
   }
 
   @override
-  void scale(scale) {
+  startScaling(HandlePosition handle) {
+    // TODO: implement startScaling
+    
+  }
+  @override
+  endScaling() {
+    // TODO: implement endScaling
+    
+  }
+  @override
+  scale(Vector2 delta, Offset pivot) {
     // TODO: implement moveBy
   }
 
