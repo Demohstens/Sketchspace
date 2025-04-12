@@ -1,3 +1,4 @@
+import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/canvas/canvas_mobile_ui.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
@@ -39,6 +40,11 @@ class CanvasPage extends StatelessWidget {
       
       Stack(
               children: [
+                Positioned.fill(
+                    child: CustomPaint(
+                      painter: BackGroundPainter(size: Size(context.width, context.height)),
+                    )
+                  ),
                 Positioned.fill(
                   child: CanvasViewport(),
                 ),

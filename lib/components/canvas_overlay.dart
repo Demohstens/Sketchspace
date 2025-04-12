@@ -1,5 +1,6 @@
 import 'dart:math' as math; // For min/max
 import 'package:flutter/material.dart';
+import 'package:flutter_box_transform/flutter_box_transform.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/elements/stroke_element.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
@@ -20,6 +21,7 @@ class CanvasOverlay extends StatefulWidget {
 }
 
 class _CanvasOverlayState extends State<CanvasOverlay> {
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Matrix4>(
@@ -46,21 +48,42 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
         const double buttonSize = 50.0;
         const double buttonPadding = 5.0;
         
+        Offset dragStartPosition = Offset.zero;
 
         return Stack(
           children: [
-            // Draggable Area
-            Positioned.fromRect(
+            TransformableBox(
+              resizable: false, //TODO reimplement scaling.
               rect: screenBounds,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onPanUpdate: (details) {
-                  // Convert the global position to canvas coordinates
-                  final globalPosition = details.globalPosition;
-                  final localPosition = context.read<TransformController>().inversePoint(globalPosition);
+              onResizeUpdate: (result, event) {
+                final globalPosition = event.globalPosition;
+                final localPosition = context.read<TransformController>().inversePoint(globalPosition);
+
+                // Apply the scaling matrix to the element
+                selectedElements.map((e) {
+                  for (var element in selectedElements) {
+                    element.transform(
+                      Matrix4.identity()
+                        ..scale(result.delta.dx, result.delta.dy)
+                        ..translate(result.delta.dx, result.delta.dy)
+                    );
+                  }
+                  
+                  });
+
+                // Repaint the canvas
+                context.read<DrawingContext>().repaint();
+              },
+              onDragStart: (event) {
+                dragStartPosition = event.globalPosition;
+              },
+              onDragUpdate: (result, event) {
+                //  Convert the global position to canvas coordinates
+                  final globalPosition = event.globalPosition;
+                  final transformedPos = context.read<TransformController>().inversePoint(globalPosition);
 
                   // Calculate the delta relative to the element's current position
-                  final delta = localPosition - selectedElements.first.boundary.center;
+                  final delta = transformedPos - selectedElements.first.boundary.center;
 
                   // Translate the selected element by the delta
                   for (var element in selectedElements) {
@@ -69,32 +92,17 @@ class _CanvasOverlayState extends State<CanvasOverlay> {
 
                   // Repaint the canvas
                   context.read<DrawingContext>().repaint();
-                },
-                onPanEnd: (details) {
-                  // context.read<DrawingContext>().canvas.updateElement(selectedElements.first);
-                  context.read<DrawingContext>().repaint();
-                },
-                onLongPress: () => context.read<DrawingContext>().unselectAll(),
-                child: CustomPaint(
-                  size: screenBounds.size,
-                  painter: HitTestPainter(
-                    points: screenPoints.map((p) => p - screenBounds.topLeft).toList(),
-                  ),
-                ),
-              ),
-            ),
-
-            // Corner Handles
-            for (var i = 0; i < 4; i++)
-              DragHandle(
-                position: Position.values[i],
-                origin: screenPoints[i],
-                opposite: screenPoints[(i + 2) % 4],
-                element: selectedElements.first,
-                controller:  context.read<TransformController>(),
-              ),
-
-            // Controls
+              },
+              contentBuilder: (context, rect, flip) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(20),
+                    border: Border.all(color: Colors.black, width: 1.5),
+                    borderRadius: BorderRadius.circular(5),
+                  ), 
+                );
+              }  ),
+            // // Controls
             Positioned(
               left: screenTopCenter.dx - (buttonSize / 2),
               top: screenPoints[0].dy - buttonSize - buttonPadding,
@@ -208,30 +216,5 @@ class _DragHandleState extends State<DragHandle> {
         ),
       ),
     );
-  }
-}
-class HitTestPainter extends CustomPainter {
-  final List<Offset> points;
-
-  HitTestPainter({required this.points});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color.fromARGB(91, 74, 74, 74)
-      ..style = PaintingStyle.fill;
-      
-    final path = Path()..moveTo(points[0].dx, points[0].dy);
-    for (var i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
-    }
-    path.close();
-    
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant HitTestPainter oldDelegate) {
-    return !List.generate(4, (i) => points[i] == oldDelegate.points[i]).contains(false);
   }
 }

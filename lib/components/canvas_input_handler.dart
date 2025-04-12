@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
@@ -17,7 +18,6 @@ class CanvasInputHandler extends StatefulWidget {
 
   late bool isLandscape = canvasWidth > canvasHeight;
 
-  // final TransformController controller;
   CanvasInputHandler({
     this.child,
     super.key,
@@ -34,17 +34,19 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   final FocusNode _focusNode = FocusNode();
 
   Offset scaleStart = Offset.zero;
+  Offset panStart = Offset.zero;
   double lastScaleFactor = 1.0;
   Offset scaleEnd = Offset.zero;
   double scaleFactor = 1.0;
   double rotation = 0.0;
   bool isAltPressed = false;
+  bool isShiftPressed = false;
   bool canDraw = true;
+  bool isPanning = false;
   late double scaleStartDistance;
   late Offset scaleStartMidpoint;
   late Matrix4 scaleStartMatrix;
 
-  /// Location of a registered LongpressDown
   Offset longPressLocation = Offset.zero;
   Offset scaleStartFocalPoint = Offset.zero;
 
@@ -52,11 +54,11 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
 
   bool isDrawing = false;
   bool isScaling = false;
+  bool potentialLongPress = false;
 
   @override
   void initState() {
     super.initState();
-    // Add focus node to capture keyboard events
     _focusNode.requestFocus();
   }
 
@@ -68,7 +70,6 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   }
 
   void startDrawing() {
-    // context.read<DrawingContext>().startDrawing();
     context.read<DrawingContext>().unselectAll();
     isDrawing = true;
   }
@@ -89,22 +90,45 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
     isDrawing = false;
   }
 
+  void startPanning(Offset position) {
+    panStart = position;
+    isPanning = true;
+    canDraw = false;
+  }
+
+  void endPanning() {
+    isPanning = false;
+    canDraw = true;
+  }
+
   void onDoubleTap(BuildContext c) {
     c.read<TransformController>().resetTransformations();
   }
 
-  void onLongPress(BuildContext c, Offset position) {
+  void onLongPress(DrawingContext c, Offset transformedPosition) {
+    canDraw = false;
+    potentialLongPress = false;
+    c.selectElement(transformedPosition);
+  }
+
+  void startPotentialLongPress(BuildContext c, Offset position) {
     var transformedPoint = c.read<TransformController>().inversePoint(position);
-    c.read<DrawingContext>().selectElement(transformedPoint);
-    // Handle long press here
+    var dc = context.read<DrawingContext>();
+    potentialLongPress = true;
+    Future.delayed(
+      Duration(milliseconds: 500),
+      () {
+        if (potentialLongPress) {
+          onLongPress(dc, transformedPoint);
+        }
+      },
+    );
   }
 
   void startScaling(Offset screenPos) {
     scaleStart = screenPos;
-
     Offset point1 = inputEvents[0].position;
     Offset point2 = inputEvents[1].position;
-
     scaleStartFocalPoint = Offset(
       (point1.dx + point2.dx) / 2,
       (point1.dy + point2.dy) / 2,
@@ -129,9 +153,6 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
     final Offset localPosition = renderBox.globalToLocal(event.position);
 
     final Matrix4 currentTransform = context.read<TransformController>().value;
-    final double currentScale = currentTransform.getMaxScaleOnAxis();
-
-    // TODO clamp by canvas size
 
     context.read<TransformController>().value =
         Matrix4.identity()
@@ -147,149 +168,157 @@ class _CanvasInputHandlerState extends State<CanvasInputHandler> {
   Widget build(BuildContext context) {
     final tool = context.watch<DrawingContext>().tool;
 
-    return SizedBox(
-      width: context.width,
-      height: context.height,
-      child: Listener(
-        behavior: HitTestBehavior.opaque,
-        onPointerDown: (event) {
-          inputEvents.add(
-            SketchPointerEvent(
-              pointer: event.pointer,
-              buttons: event.buttons,
-              position: event.localPosition,
-              timeStamp: DateTime.now(),
-            ),
-          );
-          // Check for double tap
-          final timeDif = timeOfLastDown.difference(DateTime.now()).abs();
-          if (timeDif < Duration(milliseconds: 200) && inputEvents.length == 1) {
-            onDoubleTap(context);
+    return Focus(
+      focusNode: _focusNode,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.shiftLeft ||
+              event.logicalKey == LogicalKeyboardKey.shiftRight) {
+            isShiftPressed = true;
           }
-          if (inputEvents.length == 2) {
-            isScaling = true;
-            final point1 = inputEvents[0].position;
-            final point2 = inputEvents[1].position;
-            scaleStartDistance = (point1 - point2).distance;
-            scaleStartMidpoint = Offset(
-              (point1.dx + point2.dx) / 2,
-              (point1.dy + point2.dy) / 2,
-            );
-            scaleStartMatrix = context.read<TransformController>().value;
+        }
+        if (event is KeyUpEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.shiftLeft ||
+              event.logicalKey == LogicalKeyboardKey.shiftRight) {
+            isShiftPressed = false;
           }
-          print("Pointer Down: ${inputEvents.length}");
-          if (event.buttons == kPrimaryButton &&
-              canDraw &&
-              tool == Tool.brush &&
-              inputEvents.length == 1) {
-            startDrawing();
-            final transformedPoint = context
-                .read<TransformController>()
-                .inversePoint(event.localPosition);
-            context.read<DrawingContext>().addPoint(transformedPoint);
-          } else if (inputEvents.length == 2 && event.buttons == kTouchContact) {
-            // Start scaling when two fingers are down
-            cancelDrawing();
-            startScaling(event.localPosition);
-
-            lastScaleFactor = 1.0;
-          }
-          timeOfLastDown = DateTime.now();
-        },
-        onPointerUp: (event) {
-          final removedEvent = inputEvents.firstWhere(
-            (ev) => ev.pointer == event.pointer,
-            orElse: () => SketchPointerEvent(
-              pointer: -1,
-              buttons: 0,
-              position: Offset.zero,
-              timeStamp: DateTime.now(),
-            ),
-          );
-
-          if (removedEvent.pointer != -1) {
-            final pressDuration =
-                DateTime.now().difference(removedEvent.timeStamp);
-            if (pressDuration >= Duration(milliseconds: 500)) {
-              onLongPress(context, removedEvent.position);
-            }
-          }
-
-          inputEvents.removeWhere((ev) {
-            return ev.pointer == event.pointer;
-          });
-
-          if (isDrawing) {
-            endDrawing();
-          }
-          if (inputEvents.length < 2 && isScaling) {
-            endScaling();
-          }
-          canDraw = true;
-        },
-        onPointerMove: (event) {
-          for (int i = 0; i < inputEvents.length; i++) {
-            if (inputEvents[i].pointer == event.pointer) {
-              inputEvents[i] = SketchPointerEvent(
+        }
+        return KeyEventResult.handled;
+      },
+      child: SizedBox(
+        width: context.width,
+        height: context.height,
+        child: Listener(
+          behavior: HitTestBehavior.opaque,
+          onPointerDown: (event) {
+            inputEvents.add(
+              SketchPointerEvent(
                 pointer: event.pointer,
                 buttons: event.buttons,
                 position: event.localPosition,
-                timeStamp: inputEvents[i].timeStamp,
-              );
-              break;
-            }
-          }
-
-          if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
-            if (isDrawing) {
-              final transformedPoint = context
-                  .read<TransformController>()
-                  .inversePoint(event.localPosition);
-              context.read<DrawingContext>().addPoint(transformedPoint);
-            }
-          }
-
-          if (inputEvents.length == 2 && isScaling) {
-            final point1 = inputEvents[0].position;
-            final point2 = inputEvents[1].position;
-
-            // Current state
-            final currentDistance = (point1 - point2).distance;
-            final currentMidpoint = Offset(
-              (point1.dx + point2.dx) / 2,
-              (point1.dy + point2.dy) / 2,
+                timeStamp: DateTime.now(),
+              ),
             );
 
-            // Calculate scale
-            final scale = currentDistance / scaleStartDistance;
+            startPotentialLongPress(context, event.localPosition);
+            
+            final timeDif = timeOfLastDown.difference(DateTime.now()).abs();
+            if (timeDif < Duration(milliseconds: 200) && inputEvents.length == 1) {
+              onDoubleTap(context);
+            }
 
-            final controller = context.read<TransformController>();
-            final matrix = Matrix4.identity()
-              ..translate(currentMidpoint.dx, currentMidpoint.dy)
-              ..scale(scale)
-              ..translate(-scaleStartMidpoint.dx, -scaleStartMidpoint.dy)
-              ..multiply(scaleStartMatrix);
+            if (inputEvents.length == 2) {
+              isScaling = true;
+              final point1 = inputEvents[0].position;
+              final point2 = inputEvents[1].position;
+              scaleStartDistance = (point1 - point2).distance;
+              scaleStartMidpoint = Offset(
+                (point1.dx + point2.dx) / 2,
+                (point1.dy + point2.dy) / 2,
+              );
+              scaleStartMatrix = context.read<TransformController>().value;
+            }
 
-            controller.value = matrix;
-          }
-        },
-        onPointerSignal: (PointerSignalEvent event) {
-          switch (event) {
-            case PointerScrollEvent scrollEvent:
-              _handleScroll(scrollEvent, context);
-              break;
-          }
-        },
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            ValueListenableBuilder<Matrix4>(
-              valueListenable: context.read<TransformController>(),
-              builder: (context, matrix, child) {
-                return Transform(transform: matrix, child: widget.child);
-              },
-            ),
-          ],
+            if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
+              if (isShiftPressed || tool == Tool.mouse) {
+                startPanning(event.localPosition);
+              } else if (canDraw && tool == Tool.brush) {
+                startDrawing();
+                final transformedPoint = context.read<TransformController>().inversePoint(event.localPosition);
+                context.read<DrawingContext>().addPoint(transformedPoint);
+              }
+            } else if (inputEvents.length == 2 && event.buttons == kTouchContact) {
+              cancelDrawing();
+              startScaling(event.localPosition);
+              lastScaleFactor = 1.0;
+            }
+            
+            timeOfLastDown = DateTime.now();
+          },
+          onPointerUp: (event) {
+            inputEvents.removeWhere((ev) => ev.pointer == event.pointer);
+
+            if (isDrawing) {
+              endDrawing();
+            }
+            if (isPanning) {
+              endPanning();
+            }
+            if (inputEvents.length < 2 && isScaling) {
+              endScaling();
+            }
+            canDraw = true;
+          },
+          onPointerMove: (event) {
+            potentialLongPress = false;
+            
+            for (int i = 0; i < inputEvents.length; i++) {
+              if (inputEvents[i].pointer == event.pointer) {
+                inputEvents[i] = SketchPointerEvent(
+                  pointer: event.pointer,
+                  buttons: event.buttons,
+                  position: event.localPosition,
+                  timeStamp: inputEvents[i].timeStamp,
+                );
+                break;
+              }
+            }
+
+            if (event.buttons == kPrimaryButton && inputEvents.length == 1) {
+              if (isPanning) {
+                final delta = event.localPosition - panStart;
+                final controller = context.read<TransformController>();
+                final matrix = Matrix4.identity()
+                  ..translate(delta.dx, delta.dy)
+                  ..multiply(controller.value);
+                controller.value = matrix;
+                panStart = event.localPosition;
+              } else if (isDrawing) {
+                final transformedPoint = context
+                    .read<TransformController>()
+                    .inversePoint(event.localPosition);
+                context.read<DrawingContext>().addPoint(transformedPoint);
+              }
+            }
+
+            if (inputEvents.length == 2 && isScaling) {
+              final point1 = inputEvents[0].position;
+              final point2 = inputEvents[1].position;
+
+              final currentDistance = (point1 - point2).distance;
+              final currentMidpoint = Offset(
+                (point1.dx + point2.dx) / 2,
+                (point1.dy + point2.dy) / 2,
+              );
+
+              final scale = currentDistance / scaleStartDistance;
+
+              final controller = context.read<TransformController>();
+              final matrix = Matrix4.identity()
+                ..translate(currentMidpoint.dx, currentMidpoint.dy)
+                ..scale(scale)
+                ..translate(-scaleStartMidpoint.dx, -scaleStartMidpoint.dy)
+                ..multiply(scaleStartMatrix);
+
+              controller.value = matrix;
+            }
+          },
+          onPointerSignal: (PointerSignalEvent event) {
+            if (event is PointerScrollEvent) {
+              _handleScroll(event, context);
+            }
+          },
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              ValueListenableBuilder<Matrix4>(
+                valueListenable: context.read<TransformController>(),
+                builder: (context, matrix, child) {
+                  return Transform(transform: matrix, child: widget.child);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -53,6 +53,7 @@ dependencies:
   awesome_extensions: ^2.0.21
   material_color_utilities: ^0.11.1
   fluent_ui: ^4.11.3
+  flutter_box_transform: ^0.4.7
     
 
 dev_dependencies:

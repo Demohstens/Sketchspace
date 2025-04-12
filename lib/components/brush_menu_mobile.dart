@@ -1,15 +1,9 @@
 import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/components/add_imported.dart';
-import 'package:sketchspace/components/brush_menu.dart';
-import 'package:sketchspace/components/color_selector.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sketchspace/tools/brush.dart';
-import 'package:sketchspace/tools/eraser.dart';
-import 'package:sketchspace/tools/mouse.dart';
-import 'package:sketchspace/tools/text.dart';
 import 'package:sketchspace/tools/tools.dart';
 
 // possible to use menu anchor instead?
@@ -41,6 +35,7 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
       ),
       controller: menuController,
       actions: [
+
         PieAction(
           child: Icon(Icons.brush, color: secondary, size: 15),
           onSelect: () {
@@ -55,23 +50,24 @@ class BrushMenuMobileState extends State<BrushMenuMobile> {
           },
           tooltip: Text("Mouse"),
         ),
-        PieAction(
-          child: Icon(Icons.text_fields, color: secondary, size: 15),
-          onSelect: () {
-            context.read<DrawingContext>().setTool(Tool.text);
-          },
-          tooltip: Text("Text"),
-        ),
+        // PieAction(
+        //   child: Icon(Icons.text_fields, color: secondary, size: 15),
+        //   onSelect: () {
+        //     context.read<DrawingContext>().setTool(Tool.text);
+        //   },
+        //   tooltip: Text("Text"),
+        // ), TODO add text again
+        
       ],
       child: IconButton(
-            onPressed: () {
-              _colorMenuController.isOpen
-                  ? _colorMenuController.close()
-                  : _colorMenuController.open();
-              menuController.toggleMenu();
-            },
-            icon: Icon(Icons.menu, color: secondary, size: 40),
-          ),
+        onPressed: () {
+          _colorMenuController.isOpen
+              ? _colorMenuController.close()
+              : _colorMenuController.open();
+          menuController.toggleMenu();
+        },
+        icon: Icon(Icons.menu, color: secondary, size: 40),
+      ),
     );
   }
 
@@ -199,25 +195,26 @@ ColorButton ColorToColotButton(Color color) {
 
 class WidthSelector extends StatelessWidget {
   final MenuController _menuController = MenuController();
+  final bool isVertical;
 
-  Widget _widthSlider(BuildContext context) {
-    return Slider(
-      value: context.read<DrawingContext>().strokeWidth,
-      min: 1,
-      max: 20,
-      divisions: 19,
-      label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
-      onChanged: (double value) {
-        context.read<DrawingContext>().changeWidth(value);
-      },
-    );
-  }
+  WidthSelector({super.key, this.isVertical = false});
 
   @override
   Widget build(BuildContext context) {
     return MenuAnchor(
       controller: _menuController,
-      menuChildren: <Widget>[_widthSlider(context)],
+      menuChildren: <Widget>[
+        Slider.adaptive(
+          value: context.read<DrawingContext>().strokeWidth,
+          min: 1,
+          max: 50,
+          divisions: 49,
+          label: 'Stroke Width: ${context.read<DrawingContext>().strokeWidth}',
+          onChanged: (double value) {
+            context.read<DrawingContext>().changeWidth(value);
+          },
+        ),
+      ],
       child: GestureDetector(
         onTap: () {
           _menuController.open();

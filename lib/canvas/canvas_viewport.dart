@@ -37,10 +37,6 @@ class _CanvasViewportState extends State<CanvasViewport> {
           canvasHeight: cHeight,
           child: Stack(
             children: [
-                  CustomPaint(
-                    size: Size(cWidth, cHeight),
-                    painter: BackGroundPainter(size: Size(cWidth, cHeight)),
-                  ),
                   ValueListenableBuilder<bool>(
                     valueListenable: context.read<DrawingContext>().repaintNotifier,
                     builder: (context, value, child) {
