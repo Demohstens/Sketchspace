@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-import 'package:flutter/foundation.dart'; // For ChangeNotifier
 import 'package:flutter/widgets.dart'; // For Offset, Matrix4
 import 'package:vector_math/vector_math_64.dart' show Matrix4, Vector3;
 

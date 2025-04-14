@@ -1,21 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_box_transform/flutter_box_transform.dart';
-import 'package:sketchspace/classes/elements/image_el.dart';
-import 'package:sketchspace/providers/drawing_context.dart';
-import 'package:sketchspace/classes/path.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:ui' as ui;
 
 import 'package:vector_math/vector_math_64.dart';
 
 abstract class SketchElement {
   late String id;
   final String layerId;
-  
-  
+
   Rect _initialBoundsOnScaleStart = Rect.zero;
-  HandlePosition? _activeHandle; 
-// Use HandlePosition enum
+  HandlePosition? _activeHandle;
+  // Use HandlePosition enum
   Rect get boundary;
   HandlePosition? get activeHandle => _activeHandle;
   Rect get initialBoundsOnScaleStart => _initialBoundsOnScaleStart;

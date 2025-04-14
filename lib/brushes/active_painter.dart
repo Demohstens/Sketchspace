@@ -12,9 +12,13 @@ class ActivePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-      var stroke = Stroke(path: SketchPath(currentPath) , paint: strokePaint, layerId: "");
-      var path = stroke.path;
-      canvas.drawPath(path.path, strokePaint);   
+    var stroke = Stroke(
+      path: SketchPath(currentPath),
+      paint: strokePaint,
+      layerId: "",
+    );
+    var path = stroke.path;
+    canvas.drawPath(path.path, strokePaint);
   }
 
   @override

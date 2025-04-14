@@ -2,9 +2,7 @@ import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:pie_menu/pie_menu.dart';
 import 'package:sketchspace/canvas/canvas_mobile_ui.dart';
 import 'package:sketchspace/canvas/canvas_viewport.dart';
-import 'package:sketchspace/classes/transformation_controller.dart';
 import 'package:sketchspace/components/sketch_drawer.dart';
-import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/canvas/canvas_desktop_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +46,7 @@ class CanvasPage extends StatelessWidget {
                   left: 10,
                   top: 50,
                   child: IconButton(
-                    icon: Icon(Icons.menu, color: Colors.black.withAlpha(200),),
+                    icon: Icon(Icons.menu, color: Colors.black.withAlpha(200)),
                     onPressed: () {
                       Scaffold.of(context).openDrawer();
                     },

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sketchspace/classes/element.dart';
 import 'package:sketchspace/classes/elements/stroke_element.dart';
-import 'package:sketchspace/classes/stroke.dart';
 
 class SelectedStrokePainter extends CustomPainter {
   final Stroke stroke;
@@ -17,10 +15,11 @@ class SelectedStrokePainter extends CustomPainter {
     // if (points.isEmpty) {
     //   return;
     // }
-    Paint shadowPaint = Paint()
-      ..color = selectionColor
-      ..strokeWidth = paint.strokeWidth * 2.5
-      ..style = PaintingStyle.stroke;
+    Paint shadowPaint =
+        Paint()
+          ..color = selectionColor
+          ..strokeWidth = paint.strokeWidth * 2.5
+          ..style = PaintingStyle.stroke;
     // Path shadowPath = Path()..moveTo(points.first.dx, points.first.dy);
     // for (int i = 1; i < points.length; i++) {
     //   shadowPath.lineTo(points[i].dx, points[i].dy);

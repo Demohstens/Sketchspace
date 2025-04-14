@@ -48,9 +48,6 @@ https://pub.dev/packages/share_pluss
 ☐ share feature
 ✔ rename file feature @started(24-08-13 15:20) @done(24-08-13 16:15) @lasted(55m26s)
 ☐ check out packages & impl?
-    - sizer
-    - file picker
-    - color picker
     - share
     - floating draggable widget 
     - flutter_svg: ^2.0.10+1

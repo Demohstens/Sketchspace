@@ -4,7 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:sketchspace/providers/drawing_context.dart';
 import 'package:sketchspace/providers/sketch_canvas.dart';
-import 'package:sketchspace/main.dart';
 import 'package:sketchspace/pages/canvas.dart';
 
 class NewFileDialog extends StatelessWidget {

@@ -16,6 +16,8 @@ import 'package:sketchspace/pages/settings_page.dart';
 
 // Menu for selecting pages (Canvas, etc.)
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

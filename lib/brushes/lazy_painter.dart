@@ -14,7 +14,7 @@ class LazyPainter extends CustomPainter {
   //     : super(repaint: repaintListener); // : super(repaint: repaintListener);
 
   LazyPainter(this.elements, this.repaintNotifier)
-      : super(repaint: repaintNotifier);
+    : super(repaint: repaintNotifier);
 
   final ValueNotifier<bool> repaintNotifier;
   @override
